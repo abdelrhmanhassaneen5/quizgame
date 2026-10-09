@@ -9,7 +9,7 @@
 :root{--paper:#FBE7B5;--card:#FFE8B5;--ink:#4A2F22;--teal:#2F5F5A;--brown:#6B4A3A;--gold:#C9973F;--red:#7A3B3B;--ok:#2F6B4A;--bad:#8B2E2E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0;height:100%}
 body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
-#app{max-width:430px;min-height:100%;margin:0 auto;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:20px 16px;display:flex;flex-direction:column;gap:14px}
+#app{max-width:430px;min-height:100%;margin:0 auto;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:18px 16px;display:flex;flex-direction:column;gap:12px}
 .hd{background:var(--teal);border:2px solid var(--gold);border-radius:16px;color:#FFE9B8;text-align:center;padding:14px}
 .hd h1{font-family:'Lemonada',sans-serif;font-size:24px;margin:0}
 .hd div{font-size:13px;margin-top:6px}
@@ -23,85 +23,144 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 .btn.t{background:var(--teal);box-shadow:0 5px 0 #1B3B38}
 .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4B2222}
 .sw{width:52px;height:30px;border-radius:15px;border:2px solid var(--gold);background:#9A8566;position:relative;cursor:pointer;padding:0}
-.sw i{position:absolute;top:2px;right:3px;width:22px;height:22px;border-radius:50%;background:#FFE9B8;transition:.2s}
+.sw i{position:absolute;top:2px;right:3px;width:22px;height:22px;border-radius:50%;background:#FFE9B8}
 .sw.on{background:var(--ok)}
 .sw:not(.on) i{right:25px}
-.pl{display:flex;justify-content:space-between;align-items:center;flex:1;padding:8px 12px;font-size:20px}
+.chip{display:flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--gold);border-radius:20px;padding:4px 12px;font-weight:900}
 .bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;border:2px solid #8A6A4A;overflow:hidden}
 .bar i{display:block;height:100%;width:100%;background:var(--gold)}
+.bar.m i{background:#B23A3A}
 .tm{background:var(--brown);color:#FFE9B8;border-radius:8px;min-width:38px;text-align:center;font-weight:900;padding:4px}
-.en{direction:ltr;text-align:left;font-size:23px;font-weight:700;line-height:1.4;margin:10px 0}
+.en{direction:ltr;text-align:left;font-size:22px;font-weight:700;line-height:1.4;margin:8px 0}
 .ar{border-top:2px dashed #8A6A4A;padding-top:8px;font-size:16px;font-weight:700}
-.opt{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;box-shadow:0 3px 0 #8A6A4A;min-height:50px;font-family:'Cairo',sans-serif;font-size:20px;font-weight:700;color:var(--ink);direction:ltr;cursor:pointer;padding:8px 14px}
+.opt{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;box-shadow:0 3px 0 #8A6A4A;min-height:48px;font-family:'Cairo',sans-serif;font-size:19px;font-weight:700;color:var(--ink);direction:ltr;cursor:pointer;padding:8px 14px}
 .opt.ok{background:var(--ok);color:#fff;border-color:var(--gold)}
 .opt.bad{background:var(--bad);color:#fff}
-.big{font-size:44px;font-weight:900;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lv{background:var(--card);border:2px solid #8A6A4A;border-radius:12px;box-shadow:0 3px 0 #8A6A4A;padding:6px 2px;min-height:76px;font-family:'Cairo',sans-serif;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.lv b{font-size:22px}
+.lv span{font-size:11px;font-weight:700}
+.lv.boss{background:var(--red);color:#FFE9B8;border-color:var(--gold)}
+.lv:disabled{opacity:.5;cursor:default}
+.big{font-size:38px;font-weight:900;text-align:center}
+.inp{font-family:'Cairo',sans-serif;font-size:20px;font-weight:700;padding:10px;border:2px solid #8A6A4A;border-radius:12px;background:#FFF6DD;color:var(--ink);text-align:center;width:100%;box-sizing:border-box}
+.me{background:var(--teal);color:#FFE9B8;border-radius:8px;padding:4px 8px}
+#mon.hit{animation:hit .5s}
+#mon.atk{animation:atk .5s}
+@keyframes hit{0%{transform:none;filter:brightness(1)}25%{transform:translateX(-12px) rotate(-8deg);filter:brightness(2)}50%{transform:translateX(12px) rotate(8deg)}100%{transform:none;filter:brightness(1)}}
+@keyframes atk{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
 </style>
+<script>
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
+</script>
+<script src="questions.js"></script>
 </head>
 <body>
 <div id="app"></div>
-<script>
-// [english, arabic translation, options, correct index, note, type]
-var Q=[
-["It is very ____ today, so I need my coat.","الجو برد جدًا النهاردة، فمحتاج جاكتي.",["cold","hot","sunny","dry"],0,"الجاكت بنلبسه في البرد","v"],
-["He is very ____ . He saved the cat.","هو شجاع جدًا. هو أنقذ القطة.",["Brave","Lazy","Hungry","Quiet"],0,"Brave = شجاع","v"],
-["I am ____ because I did not eat all day.","أنا جعان لأني ماكلتش طول اليوم.",["Angry","Hungry","Late","Cold"],1,"Hungry = جعان","v"],
-["We use a ____ to write on paper.","بنستخدم قلم علشان نكتب على الورق.",["pen","chair","door","bus"],0,"pen = قلم","v"],
-["My mother works in a hospital. She is a ____ .","أمي بتشتغل في مستشفى. هي ممرضة.",["farmer","nurse","pilot","baker"],1,"nurse = ممرضة","v"],
-["The opposite of big is ____ .","عكس كبير هو صغير.",["tall","long","small","fast"],2,"small = صغير","v"],
-["I wash my hands with ____ and water.","بغسل إيديا بالصابون والمية.",["soap","bread","paper","milk"],0,"soap = صابون","v"],
-["A place where we borrow books is a ____ .","المكان اللي بنستلف منه كتب هو مكتبة.",["shop","library","farm","bank"],1,"library = مكتبة","v"],
-["She ____ to school every day.","هي بتروح المدرسة كل يوم.",["go","goes","going","gone"],1,"مع he/she/it بنزوّد s للفعل","g"],
-["They ____ playing football now.","هم بيلعبوا كورة دلوقتي.",["is","am","are","be"],2,"مع they بنستخدم are","g"],
-["I ____ breakfast yesterday at 8.","أنا فطرت امبارح الساعة 8.",["eat","eats","ate","eaten"],2,"yesterday = ماضي، وماضي eat هو ate","g"],
-["There ____ two books on the desk.","في كتابين على المكتب.",["is","are","am","be"],1,"كتابين = جمع، يبقى are","g"],
-["He does not ____ milk.","هو مش بيحب اللبن.",["likes","like","liking","liked"],1,"بعد does not بنكتب الفعل من غير s","g"],
-["My sister is ____ than me.","أختي أطول مني.",["tall","taller","tallest","more tall"],1,"المقارنة: كلمة قصيرة + er","g"],
-["We ____ to the park tomorrow.","إحنا هنروح الحديقة بكرة.",["went","goes","will go","going"],2,"tomorrow = مستقبل، نستخدم will","g"],
-["This is ____ apple.","دي تفاحة.",["a","an","some","many"],1,"apple بتبدأ بحرف متحرك، يبقى an","g"],
-["Which sentence is wrong?","أي جملة فيها غلط؟",["She likes pizza.","He go to school.","They are happy.","I am a student."],1,"الصح: He goes to school","w"],
-["Which sentence is wrong?","أي جملة فيها غلط؟",["My father work in a bank.","She is my friend.","I like tea.","They live here."],0,"الصح: My father works in a bank","w"],
-["Which sentence is wrong?","أي جملة فيها غلط؟",["There is a book.","She don't like fish.","We are late.","It is cold."],1,"الصح: She doesn't like fish","w"],
-["Which sentence is wrong?","أي جملة فيها غلط؟",["I can swim.","He can swims fast.","She can run.","They can sing."],1,"بعد can بنكتب الفعل من غير s","w"]
-];
-var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟"};
-var tr=true,G=null,app=document.getElementById('app');
-function $(s){return document.querySelector(s)}
-function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function home(){
-  app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>أسرع وأصح إجابة تكسب. 5 أسئلة وبس!</div></div>'+
-  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
-  '<div class="card"><div class="tag">خصمك النهاردة</div><div style="text-align:center;font-weight:900;font-size:20px;margin-top:8px">نور (الكمبيوتر)</div></div>'+
-  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="start()">ابدأ التحدّي</button>';
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,doc,setDoc,collection,query,orderBy,limit,getDocs,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+if(window.FIREBASE_CONFIG){
+  const db=getFirestore(initializeApp(window.FIREBASE_CONFIG));
+  window.FB={
+    submit:(wk,uid,name,pts)=>setDoc(doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:serverTimestamp()}),
+    top:async(wk)=>{const s=await getDocs(query(collection(db,'weeks',String(wk),'scores'),orderBy('pts','desc'),limit(10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))}
+  };
 }
-function start(){G={qs:shuffle(Q).slice(0,5),i:0,me:0,op:0,ok:0,bad:[],left:10,done:false};show()}
+</script>
+<script>
+var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟"};
+var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.last=S.last||'';S.seen=S.seen||[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
+function daily(){var t=new Date().toDateString();if(S.last===t)return 0;var y=new Date(Date.now()-864e5).toDateString();S.streak=(S.last===y)?S.streak+1:1;S.last=t;var b=10+5*Math.min(S.streak,5);S.coins+=b;save();return b}
+function wkKey(){return Math.floor((Math.floor(Date.now()/864e5)-2)/7)}
+function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
+function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
+function submit(){if(window.FB&&S.nick){try{FB.submit(wkKey(),S.uid,S.nick,wkPts()).catch(function(){})}catch(e){}}}
+function heart(o){return'<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z" fill="'+(o?'#B23A3A':'#CDB88A')+'" stroke="#6B4A3A" stroke-width="1.5"/></svg>'}
+function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z" fill="'+(o?'#C9973F':'#E3C98F')+'" stroke="#6B4A3A" stroke-width="1.2"/></svg>'}
+function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
+function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
+function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
+function home(){
+  app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
+  (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
+  '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
+  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button>';
+}
+function map(){
+  var g='';for(var i=1;i<=10;i++){var u=i<=S.max,b=i%5===0;
+    g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
+  app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div></div><div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+}
+function pickQs(n){
+  var all=Q.map(function(_,i){return i}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,n);
+  if(out.length<n){S.seen=[];out=out.concat(shuffle(all.filter(function(i){return out.indexOf(i)<0})).slice(0,n-out.length))}
+  S.seen=S.seen.concat(out);save();return out.map(function(i){return Q[i]});
+}
+function start(lv){var b=lv%5===0,n=b?7:5,T=Math.max(8,13-Math.ceil(lv/2))-(b?2:0),mx=Math.ceil(n*0.6);
+  G={lv:lv,n:n,T:T,qs:pickQs(n),i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
+function hearts(){var r='';for(var i=1;i<=3;i++)r+=heart(i<=G.h);return r}
 function show(){
-  var q=G.qs[G.i];G.left=10;G.done=false;
+  var q=G.qs[G.i];G.left=G.T;G.done=false;
   var o=q[2].map(function(t,k){return'<button class="opt" onclick="pick('+k+')">'+t+'</button>'}).join('');
-  app.innerHTML='<div class="row"><div class="card pl"><b>أنت</b><b id="me">'+G.me+'</b></div><div class="card pl" style="background:#D9C39A"><b>نور</b><b id="op">'+G.op+'</b></div></div>'+
-  '<div class="row"><span class="sm">سؤال '+(G.i+1)+' من 5</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">10</div></div>'+
+  app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
+  '<div class="card" style="padding:8px"><div class="row"><span class="sm">الوحش</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
+  '<div id="mon" style="text-align:center;filter:hue-rotate('+(G.lv*40)+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv)+'</div></div></div>'+
+  '<div class="row"><span class="sm">جولة '+G.lv+(G.lv%5===0?' (زعيم)':'')+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+G.T+'</div></div>'+
   '<div class="card"><div class="tag g">'+TT[q[5]]+'</div><div class="en">'+q[0]+'</div>'+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+o+'<div id="fb"></div>';
   clearInterval(G.t);
-  G.t=setInterval(function(){G.left-=0.1;if(G.left<=0){pick(-1);return}$('#bf').style.width=(G.left*10)+'%';$('#tm').textContent=Math.ceil(G.left)},100);
+  G.t=setInterval(function(){G.left-=0.1;if(G.left<=0){pick(-1);return}$('#bf').style.width=(G.left/G.T*100)+'%';$('#tm').textContent=Math.ceil(G.left);$('#ms').style.transform='scale('+(0.85+(1-G.left/G.T)*0.4)+')'},100);
 }
+function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c}
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
-  var q=G.qs[G.i],good=k===q[3];
-  if(good){G.me+=10+Math.floor(G.left);G.ok++}else G.bad.push(q);
-  if(Math.random()<.65)G.op+=10+Math.floor(Math.random()*7);
-  $('#me').textContent=G.me;$('#op').textContent=G.op;
+  var q=G.qs[G.i],good=k===q[3],msg;
+  if(good){var gain=5+Math.floor(G.left/3),dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);anim('hit')}
+  else{G.h--;G.combo=0;G.bad.push(q);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب';anim('atk')}
+  $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===q[3])b.classList.add('ok');else if(j===k)b.classList.add('bad')});
-  $('#fb').innerHTML='<div class="card"><div style="font-weight:900">'+(good?'إجابة صح!':(k<0?'الوقت خلص':'غلط'))+'</div><div class="sm">'+q[4]+'</div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="next()">'+(G.i>=4?'شوف النتيجة':'التالي')+'</button>';
+  var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
+  if(win)msg+=' • الوحش اتهزم!';
+  $('#fb').innerHTML='<div class="card"><div style="font-weight:900">'+msg+'</div><div class="sm">'+q[4]+'</div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>';
 }
-function next(){G.i++;if(G.i>=5)result();else show()}
-function result(){
-  var w=G.me>G.op?'مبروك! كسبت':(G.me<G.op?'حظ أوفر المرة الجاية':'تعادل');
+function next(){G.i++;show()}
+function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
+function endRound(){
+  var win=G.mhp<=0,lv=G.lv,bonus=0;
+  if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<10)S.max++;save()}
+  submit();
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
-  app.innerHTML='<div class="hd"><h1>'+w+'</h1><div>'+G.ok+' إجابات صح من 5</div></div>'+
-  '<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">أنت</div><div class="big">'+G.me+'</div></div><b>ضد</b><div style="text-align:center"><div class="sm">نور</div><div class="big" style="color:#8A6A4A">'+G.op+'</div></div></div>'+rv+
-  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="start()">العب تاني</button><button class="btn t" onclick="home()">الرئيسية</button>';
+  app.innerHTML='<div class="hd"><h1>'+(win?(lv===10?'خلّصت كل الجولات!':'الوحش اتهزم!'):(G.h<=0?'القلوب خلصت':'الوحش هرب'))+'</h1><div>'+(win?'عدّيت الجولة '+lv:'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
+  (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
+  '<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
+  '<div class="sp"></div>'+(win&&lv<10?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':'')+
+  '<button class="btn'+(win&&lv<10?' t':'')+'" onclick="start('+lv+')">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="map()">الخريطة</button>';
 }
-home();
+function nick(){
+  app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
+}
+function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=v;save();board()}
+function board(){
+  if(!S.nick){nick();return}
+  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>بيتصفّر كل جمعة</div></div><div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+'</div><div style="font-weight:900">نقاطك: '+wkPts()+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div><div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
+  var lb=$('#lb');
+  if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';return}
+  submit();
+  FB.top(wkKey()).then(function(r){
+    lb.innerHTML=r.length?r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':'')+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join(''):'مفيش حد لسه. كن أول واحد!';
+  }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
+}
+load();DB=daily();home();
 </script>
 </body>
 </html>
