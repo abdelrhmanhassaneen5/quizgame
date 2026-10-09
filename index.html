@@ -49,16 +49,12 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 #mon.atk{animation:atk .5s}
 @keyframes hit{0%{transform:none;filter:brightness(1)}25%{transform:translateX(-12px) rotate(-8deg);filter:brightness(2)}50%{transform:translateX(12px) rotate(8deg)}100%{transform:none;filter:brightness(1)}}
 @keyframes atk{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+.gold{background:#E3B03F;border-radius:8px;padding:4px 8px}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -71,7 +67,7 @@ if(window.FIREBASE_CONFIG){
   const db=getFirestore(initializeApp(window.FIREBASE_CONFIG));
   window.FB={
     submit:(wk,uid,name,pts)=>setDoc(doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:serverTimestamp()}),
-    top:async(wk)=>{const s=await getDocs(query(collection(db,'weeks',String(wk),'scores'),orderBy('pts','desc'),limit(10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))}
+    top:async(wk,n)=>{const s=await getDocs(query(collection(db,'weeks',String(wk),'scores'),orderBy('pts','desc'),limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))}
   };
 }
 </script>
@@ -155,15 +151,30 @@ function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
 }
 function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=v;save();board()}
+function leftTxt(){var k=wkKey(),ms=(7*(k+1)+2)*864e5-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return'باقي '+d+' يوم و '+h+' ساعة على التصفير'}
+var PR=[200,100,50];
+function rows(r){return r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':(i===0?' gold':''))+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join('')}
 function board(){
   if(!S.nick){nick();return}
-  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>بيتصفّر كل جمعة</div></div><div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+'</div><div style="font-weight:900">نقاطك: '+wkPts()+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div><div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
-  var lb=$('#lb');
-  if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';return}
-  submit();
-  FB.top(wkKey()).then(function(r){
-    lb.innerHTML=r.length?r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':'')+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join(''):'مفيش حد لسه. كن أول واحد!';
+  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>'+leftTxt()+'</div></div>'+
+  '<div class="card"><div class="tag">جايزة بطل الأسبوع</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب بطل الأسبوع • التاني: 100 • التالت: 50<br>بتوصلك لما تفتح الشاشة دي بعد التصفير.</div></div>'+
+  '<div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+wkPts()+' • <span id="rk">ترتيبك: ...</span></div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div>'+
+  '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
+  '<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>'+
+  '<div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
+  var lb=$('#lb'),pv=$('#pv');
+  if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';return}
+  var p=wkPts()>0?FB.submit(wkKey(),S.uid,S.nick,wkPts()).catch(function(){}):Promise.resolve();
+  p.then(function(){return FB.top(wkKey(),10)}).then(function(r){
+    lb.innerHTML=r.length?rows(r):'مفيش حد لسه. كن أول واحد!';
+    var i=r.map(function(x){return x.id}).indexOf(S.uid);$('#rk').textContent='ترتيبك: '+(i>=0?(i+1):'برّه أول 10');
   }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
+  FB.top(wkKey()-1,3).then(function(r){
+    var h='<div class="tag">أبطال الأسبوع اللي فات</div>'+(r.length?rows(r):'مفيش نتايج لسه');
+    var i=r.map(function(x){return x.id}).indexOf(S.uid);
+    if(i>=0&&S.claim!==wkKey()-1){S.claim=wkKey()-1;S.coins+=PR[i];if(i===0)S.crowns=(S.crowns||0)+1;save();h+='<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">مبروك! كسبت '+PR[i]+' عملة'+(i===0?' ولقب بطل الأسبوع':'')+'</div>'}
+    pv.innerHTML=h;
+  }).catch(function(){pv.style.display='none'});
 }
 load();DB=daily();home();
 </script>
