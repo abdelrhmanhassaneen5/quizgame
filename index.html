@@ -54,14 +54,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 .pwb:disabled{opacity:.45;cursor:default}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -87,7 +82,13 @@ function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(func
 function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.last=S.last||'';S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last===t)return 0;var y=new Date(Date.now()-864e5).toDateString();S.streak=(S.last===y)?S.streak+1:1;S.last=t;var b=10+5*Math.min(S.streak,5);S.coins+=b;save();return b}
-function wkKey(){return Math.floor((Math.floor(Date.now()/864e5)-2)/7)}
+var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function cairo(){var p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(new Date()).forEach(function(x){p[x.type]=+x.value})}catch(e){}
+  if(!p.year){var t=new Date(Date.now()+3*36e5);p={year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate(),hour:t.getUTCHours(),minute:t.getUTCMinutes(),second:t.getUTCSeconds()}}return p}
+function cDay(){var p=cairo();return Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5)}
+function wkKey(){return Math.floor((cDay()-2)/7)}
+function dTxt(dn){var t=new Date(dn*864e5);return DN[t.getUTCDay()]+' '+t.getUTCDate()+'/'+(t.getUTCMonth()+1)}
+function wkRange(k){return'من '+dTxt(7*k+2)+' إلى '+dTxt(7*k+8)}
 function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
 function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
 function submit(){if(window.FB&&S.nick){try{FB.submit(wkKey(),S.uid,S.nick,wkPts()).catch(function(){})}catch(e){}}}
@@ -158,12 +159,12 @@ function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
 }
 function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=v;save();board()}
-function leftTxt(){var k=wkKey(),ms=(7*(k+1)+2)*864e5-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return'باقي '+d+' يوم و '+h+' ساعة على التصفير'}
+function leftTxt(){var p=cairo(),d=Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5),ms=(7-((d-2)%7))*864e5-((p.hour*60+p.minute)*60+p.second)*1000,dd=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return(dd===0&&h===0)?'باقي أقل من ساعة على التصفير':'باقي '+dd+' يوم و '+h+' ساعة على التصفير'}
 var PR=[200,100,50];
 function rows(r){return r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':(i===0?' gold':''))+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join('')}
 function board(){
   if(!S.nick){nick();return}
-  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>'+leftTxt()+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>النهاردة '+dTxt(cDay())+'</div></div>'+'<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
   '<div class="card"><div class="tag">جايزة بطل الأسبوع</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب بطل الأسبوع • التاني: 100 • التالت: 50<br>بتوصلك لما تفتح الشاشة دي بعد التصفير.</div></div>'+
   '<div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+wkPts()+' • <span id="rk">ترتيبك: ...</span></div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div>'+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
@@ -177,7 +178,7 @@ function board(){
     var i=r.map(function(x){return x.id}).indexOf(S.uid);$('#rk').textContent='ترتيبك: '+(i>=0?(i+1):'برّه أول 10');
   }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
   FB.top(wkKey()-1,3).then(function(r){
-    var h='<div class="tag">أبطال الأسبوع اللي فات</div>'+(r.length?rows(r):'مفيش نتايج لسه');
+    var h='<div class="tag">أبطال الأسبوع اللي فات</div><div class="sm" style="text-align:center">'+wkRange(wkKey()-1)+'</div>'+(r.length?rows(r):'مفيش نتايج لسه');
     var i=r.map(function(x){return x.id}).indexOf(S.uid);
     if(i>=0&&S.claim!==wkKey()-1){S.claim=wkKey()-1;S.coins+=PR[i];if(i===0)S.crowns=(S.crowns||0)+1;save();h+='<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">مبروك! كسبت '+PR[i]+' عملة'+(i===0?' ولقب بطل الأسبوع':'')+'</div>'}
     pv.innerHTML=h;
