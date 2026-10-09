@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تحدّي الأصحاب</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Lemonada:wght@600;700&display=swap">
+<style>
+:root{--paper:#FBE7B5;--card:#FFE8B5;--ink:#4A2F22;--teal:#2F5F5A;--brown:#6B4A3A;--gold:#C9973F;--red:#7A3B3B;--ok:#2F6B4A;--bad:#8B2E2E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;height:100%}
+body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
+#app{max-width:430px;min-height:100%;margin:0 auto;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:20px 16px;display:flex;flex-direction:column;gap:14px}
+.hd{background:var(--teal);border:2px solid var(--gold);border-radius:16px;color:#FFE9B8;text-align:center;padding:14px}
+.hd h1{font-family:'Lemonada',sans-serif;font-size:24px;margin:0}
+.hd div{font-size:13px;margin-top:6px}
+.card{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:12px}
+.tag{background:var(--brown);color:#FFE9B8;border-radius:8px;padding:5px;text-align:center;font-weight:700;font-size:14px}
+.tag.g{background:var(--teal)}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1}
+.sm{font-size:12px;color:var(--teal);font-weight:700}
+.btn{background:var(--red);color:#FFE9B8;border:3px solid #D9A84E;border-radius:14px;box-shadow:0 5px 0 #4B2222;font-family:'Lemonada',sans-serif;font-size:18px;padding:12px;min-height:48px;cursor:pointer}
+.btn.t{background:var(--teal);box-shadow:0 5px 0 #1B3B38}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4B2222}
+.sw{width:52px;height:30px;border-radius:15px;border:2px solid var(--gold);background:#9A8566;position:relative;cursor:pointer;padding:0}
+.sw i{position:absolute;top:2px;right:3px;width:22px;height:22px;border-radius:50%;background:#FFE9B8;transition:.2s}
+.sw.on{background:var(--ok)}
+.sw:not(.on) i{right:25px}
+.pl{display:flex;justify-content:space-between;align-items:center;flex:1;padding:8px 12px;font-size:20px}
+.bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;border:2px solid #8A6A4A;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--gold)}
+.tm{background:var(--brown);color:#FFE9B8;border-radius:8px;min-width:38px;text-align:center;font-weight:900;padding:4px}
+.en{direction:ltr;text-align:left;font-size:23px;font-weight:700;line-height:1.4;margin:10px 0}
+.ar{border-top:2px dashed #8A6A4A;padding-top:8px;font-size:16px;font-weight:700}
+.opt{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;box-shadow:0 3px 0 #8A6A4A;min-height:50px;font-family:'Cairo',sans-serif;font-size:20px;font-weight:700;color:var(--ink);direction:ltr;cursor:pointer;padding:8px 14px}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--gold)}
+.opt.bad{background:var(--bad);color:#fff}
+.big{font-size:44px;font-weight:900;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// [english, arabic translation, options, correct index, note, type]
+var Q=[
+["It is very ____ today, so I need my coat.","الجو برد جدًا النهاردة، فمحتاج جاكتي.",["cold","hot","sunny","dry"],0,"الجاكت بنلبسه في البرد","v"],
+["He is very ____ . He saved the cat.","هو شجاع جدًا. هو أنقذ القطة.",["Brave","Lazy","Hungry","Quiet"],0,"Brave = شجاع","v"],
+["I am ____ because I did not eat all day.","أنا جعان لأني ماكلتش طول اليوم.",["Angry","Hungry","Late","Cold"],1,"Hungry = جعان","v"],
+["We use a ____ to write on paper.","بنستخدم قلم علشان نكتب على الورق.",["pen","chair","door","bus"],0,"pen = قلم","v"],
+["My mother works in a hospital. She is a ____ .","أمي بتشتغل في مستشفى. هي ممرضة.",["farmer","nurse","pilot","baker"],1,"nurse = ممرضة","v"],
+["The opposite of big is ____ .","عكس كبير هو صغير.",["tall","long","small","fast"],2,"small = صغير","v"],
+["I wash my hands with ____ and water.","بغسل إيديا بالصابون والمية.",["soap","bread","paper","milk"],0,"soap = صابون","v"],
+["A place where we borrow books is a ____ .","المكان اللي بنستلف منه كتب هو مكتبة.",["shop","library","farm","bank"],1,"library = مكتبة","v"],
+["She ____ to school every day.","هي بتروح المدرسة كل يوم.",["go","goes","going","gone"],1,"مع he/she/it بنزوّد s للفعل","g"],
+["They ____ playing football now.","هم بيلعبوا كورة دلوقتي.",["is","am","are","be"],2,"مع they بنستخدم are","g"],
+["I ____ breakfast yesterday at 8.","أنا فطرت امبارح الساعة 8.",["eat","eats","ate","eaten"],2,"yesterday = ماضي، وماضي eat هو ate","g"],
+["There ____ two books on the desk.","في كتابين على المكتب.",["is","are","am","be"],1,"كتابين = جمع، يبقى are","g"],
+["He does not ____ milk.","هو مش بيحب اللبن.",["likes","like","liking","liked"],1,"بعد does not بنكتب الفعل من غير s","g"],
+["My sister is ____ than me.","أختي أطول مني.",["tall","taller","tallest","more tall"],1,"المقارنة: كلمة قصيرة + er","g"],
+["We ____ to the park tomorrow.","إحنا هنروح الحديقة بكرة.",["went","goes","will go","going"],2,"tomorrow = مستقبل، نستخدم will","g"],
+["This is ____ apple.","دي تفاحة.",["a","an","some","many"],1,"apple بتبدأ بحرف متحرك، يبقى an","g"],
+["Which sentence is wrong?","أي جملة فيها غلط؟",["She likes pizza.","He go to school.","They are happy.","I am a student."],1,"الصح: He goes to school","w"],
+["Which sentence is wrong?","أي جملة فيها غلط؟",["My father work in a bank.","She is my friend.","I like tea.","They live here."],0,"الصح: My father works in a bank","w"],
+["Which sentence is wrong?","أي جملة فيها غلط؟",["There is a book.","She don't like fish.","We are late.","It is cold."],1,"الصح: She doesn't like fish","w"],
+["Which sentence is wrong?","أي جملة فيها غلط؟",["I can swim.","He can swims fast.","She can run.","They can sing."],1,"بعد can بنكتب الفعل من غير s","w"]
+];
+var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟"};
+var tr=true,G=null,app=document.getElementById('app');
+function $(s){return document.querySelector(s)}
+function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
+function home(){
+  app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>أسرع وأصح إجابة تكسب. 5 أسئلة وبس!</div></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
+  '<div class="card"><div class="tag">خصمك النهاردة</div><div style="text-align:center;font-weight:900;font-size:20px;margin-top:8px">نور (الكمبيوتر)</div></div>'+
+  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="start()">ابدأ التحدّي</button>';
+}
+function start(){G={qs:shuffle(Q).slice(0,5),i:0,me:0,op:0,ok:0,bad:[],left:10,done:false};show()}
+function show(){
+  var q=G.qs[G.i];G.left=10;G.done=false;
+  var o=q[2].map(function(t,k){return'<button class="opt" onclick="pick('+k+')">'+t+'</button>'}).join('');
+  app.innerHTML='<div class="row"><div class="card pl"><b>أنت</b><b id="me">'+G.me+'</b></div><div class="card pl" style="background:#D9C39A"><b>نور</b><b id="op">'+G.op+'</b></div></div>'+
+  '<div class="row"><span class="sm">سؤال '+(G.i+1)+' من 5</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">10</div></div>'+
+  '<div class="card"><div class="tag g">'+TT[q[5]]+'</div><div class="en">'+q[0]+'</div>'+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+o+'<div id="fb"></div>';
+  clearInterval(G.t);
+  G.t=setInterval(function(){G.left-=0.1;if(G.left<=0){pick(-1);return}$('#bf').style.width=(G.left*10)+'%';$('#tm').textContent=Math.ceil(G.left)},100);
+}
+function pick(k){
+  if(G.done)return;G.done=true;clearInterval(G.t);
+  var q=G.qs[G.i],good=k===q[3];
+  if(good){G.me+=10+Math.floor(G.left);G.ok++}else G.bad.push(q);
+  if(Math.random()<.65)G.op+=10+Math.floor(Math.random()*7);
+  $('#me').textContent=G.me;$('#op').textContent=G.op;
+  document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===q[3])b.classList.add('ok');else if(j===k)b.classList.add('bad')});
+  $('#fb').innerHTML='<div class="card"><div style="font-weight:900">'+(good?'إجابة صح!':(k<0?'الوقت خلص':'غلط'))+'</div><div class="sm">'+q[4]+'</div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="next()">'+(G.i>=4?'شوف النتيجة':'التالي')+'</button>';
+}
+function next(){G.i++;if(G.i>=5)result();else show()}
+function result(){
+  var w=G.me>G.op?'مبروك! كسبت':(G.me<G.op?'حظ أوفر المرة الجاية':'تعادل');
+  var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
+  app.innerHTML='<div class="hd"><h1>'+w+'</h1><div>'+G.ok+' إجابات صح من 5</div></div>'+
+  '<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">أنت</div><div class="big">'+G.me+'</div></div><b>ضد</b><div style="text-align:center"><div class="sm">نور</div><div class="big" style="color:#8A6A4A">'+G.op+'</div></div></div>'+rv+
+  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="start()">العب تاني</button><button class="btn t" onclick="home()">الرئيسية</button>';
+}
+home();
+</script>
+</body>
+</html>
