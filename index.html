@@ -52,16 +52,13 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 .gold{background:#E3B03F;border-radius:8px;padding:4px 8px}
 .pwb{flex:1;background:var(--card);border:2px solid #8A6A4A;border-radius:12px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;color:var(--ink);padding:6px 4px;min-height:44px;cursor:pointer;text-align:center}
 .pwb:disabled{opacity:.45;cursor:default}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2F6B4A;margin-inline-end:5px;animation:pl 1.4s infinite}
+@keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -69,13 +66,24 @@ window.FIREBASE_CONFIG = {
 <div id="app"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {getFirestore,doc,setDoc,collection,query,orderBy,limit,getDocs,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import * as FS from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 if(window.FIREBASE_CONFIG){
-  const db=getFirestore(initializeApp(window.FIREBASE_CONFIG));
+  const db=FS.getFirestore(initializeApp(window.FIREBASE_CONFIG));
+  const vs=FS.collection(db,'visitors');
+  const cnt=(q)=>FS.getCountFromServer(q).then((x)=>x.data().count);
   window.FB={
-    submit:(wk,uid,name,pts)=>setDoc(doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:serverTimestamp()}),
-    top:async(wk,n)=>{const s=await getDocs(query(collection(db,'weeks',String(wk),'scores'),orderBy('pts','desc'),limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))}
+    submit:(wk,uid,name,pts)=>FS.setDoc(FS.doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:FS.serverTimestamp()}),
+    top:async(wk,n)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wk),'scores'),FS.orderBy('pts','desc'),FS.limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
+    ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
+    beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
+    stats:async(startMs)=>{
+      const T=FS.Timestamp.fromMillis;
+      const r=await Promise.all([cnt(vs),cnt(FS.query(vs,FS.where('last','>=',T(Date.now()-120000)))),cnt(FS.query(vs,FS.where('last','>=',T(startMs)))),
+        FS.getAggregateFromServer&&FS.sum?FS.getAggregateFromServer(vs,{v:FS.sum('v')}).then((x)=>x.data().v).catch(()=>null):Promise.resolve(null)]);
+      return {total:r[0],online:Math.max(1,r[1]),today:Math.max(1,r[2]),visits:r[3]};
+    }
   };
+  if(window.onFB)window.onFB();
 }
 </script>
 <script>
@@ -102,9 +110,9 @@ function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
-function home(){
+function home(){setTimeout(fillStats,0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div>'+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
@@ -278,6 +286,23 @@ function doBuy(id){
 function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'')}
 function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[]}save();home()}
 function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
+var ST=null;
+function num(n){return Number(n).toLocaleString('en')}
+function statsHtml(r){
+  function cell(l,n){return'<div style="text-align:center"><div class="big" style="font-size:26px">'+num(n)+'</div><div class="sm">'+l+'</div></div>'}
+  return'<div class="tag g">اللعبة دلوقتي</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">'+cell('<span class="dot"></span>أونلاين دلوقتي',r.online)+cell('لعبوا النهاردة',r.today)+cell('إجمالي اللاعبين',r.total)+(r.visits!=null?cell('مرات الدخول',r.visits):'')+'</div>';
+}
+function fillStats(){var e=$('#st');if(!e||!ST)return;e.style.display='';e.innerHTML=statsHtml(ST)}
+function refreshStats(){
+  if(!window.FB||!$('#st'))return;
+  var p=cairo();
+  FB.stats(Date.now()-((p.hour*60+p.minute)*60+p.second)*1000).then(function(r){ST=r;fillStats()}).catch(function(){});
+}
+window.onFB=function(){
+  var first=!S.reg;FB.ping(S.uid,first).catch(function(){});if(first){S.reg=1;save()}
+  setInterval(function(){if(document.visibilityState==='visible')FB.beat(S.uid).catch(function(){})},60000);
+  setInterval(refreshStats,60000);refreshStats();
+};
 load();applyTheme();DB=daily();S.stage?home():stageScr();
 </script>
 </body>
