@@ -54,14 +54,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 .pwb:disabled{opacity:.45;cursor:default}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -96,7 +91,7 @@ function dTxt(dn){var t=new Date(dn*864e5);return DN[t.getUTCDay()]+' '+t.getUTC
 function wkRange(k){return'من '+dTxt(7*k+2)+' إلى '+dTxt(7*k+8)}
 function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
 function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
-function submit(){if(window.FB&&S.nick){try{FB.submit(wkKey(),S.uid,S.nick,wkPts()).catch(function(){})}catch(e){}}}
+function submit(){if(window.FB&&S.nick){try{FB.submit(wkId(wkKey()),S.uid,S.nick,wkPts()).catch(function(){})}catch(e){}}}
 function heart(o){return'<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z" fill="'+(o?'#B23A3A':'#CDB88A')+'" stroke="#6B4A3A" stroke-width="1.5"/></svg>'}
 function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z" fill="'+(o?'#C9973F':'#E3C98F')+'" stroke="#6B4A3A" stroke-width="1.2"/></svg>'}
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
@@ -104,31 +99,32 @@ function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
 function home(){
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
   '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button>';
 }
 function map(){
-  var g='';for(var i=1;i<=10;i++){var u=i<=S.max,b=i%5===0;
+  var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
     g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
   app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div></div><div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
 function pickQs(n){
-  var all=Q.map(function(_,i){return i}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,n);
+  var all=Q.map(function(_,i){return i}).filter(function(i){return Q[i][6]===(S.stage||'m')}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,n);
   if(out.length<n){S.seen=[];out=out.concat(shuffle(all.filter(function(i){return out.indexOf(i)<0})).slice(0,n-out.length))}
   S.seen=S.seen.concat(out);save();return out.map(function(i){return Q[i]});
 }
-function start(lv){var b=lv%5===0,n=b?7:5,T=Math.max(8,13-Math.ceil(lv/2))-(b?2:0),mx=Math.ceil(n*0.6);
-  G={lv:lv,n:n,T:T,qs:pickQs(n),i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
+function start(lv){var b=lv%5===0,t=Math.floor((lv-1)/5),n=b?[7,8,9,10][t]:(lv>10?6:5),base=Math.max(7,13-Math.ceil(lv/2)),T=b?Math.max(6,base-2):base,mx=Math.ceil(n*[.6,.7,.8,.85][t]);
+  G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
 function hearts(){var r='';for(var i=1;i<=3;i++)r+=heart(i<=G.h);return r}
 function show(){
   var q=G.qs[G.i];G.left=G.T;G.done=false;G.f50=false;
-  var o=q[2].map(function(t,k){return'<button class="opt" onclick="pick('+k+')">'+t+'</button>'}).join('');
+  G.ord=shuffle([0,1,2,3]);G.ci=G.ord.indexOf(q[3]);
+  var o=G.ord.map(function(x,k){return'<button class="opt" onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
   app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
-  '<div class="card" style="padding:8px"><div class="row"><span class="sm">الوحش</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
+  '<div class="card" style="padding:8px"><div class="row"><span class="sm">'+mName(G.lv)+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
   '<div id="mon" style="text-align:center;filter:hue-rotate('+hueOf()+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv,S.eq.ch)+'</div></div></div>'+
   '<div class="row"><span class="sm">جولة '+G.lv+(G.lv%5===0?' (زعيم)':'')+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+G.T+'</div></div>'+
   '<div class="row" id="pw">'+pwHtml()+'</div>'+'<div class="card"><div class="tag g">'+TT[q[5]]+'</div><div class="en">'+q[0]+'</div>'+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+o+'<div id="fb"></div>';
@@ -138,11 +134,11 @@ function show(){
 function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c}
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
-  var q=G.qs[G.i],good=k===q[3],msg;
-  if(good){var gain=5+Math.floor(G.left/3),dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);anim('hit')}
+  var q=G.qs[G.i],good=k===G.ci,msg;
+  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);anim('hit')}
   else{G.h--;G.combo=0;G.bad.push(q);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب';anim('atk');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
-  document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===q[3])b.classList.add('ok');else if(j===k)b.classList.add('bad')});
+  document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
   if(win)msg+=' • الوحش اتهزم!';
   $('#fb').innerHTML='<div class="card"><div style="font-weight:900">'+msg+'</div><div class="sm">'+q[4]+'</div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>';
@@ -151,14 +147,14 @@ function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function endRound(){
   var win=G.mhp<=0,lv=G.lv,bonus=0;
-  if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<10)S.max++;save()}
+  if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++;save()}
   submit();
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
-  app.innerHTML='<div class="hd"><h1>'+(win?(lv===10?'خلّصت كل الجولات!':'الوحش اتهزم!'):(G.h<=0?'القلوب خلصت':'الوحش هرب'))+'</h1><div>'+(win?'عدّيت الجولة '+lv:'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>'+(win?(lv===20?'خلّصت كل الجولات!':'الوحش اتهزم!'):(G.h<=0?'القلوب خلصت':'الوحش هرب'))+'</h1><div>'+(win?'عدّيت الجولة '+lv:'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
-  '<div class="sp"></div>'+(win&&lv<10?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':'')+
-  '<button class="btn'+(win&&lv<10?' t':'')+'" onclick="start('+lv+')">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="map()">الخريطة</button>';
+  '<div class="sp"></div>'+(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':'')+
+  '<button class="btn'+(win&&lv<20?' t':'')+'" onclick="start('+lv+')">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="map()">الخريطة</button>';
 }
 function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
@@ -169,7 +165,7 @@ var PR=[200,100,50];
 function rows(r){return r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':(i===0?' gold':''))+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join('')}
 function board(){
   if(!S.nick){nick();return}
-  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع</h1><div>النهاردة '+dTxt(cDay())+'</div></div>'+'<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
+  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع ('+(S.stage==='p'?'ابتدائي':'إعدادي')+')</h1><div>النهاردة '+dTxt(cDay())+'</div></div>'+'<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
   '<div class="card"><div class="tag">جايزة بطل الأسبوع</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب بطل الأسبوع • التاني: 100 • التالت: 50<br>بتوصلك لما تفتح الشاشة دي بعد التصفير.</div></div>'+
   '<div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+wkPts()+' • <span id="rk">ترتيبك: ...</span></div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div>'+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
@@ -177,12 +173,12 @@ function board(){
   '<div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
   var lb=$('#lb'),pv=$('#pv');
   if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';return}
-  var p=wkPts()>0?FB.submit(wkKey(),S.uid,S.nick,wkPts()).catch(function(){}):Promise.resolve();
-  p.then(function(){return FB.top(wkKey(),10)}).then(function(r){
+  var p=wkPts()>0?FB.submit(wkId(wkKey()),S.uid,S.nick,wkPts()).catch(function(){}):Promise.resolve();
+  p.then(function(){return FB.top(wkId(wkKey()),10)}).then(function(r){
     lb.innerHTML=r.length?rows(r):'مفيش حد لسه. كن أول واحد!';
     var i=r.map(function(x){return x.id}).indexOf(S.uid);$('#rk').textContent='ترتيبك: '+(i>=0?(i+1):'برّه أول 10');
   }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
-  FB.top(wkKey()-1,3).then(function(r){
+  FB.top(wkId(wkKey()-1),3).then(function(r){
     var h='<div class="tag">أبطال الأسبوع اللي فات</div><div class="sm" style="text-align:center">'+wkRange(wkKey()-1)+'</div>'+(r.length?rows(r):'مفيش نتايج لسه');
     var i=r.map(function(x){return x.id}).indexOf(S.uid);
     if(i>=0&&S.claim!==wkKey()-1){S.claim=wkKey()-1;S.coins+=PR[i];if(i===0)S.crowns=(S.crowns||0)+1;save();h+='<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">مبروك! كسبت '+PR[i]+' عملة'+(i===0?' ولقب بطل الأسبوع':'')+'</div>'}
@@ -201,12 +197,18 @@ var ITEMS=[
 ];
 var DEF={ch:[{k:'ch',id:'blob',n:'الوحش الأخضر'}],col:[{k:'col',id:'c0',n:'حسب الجولة',h:0}],th:[{k:'th',id:'t0',n:'ورق كلاسيك',c:'#FBE7B5'}]};
 function item(id){return ITEMS.filter(function(x){return x.id===id})[0]}
+function mName(lv){var t=Math.floor((lv-1)/5);return lv%5===0?['زعيم الغابة','زعيم الكهف','زعيم البركان','ملك الوحوش'][t]:['وحش الغابة','وحش الكهف','وحش البركان','وحش الجليد'][t]}
 function monster(lv,ch,w){
-  var b=lv%5===0,body,m='<path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/>';
+  var b=lv%5===0,t=Math.floor((lv-1)/5),body,ex='',eye=t>=3?'#B23A3A':'#4A2F22',m='<path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/>';
   if(ch==='ghost')body='<path d="M20 98V52C20 32 40 22 60 22S100 32 100 52V98L88 88L74 98L60 88L46 98L32 88Z" fill="#B9A7E0" stroke="#4A2F22" stroke-width="3"/>';
   else if(ch==='robot'){body='<rect x="22" y="34" width="76" height="64" rx="12" fill="#7FA3B5" stroke="#4A2F22" stroke-width="3"/><path d="M60 34V20" stroke="#4A2F22" stroke-width="3"/><circle cx="60" cy="16" r="6" fill="#C9973F" stroke="#4A2F22" stroke-width="2"/>';m='<path d="M44 84H76" stroke="#4A2F22" stroke-width="4"/>'}
   else body='<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/>';
-  return'<svg viewBox="0 0 120 110" width="'+(w||(b?110:94))+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+body+'<circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/>'+m+'</svg>';
+  if(b)ex+='<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>';
+  else if(t>=1)ex+='<path d="M28 42L22 22L42 34zM54 28L60 6L68 28zM92 42L98 22L78 34z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>';
+  if(b&&t>=3)ex+='<path d="M40 28L46 12L54 24L60 8L66 24L74 12L80 28Z" fill="#C9973F" stroke="#4A2F22" stroke-width="2"/>';
+  var brow=t>=2?'<path d="M32 44L56 54M88 44L64 54" stroke="#4A2F22" stroke-width="4"/>':'';
+  var fang=t>=1?'<path d="M50 87L54 97L58 89M62 89L66 97L70 87" fill="#fff" stroke="#4A2F22" stroke-width="1.5"/>':'';
+  return'<svg viewBox="0 0 120 110" width="'+(w||(b?110+t*6:94+t*4))+'" aria-hidden="true">'+ex+body+'<circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="'+eye+'"/><circle cx="73" cy="62" r="5" fill="'+eye+'"/>'+brow+m+fang+'</svg>';
 }
 function shopIcon(s){
   var st='',sc='',i,f;
@@ -224,7 +226,7 @@ function pwHtml(){
 function updPw(){var e=$('#pw');if(e)e.innerHTML=pwHtml()}
 function useFifty(){
   if(G.done||G.f50||S.inv.fifty<1)return;
-  var q=G.qs[G.i],w=[];q[2].forEach(function(_,j){if(j!==q[3])w.push(j)});
+  var q=G.qs[G.i],w=[];q[2].forEach(function(_,j){if(j!==G.ci)w.push(j)});
   shuffle(w).slice(0,2).forEach(function(j){var b=document.querySelectorAll('.opt')[j];b.disabled=true;b.style.opacity='.3'});
   G.f50=true;S.inv.fifty--;save();updPw();
 }
@@ -268,7 +270,10 @@ function doBuy(id){
   save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
 }
 
-load();applyTheme();DB=daily();home();
+function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'')}
+function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[]}save();home()}
+function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
+load();applyTheme();DB=daily();S.stage?home():stageScr();
 </script>
 </body>
 </html>
