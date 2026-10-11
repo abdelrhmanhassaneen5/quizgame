@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -81,6 +76,20 @@ if(window.FIREBASE_CONFIG){
     top:async(wk,n)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wk),'scores'),FS.orderBy('pts','desc'),FS.limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
+    board:async(wk,lo,hi,mine,n)=>{
+      const col=FS.collection(db,'weeks',String(wk),'scores');
+      const W=(...c)=>FS.query(col,FS.where('pts','>=',lo),FS.where('pts','<',hi),...c);
+      const ds=(s)=>s.docs.map((d)=>Object.assign({id:d.id},d.data()));
+      const r=await Promise.all([FS.getDocs(W(FS.orderBy('pts','desc'),FS.limit(n))).then(ds),cnt(W()),cnt(W(FS.where('pts','>',mine)))]);
+      let above=[],below=[];
+      if(r[2]>=n){const x=await Promise.all([FS.getDocs(W(FS.where('pts','>',mine),FS.orderBy('pts','asc'),FS.limit(3))).then(ds),FS.getDocs(W(FS.where('pts','<',mine),FS.orderBy('pts','desc'),FS.limit(3))).then(ds)]);above=x[0];below=x[1]}
+      return {rows:r[0],total:r[1],rank:r[2]+1,above:above,below:below};
+    },
+    rank:async(wk,mine)=>{
+      const col=FS.collection(db,'weeks',String(wk),'scores');
+      const r=await Promise.all([cnt(FS.query(col,FS.where('pts','>',mine))),cnt(col)]);
+      return {rank:r[0]+1,total:r[1]};
+    },
     stats:async(startMs)=>{
       const T=FS.Timestamp.fromMillis;
       const r=await Promise.all([cnt(vs),cnt(FS.query(vs,FS.where('last','>=',T(Date.now()-120000)))),cnt(FS.query(vs,FS.where('last','>=',T(startMs)))),
@@ -115,9 +124,9 @@ function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
-function home(){setTimeout(fillStats,0);
+function home(){setTimeout(function(){fillStats();fillMk();refreshStats()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div>'+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
@@ -181,20 +190,41 @@ function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=
 function leftTxt(){var p=cairo(),d=Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5),ms=(7-((d-2)%7))*864e5-((p.hour*60+p.minute)*60+p.second)*1000,dd=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return(dd===0&&h===0)?'باقي أقل من ساعة على التصفير':'باقي '+dd+' يوم و '+h+' ساعة على التصفير'}
 var PR=[200,100,50];
 function rows(r){return r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':(i===0?' gold':''))+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join('')}
-function board(){
+var LG=[{n:'برونزي',lo:0,c:'#B07A4A'},{n:'فضي',lo:1000,c:'#9AA3AA'},{n:'ذهبي',lo:3000,c:'#C9973F'},{n:'ماسي',lo:8000,c:'#4FA3C7'}],BT='all',BN=20;
+function lgIdx(p){var r=0;LG.forEach(function(x,i){if(p>=x.lo)r=i});return r}
+function lgIcon(i,z){return'<svg width="'+z+'" height="'+z+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5z" fill="'+LG[i].c+'" stroke="#4A2F22" stroke-width="1.5"/><path d="M12 7l1.6 3.3 3.6.5-2.6 2.5.6 3.6L12 15l-3.2 1.9.6-3.6-2.6-2.5 3.6-.5z" fill="#FFE9B8"/></svg>'}
+function rrow(x,rk,me){return'<div class="row'+(me?' me':(rk===1?' gold':''))+'"><b style="min-width:28px">'+rk+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}
+function board(t){
+  if(t)BT=t;
   if(!S.nick){nick();return}
-  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع ('+(S.stage==='p'?'ابتدائي':'إعدادي')+')</h1><div>النهاردة '+dTxt(cDay())+'</div></div>'+'<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
+  var pts=wkPts(),li=lgIdx(pts),lo=BT==='lg'?LG[li].lo:0,hi=BT==='lg'&&li+1<LG.length?LG[li+1].lo:1e12,prog='';
+  if(li<LG.length-1){var nx=LG[li+1];prog='<div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,(pts-LG[li].lo)/(nx.lo-LG[li].lo)*100)+'%"></i></div><div class="sm">باقي '+(nx.lo-pts)+' نقطة للدوري ال'+nx.n+'</div>'}
+  var tab=function(k,l){return'<button class="pwb" style="'+(BT===k?'background:#2F5F5A;color:#FFE9B8':'')+'" onclick="board(\''+k+'\')">'+l+'</button>'};
+  app.innerHTML='<div class="hd"><h1>ترتيب الأسبوع ('+(S.stage==='p'?'ابتدائي':'إعدادي')+')</h1><div>النهاردة '+dTxt(cDay())+'</div></div>'+
+  '<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
   '<div class="card"><div class="tag">جايزة بطل الأسبوع</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب بطل الأسبوع • التاني: 100 • التالت: 50<br>بتوصلك لما تفتح الشاشة دي بعد التصفير.</div></div>'+
-  '<div class="card row"><div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+wkPts()+' • <span id="rk">ترتيبك: ...</span></div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div>'+
+  '<div class="card"><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>'+
+  '<div class="row">'+tab('all','كل اللاعبين')+tab('lg','دوري '+LG[li].n)+'</div>'+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
   '<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>'+
   '<div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
   var lb=$('#lb'),pv=$('#pv');
-  if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';return}
-  var p=wkPts()>0?FB.submit(wkId(wkKey()),S.uid,S.nick,wkPts()).catch(function(){}):Promise.resolve();
-  p.then(function(){return FB.top(wkId(wkKey()),10)}).then(function(r){
-    lb.innerHTML=r.length?rows(r):'مفيش حد لسه. كن أول واحد!';
-    var i=r.map(function(x){return x.id}).indexOf(S.uid);$('#rk').textContent='ترتيبك: '+(i>=0?(i+1):'برّه أول 10');
+  if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';$('#mr').style.display='none';return}
+  var p=pts>0?FB.submit(wkId(wkKey()),S.uid,S.nick,pts).catch(function(){}):Promise.resolve();
+  p.then(function(){return FB.board(wkId(wkKey()),lo,hi,pts,BN)}).then(function(d){
+    var h=d.rows.length?d.rows.map(function(x,i){return rrow(x,i+1,x.id===S.uid)}).join(''):'مفيش حد لسه. كن أول واحد!';
+    var myI=d.rows.map(function(x){return x.id}).indexOf(S.uid),rk=d.rank,gap='';
+    if(pts>0&&myI<0&&rk>BN){
+      var ab=d.above.slice().reverse();
+      h+='<div class="sm" style="text-align:center">• • •</div>'+ab.map(function(x,i){return rrow(x,rk-ab.length+i,false)}).join('')+rrow({name:S.nick,pts:pts},rk,true)+d.below.map(function(x,i){return rrow(x,rk+1+i,false)}).join('');
+    }
+    lb.innerHTML=h;
+    if(pts<=0){$('#mr').textContent='العب جولة علشان تدخل الترتيب'}
+    else{
+      var nxt=myI>0?d.rows[myI-1]:(myI<0?(d.above[0]||null):null);
+      gap=nxt?'<br><span class="sm">باقي '+(nxt.pts-pts+1)+' نقطة وتعدّي '+esc(nxt.name)+'</span>':(rk===1?'<br><span class="sm">إنت الأول!</span>':'');
+      $('#mr').innerHTML='ترتيبك: <b>#'+rk+'</b> من '+d.total+(BT==='lg'?' في دوريك':'')+gap;
+    }
   }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
   FB.top(wkId(wkKey()-1),3).then(function(r){
     var h='<div class="tag">أبطال الأسبوع اللي فات</div><div class="sm" style="text-align:center">'+wkRange(wkKey()-1)+'</div>'+(r.length?rows(r):'مفيش نتايج لسه');
@@ -298,15 +328,19 @@ function statsHtml(r){
   return'<div class="tag g">اللعبة دلوقتي</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">'+cell('<span class="dot"></span>أونلاين دلوقتي',r.online)+cell('لعبوا النهاردة',r.today)+cell('إجمالي اللاعبين',r.total)+(r.visits!=null?cell('مرات الدخول',r.visits):'')+'</div>';
 }
 function fillStats(){var e=$('#st');if(!e||!ST)return;e.style.display='';e.innerHTML=statsHtml(ST)}
-function refreshStats(){
+var MK=null,LASTR=0;
+function fillMk(){var e=$('#mk');if(!e||!MK||wkPts()<=0)return;var i=lgIdx(wkPts());e.style.display='';e.innerHTML='<div class="row">'+lgIcon(i,36)+'<div class="sp"><div style="font-weight:900">ترتيبك: #'+MK.rank+' من '+MK.total+'</div><div class="sm">دوري '+LG[i].n+' • '+wkPts()+' نقطة</div></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="board()">الترتيب</button></div>'}
+function refreshStats(f){
   if(!window.FB||!$('#st'))return;
+  if(!f&&Date.now()-LASTR<20000)return;LASTR=Date.now();
   var p=cairo();
   FB.stats(Date.now()-((p.hour*60+p.minute)*60+p.second)*1000).then(function(r){ST=r;fillStats()}).catch(function(){});
+  if(wkPts()>0)FB.rank(wkId(wkKey()),wkPts()).then(function(r){MK=r;fillMk()}).catch(function(){});
 }
 window.onFB=function(){
   var first=!S.reg;FB.ping(S.uid,first).catch(function(){});if(first){S.reg=1;save()}
   setInterval(function(){if(document.visibilityState==='visible')FB.beat(S.uid).catch(function(){})},60000);
-  setInterval(refreshStats,60000);refreshStats();
+  setInterval(function(){refreshStats(true)},60000);refreshStats(true);
 };
 load();applyTheme();DB=daily();S.stage?home():stageScr();
 </script>
