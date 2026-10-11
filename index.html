@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -90,6 +85,26 @@ if(window.FIREBASE_CONFIG){
       if(r[2]>=n){const x=await Promise.all([FS.getDocs(W(FS.where('pts','>',mine),FS.orderBy('pts','asc'),FS.limit(3))).then(ds),FS.getDocs(W(FS.where('pts','<',mine),FS.orderBy('pts','desc'),FS.limit(3))).then(ds)]);above=x[0];below=x[1]}
       return {rows:r[0],total:r[1],rank:r[2]+1,above:above,below:below};
     },
+    grades:async(base,n)=>{
+      if(!(FS.getAggregateFromServer&&FS.sum&&FS.count))return null;
+      const p=[];for(let g=1;g<=n;g++){p.push(FS.getAggregateFromServer(FS.collection(db,'weeks',base+'g'+g,'scores'),{n:FS.count(),s:FS.sum('pts')}).then((a)=>({g:g,n:a.data().n,s:a.data().s})).catch(()=>({g:g,n:0,s:0})))}
+      return Promise.all(p);
+    },
+    roomGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'rooms',c));return x.exists()?x.data():null},
+    roomCreate:(c,d)=>FS.setDoc(FS.doc(db,'rooms',c),d),
+    roomJoin:async(c,uid,name,stage)=>{
+      const r=FS.doc(db,'rooms',c),x=await FS.getDoc(r);
+      if(!x.exists())return {err:'مفيش روم بالكود ده'};
+      const d=x.data();
+      if(d.u1===uid)return {err:'دي الروم بتاعتك، ابعت الكود لصاحبك'};
+      if(d.u2)return {err:'الروم دي اتملت'};
+      if(d.stage!==stage)return {err:'الروم دي لمرحلة تانية'};
+      const end=Date.now()+864e5;
+      await FS.updateDoc(r,{u2:uid,n2:name,end:end});
+      return {d:Object.assign({},d,{u2:uid,n2:name,end:end})};
+    },
+    roomPts:(c,side,p)=>FS.updateDoc(FS.doc(db,'rooms',c),side===1?{p1:p}:{p2:p}),
+    roomMsg:(c,side,i)=>FS.updateDoc(FS.doc(db,'rooms',c),side===1?{m1:i}:{m2:i}),
     rank:async(wk,mine)=>{
       const col=FS.collection(db,'weeks',String(wk),'scores');
       const r=await Promise.all([cnt(FS.query(col,FS.where('pts','>',mine))),cnt(col)]);
@@ -123,7 +138,16 @@ function dTxt(dn){var t=new Date(dn*864e5);return DN[t.getUTCDay()]+' '+t.getUTC
 function wkRange(k){return'من '+dTxt(7*k+2)+' إلى '+dTxt(7*k+8)}
 function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
 function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
-function submit(){if(window.FB&&S.nick){try{FB.submit(wkId(wkKey()),S.uid,S.nick,wkPts()).catch(function(){})}catch(e){}}}
+var GP=['الأول الابتدائي','الثاني الابتدائي','الثالث الابتدائي','الرابع الابتدائي','الخامس الابتدائي','السادس الابتدائي'],GM=['الأول الإعدادي','الثاني الإعدادي','الثالث الإعدادي'];
+function gName(g){g=g||S.grade;return(S.stage==='p'?GP:GM)[g-1]||''}
+function gId(k,g){return wkId(k)+'g'+(g||S.grade)}
+function submitP(){
+  if(!window.FB||!S.nick)return Promise.resolve();
+  var w=wkKey(),pt=wkPts(),a=[];
+  try{a.push(FB.submit(wkId(w),S.uid,S.nick,pt));if(S.grade)a.push(FB.submit(gId(w),S.uid,S.nick,pt))}catch(e){}
+  return Promise.all(a.map(function(x){return x.catch(function(){})}));
+}
+function submit(){submitP()}
 function heart(o){return'<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z" fill="'+(o?'#B23A3A':'#CDB88A')+'" stroke="#6B4A3A" stroke-width="1.5"/></svg>'}
 function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z" fill="'+(o?'#C9973F':'#E3C98F')+'" stroke="#6B4A3A" stroke-width="1.2"/></svg>'}
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
@@ -131,11 +155,11 @@ function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
 function home(){setTimeout(function(){fillStats();fillMk();refreshStats()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div>'+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
-  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button>';
+  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button>';
 }
 function map(){
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
@@ -167,7 +191,7 @@ function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,msg;
-  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);anim('hit')}
+  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);roomAdd(gain);anim('hit')}
   else{G.h--;G.combo=0;G.bad.push(q);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب';anim('atk');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
@@ -179,7 +203,7 @@ function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function endRound(){
   var win=G.mhp<=0,lv=G.lv,bonus=0;
-  if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++;save()}
+  if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);roomAdd(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++;save()}
   submit();
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
   app.innerHTML='<div class="hd"><h1>'+(win?(lv===20?'خلّصت كل الجولات!':'الوحش اتهزم!'):(G.h<=0?'القلوب خلصت':'الوحش هرب'))+'</h1><div>'+(win?'عدّيت الجولة '+lv:'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
@@ -191,7 +215,7 @@ function endRound(){
 function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
 }
-function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=v;save();board()}
+function saveNick(){var v=$('#nk').value.trim().slice(0,14);if(!v)return;S.nick=v;save();if(NEXT){var f=NEXT;NEXT=null;f()}else board()}
 function leftTxt(){var p=cairo(),d=Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5),ms=(7-((d-2)%7))*864e5-((p.hour*60+p.minute)*60+p.second)*1000,dd=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return(dd===0&&h===0)?'باقي أقل من ساعة على التصفير':'باقي '+dd+' يوم و '+h+' ساعة على التصفير'}
 var PR=[200,100,50];
 function rows(r){return r.map(function(x,i){return'<div class="row'+(x.id===S.uid?' me':(i===0?' gold':''))+'"><b>'+(i+1)+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+'</b></div>'}).join('')}
@@ -209,14 +233,22 @@ function board(t){
   '<div class="card" style="line-height:1.9;font-size:15px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+'<br><b>التصفير:</b> نهاية الجمعة '+dTxt(7*wkKey()+8)+' الساعة 12 بالليل بتوقيت مصر<br><b>'+leftTxt()+'</b></div>'+
   '<div class="card"><div class="tag">جايزة بطل الأسبوع</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب بطل الأسبوع • التاني: 100 • التالت: 50<br>بتوصلك لما تفتح الشاشة دي بعد التصفير.</div></div>'+
   '<div class="card"><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>'+
-  '<div class="row">'+tab('all','كل اللاعبين')+tab('lg','دوري '+LG[li].n)+'</div>'+
+  '<div class="row" style="flex-wrap:wrap">'+tab('all','كل اللاعبين')+tab('lg','دوري '+LG[li].n)+tab('gr','صفّي')+tab('gs','الصفوف')+'</div>'+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
   '<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>'+
   '<div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
   var lb=$('#lb'),pv=$('#pv');
   if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';$('#mr').style.display='none';return}
-  var p=pts>0?FB.submit(wkId(wkKey()),S.uid,S.nick,pts).catch(function(){}):Promise.resolve();
-  p.then(function(){return FB.board(wkId(wkKey()),lo,hi,pts,BN)}).then(function(d){
+  var p=pts>0?submitP():Promise.resolve();
+  if(BT==='gs'){
+    $('#mr').style.display='none';
+    p.then(function(){return FB.grades(wkId(wkKey()),S.stage==='p'?6:3)}).then(function(r){
+      if(!r){lb.textContent='ترتيب الصفوف مش متاح دلوقتي.';return}
+      r=r.map(function(x){x.avg=x.n?Math.round(x.s/x.n):0;return x}).sort(function(a,b){return b.avg-a.avg});
+      lb.innerHTML='<div class="sm" style="text-align:center">الترتيب بمتوسط نقاط اللاعب في كل صف</div>'+r.map(function(x,i){return'<div class="row'+(x.g===S.grade?' me':(i===0?' gold':''))+'"><b style="min-width:28px">'+(i+1)+'</b><span class="sp">'+gName(x.g)+'</span><span class="sm" style="color:inherit">'+x.n+' لاعب</span><b>'+x.avg+'</b></div>'}).join('');
+    }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
+  }else
+  p.then(function(){return FB.board(BT==='gr'?gId(wkKey()):wkId(wkKey()),lo,hi,pts,BN)}).then(function(d){
     var h=d.rows.length?d.rows.map(function(x,i){return rrow(x,i+1,x.id===S.uid)}).join(''):'مفيش حد لسه. كن أول واحد!';
     var myI=d.rows.map(function(x){return x.id}).indexOf(S.uid),rk=d.rank,gap='';
     if(pts>0&&myI<0&&rk>BN){
@@ -228,7 +260,7 @@ function board(t){
     else{
       var nxt=myI>0?d.rows[myI-1]:(myI<0?(d.above[0]||null):null);
       gap=nxt?'<br><span class="sm">باقي '+(nxt.pts-pts+1)+' نقطة وتعدّي '+esc(nxt.name)+'</span>':(rk===1?'<br><span class="sm">إنت الأول!</span>':'');
-      $('#mr').innerHTML='ترتيبك: <b>#'+rk+'</b> من '+d.total+(BT==='lg'?' في دوريك':'')+gap;
+      $('#mr').innerHTML='ترتيبك: <b>#'+rk+'</b> من '+d.total+(BT==='lg'?' في دوريك':(BT==='gr'?' في صفّك':''))+gap;
     }
   }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
   FB.top(wkId(wkKey()-1),3).then(function(r){
@@ -324,8 +356,92 @@ function doBuy(id){
 }
 
 function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'')}
-function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[]}save();home()}
+function gradeScr(){
+  var G6=S.stage==='p'?GP:GM;
+  app.innerHTML='<div class="hd"><h1>اختار صفّك</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • هتتنافس مع طلاب صفّك</div></div><div class="sp"></div>'+G6.map(function(n,i){return'<button class="btn'+(S.grade===i+1?'':' t')+'" onclick="setGrade('+(i+1)+')">'+n+'</button>'}).join('')+'<button class="btn t" onclick="stageScr()" style="font-size:14px">رجوع</button>';
+}
+function setGrade(g){S.grade=g;save();submit();home()}
+function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[];S.grade=0}save();gradeScr()}
 function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
+var QM=['جاهز للتحدّي؟','يلا نلعب!','شد حيلك','برافو عليك','جولة حلوة!','هكسبك المرة دي','تحدّي تاني؟'],RT=0,RMD=null,NEXT=null,LSAY=0,RTRY=0;
+var RQ=(function(){try{return new URLSearchParams(location.search).get('room')}catch(e){return null}})();
+var RCAP=500,RMIN=100,RDAY=2,PW=300,PL=30,PT=100;
+function genCode(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(var i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
+function rmsg(t){var e=$('#rmsg');if(e)e.textContent=t}
+function roomAdd(n){
+  var r=S.rm;if(!r||!window.FB)return;
+  if(!r.live||Date.now()>=r.end){if(Date.now()-(r.ls||0)>20000)roomSync();return}
+  r.p=Math.min(RCAP,(r.p||0)+n);save();FB.roomPts(r.code,r.side,r.p).catch(function(){});
+}
+function roomSync(cb){
+  var r=S.rm;if(!r||!window.FB)return;
+  r.ls=Date.now();
+  FB.roomGet(r.code).then(function(d){
+    if(!d){S.rm=null;save();if(cb)cb();return}
+    RMD=d;var mp=r.side===1?d.p1:d.p2;
+    if((r.p||0)>mp&&d.end>0&&Date.now()<d.end)FB.roomPts(r.code,r.side,r.p).catch(function(){});
+    r.p=Math.max(r.p||0,mp);r.live=!!d.u2&&d.end>0;r.end=d.end;
+    if(d.end>0&&Date.now()>=d.end)roomFinish(d);
+    else if(!d.u2&&Date.now()-d.t0>864e5){S.rm=null;S.rres={code:r.code,mp:0,op:0,res:'الروم اتقفلت لأن محدّش دخلها في 24 ساعة',on:''}}
+    save();if(cb)cb(d);
+  }).catch(function(){if(cb)cb(RMD)});
+}
+function roomFinish(d){
+  var r=S.rm,me=r.side,mp=Math.max(r.p||0,me===1?d.p1:d.p2),op=me===1?d.p2:d.p1,day=cDay(),res;
+  if(!S.rday||S.rday.d!==day)S.rday={d:day,n:0};
+  if(mp<RMIN||op<RMIN)res='الروم اتلغت: لازم الاتنين يجمعوا '+RMIN+' نقطة على الأقل علشان تتحسب الجايزة';
+  else if(S.rday.n>=RDAY)res='وصلت للحد اليومي للجوايز ('+RDAY+' رومات)، وده علشان الترتيب يفضل عادل';
+  else{S.rday.n++;
+    if(mp>op){S.coins+=PW;addPts(PW);S.rw=(S.rw||0)+1;res='كسبت! +'+PW+' عملة و+'+PW+' نقطة في الترتيب'}
+    else if(mp<op){S.coins+=PL;res='خسرت المرة دي.. +'+PL+' عملة تشجيعية'}
+    else{S.coins+=PT;addPts(PT);res='تعادل! +'+PT+' عملة و+'+PT+' نقطة'}}
+  S.rres={code:r.code,mp:mp,op:op,res:res,on:me===1?d.n2:d.n1};S.rm=null;save();submit();
+}
+function roomScr(pre){
+  if(!S.nick){NEXT=function(){roomScr(pre)};nick();return}
+  clearInterval(RT);
+  var hd='<div class="hd"><h1>تحدّي صاحب</h1><div>روم 1 ضد 1 • 24 ساعة</div></div>';
+  if(!window.FB){
+    if(window.FIREBASE_CONFIG&&++RTRY<8){app.innerHTML=hd+'<div class="card">بنحمّل...</div>';setTimeout(function(){roomScr(pre)},600);return}
+    app.innerHTML=hd+'<div class="card">الرومات لسه متفعّلتش.</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';return}
+  if(S.rm){
+    app.innerHTML=hd+'<div id="rm">بنحمّل...</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+    if(RMD)drawRoom(RMD);roomSync(drawRoom);
+    RT=setInterval(function(){if(!$('#rm')){clearInterval(RT);return}roomSync(drawRoom)},15000);return}
+  var rr=S.rres;
+  app.innerHTML=hd+(rr?'<div class="card"><div class="tag g">نتيجة آخر روم ('+rr.code+')</div><div style="margin-top:8px;line-height:1.8">'+esc(rr.on||'الخصم')+': '+rr.op+' • إنت: '+rr.mp+'<br><b>'+rr.res+'</b></div><button class="btn t" style="margin-top:8px;font-size:14px;min-height:36px" onclick="S.rres=null;save();roomScr()">تمام</button></div>':'')+
+  '<div class="card" style="line-height:1.8;font-size:14px"><div class="tag">قواعد الروم</div>• اعمل روم وابعت الكود لصاحبك (لازم يكون في نفس مرحلتك).<br>• بعد ما يدخل بتبدأ 24 ساعة، وكل واحد بيلعب في وقته.<br>• نقاط الروم من الجولات بس، وأقصى نقاط للواحد '+RCAP+'.<br>• الأعلى نقاط بياخد '+PW+' عملة و'+PW+' نقطة في الترتيب.<br>• لازم الاتنين يجمعوا '+RMIN+' نقطة على الأقل، والجايزة لحد '+RDAY+' رومات في اليوم.</div>'+
+  (S.rw?'<div class="sm" style="text-align:center">انتصاراتك في الرومات: '+S.rw+'</div>':'')+
+  '<button class="btn" onclick="roomMake()">اعمل روم جديدة</button><div class="card"><input id="rc" class="inp" maxlength="5" placeholder="كود الروم" value="'+esc(pre||'')+'" style="direction:ltr;text-transform:uppercase"><div style="margin-top:8px"><button class="btn t" style="width:100%" onclick="roomJoinUi()">ادخل الروم</button></div></div><div id="rmsg" class="sm" style="text-align:center;font-weight:900"></div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+}
+function drawRoom(d){
+  var r=S.rm,el=$('#rm');
+  if(!r){roomScr();return}
+  if(!el)return;
+  d=d||RMD;if(!d){el.textContent='بنحمّل...';return}
+  var me=r.side,mn=me===1?d.n1:d.n2,on=me===1?d.n2:d.n1,mp=Math.max(r.p||0,me===1?d.p1:d.p2),op=me===1?d.p2:d.p1,om=me===1?d.m2:d.m1,mm=me===1?d.m1:d.m2,live=r.live&&Date.now()<r.end,ms=r.end-Date.now();
+  var st=!d.u2?'مستني صاحبك يدخل بالكود':(live?'الروم شغالة • باقي '+Math.floor(ms/36e5)+' ساعة و '+Math.floor(ms%36e5/6e4)+' دقيقة':'الروم خلصت');
+  function pl(n,p,mine){return'<div class="'+(mine?'me':'')+'" style="padding:6px 8px;border-radius:8px"><div class="row"><b class="sp">'+esc(n)+(mine?' (إنت)':'')+'</b><b>'+p+' / '+RCAP+'</b></div><div class="bar"><i style="width:'+Math.min(100,p/RCAP*100)+'%"></i></div></div>'}
+  el.innerHTML='<div class="card" style="text-align:center"><div class="sm">كود الروم</div><div class="big" style="letter-spacing:6px">'+r.code+'</div><div style="font-weight:700">'+st+'</div></div>'+
+  '<div class="card" style="display:flex;flex-direction:column;gap:10px">'+pl(mn,mp,true)+(d.u2?pl(on,op,false):'<div class="sm" style="text-align:center">مستني اللاعب التاني...</div>')+'</div>'+
+  (d.u2?'<div class="card"><div class="tag">رسايل سريعة</div>'+(om?'<div style="margin:8px 0;font-weight:700">'+esc(on)+': '+QM[om-1]+'</div>':'')+(mm?'<div class="sm">رسالتك: '+QM[mm-1]+'</div>':'')+'<div class="row" style="flex-wrap:wrap;margin-top:8px">'+QM.map(function(q,i){return'<button class="pwb" style="flex:1 1 40%" onclick="roomSay('+(i+1)+')">'+q+'</button>'}).join('')+'</div></div>':'')+
+  '<button class="btn" onclick="map()">العب وجمّع نقاط</button><button class="btn t" onclick="roomShare()">ابعت الكود لصاحبك</button>'+(!d.u2?'<button class="btn t" onclick="roomLeave()" style="font-size:14px">اقفل الروم</button>':'');
+}
+function roomMake(){
+  var c=genCode(),d={stage:S.stage,u1:S.uid,n1:S.nick,p1:0,u2:'',n2:'',p2:0,end:0,m1:0,m2:0,t0:Date.now()};
+  FB.roomCreate(c,d).then(function(){RMD=null;S.rm={code:c,side:1,live:false,end:0,p:0,ls:0};S.rres=null;save();roomScr()}).catch(function(){rmsg('مقدرناش نعمل الروم، جرّب تاني')});
+}
+function roomJoinUi(){
+  var c=$('#rc').value.trim().toUpperCase();if(c.length<5){rmsg('اكتب كود الروم (5 حروف)');return}
+  rmsg('بندخّلك...');
+  FB.roomJoin(c,S.uid,S.nick,S.stage).then(function(r){
+    if(r.err){rmsg(r.err);return}
+    RMD=r.d;S.rm={code:c,side:2,live:true,end:r.d.end,p:0,ls:Date.now()};S.rres=null;save();roomScr();
+  }).catch(function(){rmsg('مقدرناش ندخّلك، جرّب تاني')});
+}
+function roomSay(i){if(!S.rm||Date.now()-LSAY<3000)return;LSAY=Date.now();FB.roomMsg(S.rm.code,S.rm.side,i).then(function(){roomSync(drawRoom)}).catch(function(){})}
+function roomShare(){var c=S.rm.code,t='تعالى نتحدّى بعض في تحدّي الأصحاب! كود الروم: '+c+' '+location.href.split('?')[0].split('#')[0]+'?room='+c;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
+function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
 var ST=null;
 function num(n){return Number(n).toLocaleString('en')}
 function statsHtml(r){
@@ -337,7 +453,7 @@ var MK=null,LASTR=0;
 function fillMk(){var e=$('#mk');if(!e||!MK||wkPts()<=0)return;var i=lgIdx(wkPts());e.style.display='';e.innerHTML='<div class="row">'+lgIcon(i,36)+'<div class="sp"><div style="font-weight:900">ترتيبك: #'+MK.rank+' من '+MK.total+'</div><div class="sm">دوري '+LG[i].n+' • '+wkPts()+' نقطة</div></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="board()">الترتيب</button></div>'}
 function refreshStats(f){
   if(!window.FB||!$('#st'))return;
-  if(!f&&Date.now()-LASTR<20000)return;LASTR=Date.now();
+  if(!f&&Date.now()-LASTR<20000)return;LASTR=Date.now();if(S.rm)roomSync();
   var p=cairo();
   FB.stats(Date.now()-((p.hour*60+p.minute)*60+p.second)*1000).then(function(r){ST=r;fillStats()}).catch(function(){});
   if(wkPts()>0)FB.rank(wkId(wkKey()),wkPts()).then(function(r){MK=r;fillMk()}).catch(function(){});
@@ -347,7 +463,7 @@ window.onFB=function(){
   setInterval(function(){if(document.visibilityState==='visible')FB.beat(S.uid).catch(function(){})},60000);
   setInterval(function(){refreshStats(true)},60000);refreshStats(true);
 };
-load();applyTheme();DB=daily();S.stage?home():stageScr();
+load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():home());if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
 </script>
 </body>
 </html>
