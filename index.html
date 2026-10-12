@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -370,7 +365,7 @@ function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[];S.grade=0}save();gradeS
 function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
 var QM=['جاهز للتحدّي؟','يلا نلعب!','شد حيلك','برافو عليك','جولة حلوة!','هكسبك المرة دي','تحدّي تاني؟'],RT=0,RMD=null,NEXT=null,LSAY=0,RTRY=0;
 var RQ=(function(){try{return new URLSearchParams(location.search).get('room')}catch(e){return null}})();
-var RCAP=500,RMIN=100,RDAY=2,PW=300,PL=30,PT=100;
+var RCAP=10000,RMIN=1000,RDAY=1,PW=1000,PL=100,PT=500;
 function genCode(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(var i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
 function rmsg(t){var e=$('#rmsg');if(e)e.textContent=t}
 function roomAdd(n){
