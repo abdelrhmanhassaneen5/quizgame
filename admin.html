@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>لوحة المدرّس</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap">
+<style>
+:root{--paper:#FBE7B5;--card:#FFE8B5;--ink:#4A2F22;--teal:#2F5F5A;--brown:#6B4A3A;--gold:#C9973F;--red:#7A3B3B}
+html,body{margin:0}
+body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
+#app{max-width:640px;margin:0 auto;min-height:100vh;box-sizing:border-box;background:var(--paper);padding:16px;display:flex;flex-direction:column;gap:12px}
+.hd{background:var(--teal);border:2px solid var(--gold);border-radius:16px;color:#FFE9B8;text-align:center;padding:12px}
+.hd h1{margin:0;font-size:22px}
+.card{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:12px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sp{flex:1}
+.sm{font-size:12px;color:var(--teal);font-weight:700}
+.btn{background:var(--red);color:#FFE9B8;border:2px solid #D9A84E;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;padding:8px 12px;min-height:40px;cursor:pointer}
+.btn.t{background:var(--teal)}
+.btn.g{background:#6B4A3A}
+.inp,select{font-family:'Cairo',sans-serif;font-size:16px;padding:10px;border:2px solid #8A6A4A;border-radius:10px;background:#FFF6DD;color:var(--ink);width:100%;box-sizing:border-box}
+select{width:auto}
+.fl{display:inline-block;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;margin:2px}
+.fl.bad{background:#8B2E2E;color:#fff}
+.fl.warn{background:#E3B03F}
+.fl.ok{background:#2F6B4A;color:#fff}
+.big{font-size:26px;font-weight:900;text-align:center}
+.lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
+</style>
+<script>
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
+</script>
+</head>
+<body>
+<div id="app">جاري التحميل...</div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import * as FS from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const app=document.getElementById('app');
+const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if(!window.FIREBASE_CONFIG){app.innerHTML='<div class="card">الصق إعدادات Firebase في أول الملف (السطر window.FIREBASE_CONFIG) وارفعه تاني.</div>'}
+else{
+const fb=initializeApp(window.FIREBASE_CONFIG),db=FS.getFirestore(fb),auth=getAuth(fb);
+let stage='m',off=0,rows=[],user=null;
+function cairo(){const p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(new Date()).forEach((x)=>{p[x.type]=+x.value})}catch(e){}
+  if(!p.year){const t=new Date(Date.now()+3*36e5);return{year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate()}}return p}
+function wkKey(){const p=cairo();return Math.floor((Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5)-2)/7)}
+function dTxt(dn){const t=new Date(dn*864e5);return['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][t.getUTCDay()]+' '+t.getUTCDate()+'/'+(t.getUTCMonth()+1)}
+const wid=()=>String(wkKey()+off)+(stage==='p'?'p':'');
+const tm=(ms)=>ms?new Date(ms).toLocaleString('ar-EG',{timeZone:'Africa/Cairo',day:'numeric',month:'numeric',hour:'numeric',minute:'2-digit'}):'-';
+const ms=(t)=>t&&t.toMillis?t.toMillis():0;
+function loginUI(m){
+  app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><input id="em" class="inp" type="email" placeholder="الإيميل" autocomplete="username" style="direction:ltr"><input id="pw" class="inp" type="password" placeholder="الباسورد" autocomplete="current-password" style="direction:ltr"><button class="btn" id="go">دخول</button><div id="er" class="sm" style="color:#8B2E2E">'+esc(m||'')+'</div></div>';
+  const go=()=>signInWithEmailAndPassword(auth,document.getElementById('em').value.trim(),document.getElementById('pw').value).catch(()=>loginUI('الإيميل أو الباسورد غلط'));
+  document.getElementById('go').onclick=go;document.getElementById('pw').onkeydown=(e)=>{if(e.key==='Enter')go()};
+}
+function panel(){
+  app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1><div class="sm" style="color:#FFE9B8">'+esc(user.email)+'</div></div>'+
+  '<div class="card row"><select id="st"><option value="m">إعدادي</option><option value="p">ابتدائي</option></select><button class="btn t" data-a="wk" data-u="0">الأسبوع الحالي</button><button class="btn g" data-a="wk" data-u="-1">الأسبوع اللي فات</button><button class="btn" data-a="r">تحديث</button><span class="sp"></span><button class="btn g" data-a="o">خروج</button></div><div id="sum"></div><div id="list" class="row" style="flex-direction:column;align-items:stretch"></div>';
+  const s=document.getElementById('st');s.value=stage;s.onchange=()=>{stage=s.value;load()};
+  load();
+}
+async function load(){
+  const L=document.getElementById('list');L.innerHTML='<div class="card">بنحمّل...</div>';
+  try{
+    const id=wid();
+    const [sc,lb,bn]=await Promise.all([FS.getDocs(FS.query(FS.collection(db,'weeks',id,'scores'),FS.orderBy('pts','desc'),FS.limit(200))),FS.getDocs(FS.collection(db,'labels')),FS.getDocs(FS.collection(db,'bans'))]);
+    const lab={},ban={};lb.docs.forEach((d)=>{lab[d.id]=d.data().n});bn.docs.forEach((d)=>{ban[d.id]=1});
+    rows=sc.docs.map((d)=>Object.assign({id:d.id},d.data(),{label:lab[d.id]||'',banned:!!ban[d.id]}));
+    await Promise.all(rows.map(async(r)=>{try{
+      const a=await FS.getAggregateFromServer(FS.query(FS.collection(db,'logs'),FS.where('u','==',r.id),FS.where('w','==',id)),{c:FS.count(),g:FS.sum('g'),s:FS.sum('sec'),r:FS.sum('r')});
+      const x=a.data();r.c=x.c;r.g=x.g||0;r.s=x.s||0;r.nr=x.r||0}catch(e){r.c=-1;r.g=0;r.s=0;r.nr=0}}));
+    render();
+  }catch(e){L.innerHTML='<div class="card">مقدرناش نحمّل البيانات ('+esc(e.code||e.message)+'). لو الكود permission-denied يبقى قواعد Firebase ما اتحدّثتش أو الإيميل مش هو إيميل الأدمن في القواعد.</div>'}
+}
+function flags(r){
+  const f=[],diff=r.pts-r.g;
+  if(r.banned)f.push(['محظور','bad']);
+  if(r.c===0&&r.pts>0)f.push(['مفيش تسجيل لنقاطه (طبيعي لو لعب قبل التحديث)','warn']);
+  else if(r.c>0&&diff>1000)f.push(['نقاطه أكتر من المسجّل بـ '+diff,'bad']);
+  else if(r.c>0&&diff>300)f.push(['فرق '+diff+' عن المسجّل','warn']);
+  if(r.c>=3&&r.s>=60&&r.g/(r.s/60)>250)f.push(['معدل عالي: '+Math.round(r.g/(r.s/60))+' نقطة/دقيقة','bad']);
+  if(!f.length&&r.c>0)f.push(['سليم','ok']);
+  return f;
+}
+function render(){
+  const id=wid(),k=wkKey()+off;
+  let tot=0,bad=0;
+  const html=rows.map((r,i)=>{tot+=r.pts;const f=flags(r);if(f.some((x)=>x[1]==='bad'))bad++;
+    return'<div class="card"><div class="row"><b style="min-width:28px">'+(i+1)+'</b><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.name)+(r.label?' <span class="fl ok">'+esc(r.label)+'</span>':'')+'</div><div class="sm">جهاز: …'+esc(r.id.slice(-5))+' • آخر تحديث: '+tm(ms(r.t))+'</div></div><div class="big">'+r.pts+'</div></div>'+
+    '<div>'+f.map((x)=>'<span class="fl '+x[1]+'">'+esc(x[0])+'</span>').join('')+'</div>'+
+    '<div class="sm">مسجّل: '+r.g+' نقطة • '+(r.c<0?'؟':r.c)+' تسجيل • '+r.nr+' جولة</div>'+
+    '<div class="row" style="margin-top:6px"><button class="btn t" data-a="d" data-u="'+esc(r.id)+'">تفاصيل</button><button class="btn g" data-a="l" data-u="'+esc(r.id)+'">اسمه الحقيقي</button><button class="btn" data-a="b" data-u="'+esc(r.id)+'">'+(r.banned?'فك الحظر':'حظر')+'</button><button class="btn" data-a="x" data-u="'+esc(r.id)+'">مسح نقاطه</button></div><div id="dt-'+esc(r.id)+'"></div></div>'}).join('');
+  document.getElementById('sum').innerHTML='<div class="card row" style="justify-content:space-around"><div><div class="sm">الأسبوع</div><b>'+dTxt(7*k+2)+' → '+dTxt(7*k+8)+'</b></div><div><div class="sm">لاعبين</div><div class="big">'+rows.length+'</div></div><div><div class="sm">إجمالي النقاط</div><div class="big">'+tot+'</div></div><div><div class="sm">مشتبه فيهم</div><div class="big" style="color:'+(bad?'#8B2E2E':'inherit')+'">'+bad+'</div></div></div>';
+  document.getElementById('list').innerHTML=html||'<div class="card">مفيش لاعبين في الأسبوع ده.</div>';
+}
+async function details(u){
+  const box=document.getElementById('dt-'+u);if(!box)return;
+  if(box.innerHTML){box.innerHTML='';return}
+  box.textContent='بنحمّل...';
+  try{
+    const s=await FS.getDocs(FS.query(FS.collection(db,'logs'),FS.where('u','==',u),FS.where('w','==',wid()),FS.limit(300)));
+    const a=s.docs.map((d)=>d.data()).sort((x,y)=>ms(y.t)-ms(x.t));
+    box.innerHTML='<div class="lg"><b>الوقت</b><b>النقاط</b><b>ثواني</b><b>جولات</b><b>ملاحظة</b></div>'+(a.map((x)=>{const n=[];if(x.g>1500)n.push('قفزة كبيرة');if(x.sec>0&&x.g>0&&x.g/(x.sec/60)>250)n.push('سريع');if(x.g<0)n.push('شراء');
+      return'<div class="lg"><span>'+tm(ms(x.t))+'</span><span>'+x.g+'</span><span>'+x.sec+'</span><span>'+x.r+'</span><span style="color:#8B2E2E;font-weight:700">'+n.join(' • ')+'</span></div>'}).join('')||'<div class="sm">مفيش تسجيلات</div>');
+  }catch(e){box.textContent='خطأ: '+(e.code||e.message)}
+}
+async function act(a,u){
+  try{
+    if(a==='o'){await signOut(auth);return}
+    if(a==='r'){load();return}
+    if(a==='wk'){off=+u;load();return}
+    if(a==='d'){details(u);return}
+    const r=rows.find((x)=>x.id===u);if(!r)return;
+    if(a==='l'){const v=prompt('الاسم الحقيقي للطالب (خاص بيك بس)، سيبه فاضي للمسح',r.label||'');if(v===null)return;
+      if(v.trim())await FS.setDoc(FS.doc(db,'labels',u),{n:v.trim().slice(0,40)});else await FS.deleteDoc(FS.doc(db,'labels',u));r.label=v.trim();render()}
+    if(a==='b'){if(r.banned){await FS.deleteDoc(FS.doc(db,'bans',u));r.banned=false}else{if(!confirm('حظر '+r.name+'؟ مش هيقدر يسجّل نقاط جديدة.'))return;await FS.setDoc(FS.doc(db,'bans',u),{n:r.name,t:FS.serverTimestamp()});r.banned=true}render()}
+    if(a==='x'){if(!confirm('مسح نقاط '+r.name+' من الأسبوع ده؟'))return;const id=wid();await FS.deleteDoc(FS.doc(db,'weeks',id,'scores',u));for(let g=1;g<=6;g++)await FS.deleteDoc(FS.doc(db,'weeks',id+'g'+g,'scores',u));rows=rows.filter((x)=>x.id!==u);render()}
+  }catch(e){alert('حصل خطأ: '+(e.code||e.message))}
+}
+app.addEventListener('click',(ev)=>{const b=ev.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.u)});
+onAuthStateChanged(auth,(u)=>{user=u;if(u)panel();else loginUI()});
+}
+</script>
+</body>
+</html>

@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -79,6 +74,7 @@ if(window.FIREBASE_CONFIG){
   window.FB={
     submit:(wk,uid,name,pts)=>FS.setDoc(FS.doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:FS.serverTimestamp()}),
     top:async(wk,n)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wk),'scores'),FS.orderBy('pts','desc'),FS.limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
+    log:(d)=>FS.addDoc(FS.collection(db,'logs'),Object.assign({},d,{t:FS.serverTimestamp()})),
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
     board:async(wk,lo,hi,mine,n)=>{
@@ -146,8 +142,17 @@ function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;s
 var GP=['الأول الابتدائي','الثاني الابتدائي','الثالث الابتدائي','الرابع الابتدائي','الخامس الابتدائي','السادس الابتدائي'],GM=['الأول الإعدادي','الثاني الإعدادي','الثالث الإعدادي'];
 function gName(g){g=g||S.grade;return(S.stage==='p'?GP:GM)[g-1]||''}
 function gId(k,g){return wkId(k)+'g'+(g||S.grade)}
+function logDelta(){
+  if(!window.FB||!FB.log||!S.uid||!S.nick)return;
+  var k=wkId(wkKey()),pt=wkPts(),now=Date.now();
+  if(!S.ls||S.ls.w!==k){S.ls={w:k,p:pt,t:now};save();return}
+  var d=pt-S.ls.p;if(d===0)return;
+  var sec=Math.min(7200,Math.round((now-S.ls.t)/1000)),r=Math.min(1000,S.nr||0);
+  S.ls.p=pt;S.ls.t=now;S.nr=0;save();
+  while(d!==0){var c=Math.max(-5000,Math.min(5000,d));d-=c;try{FB.log({u:S.uid,n:S.nick,w:k,g:c,sec:sec,r:r}).catch(function(){})}catch(e){}sec=0;r=0}
+}
 function submitP(){
-  if(!window.FB||!S.nick)return Promise.resolve();
+  if(!window.FB||!S.nick)return Promise.resolve();logDelta();
   var w=wkKey(),pt=wkPts(),a=[];
   try{a.push(FB.submit(wkId(w),S.uid,S.nick,pt));if(S.grade)a.push(FB.submit(gId(w),S.uid,S.nick,pt))}catch(e){}
   return Promise.all(a.map(function(x){return x.catch(function(){})}));
@@ -207,7 +212,7 @@ function pick(k){
 function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function endRound(){
-  var win=G.mhp<=0,lv=G.lv,bonus=0;
+  var win=G.mhp<=0,lv=G.lv,bonus=0;S.nr=(S.nr||0)+1;
   if(win){bonus=20+10*G.h;S.coins+=bonus;addPts(bonus);roomAdd(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++;save()}
   submit();
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
