@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -162,7 +157,7 @@ function home(){setTimeout(function(){fillStats();fillMk();refreshStats()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div>'+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
-  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+'<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات</div><div class="sm">تصفيق وصوت الوحش وأصوات المرح</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="toggleSnd()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
   '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button>';
 }
@@ -184,7 +179,7 @@ function show(){
   var q=G.qs[G.i];G.left=G.T;G.done=false;G.f50=false;
   G.ord=shuffle([0,1,2,3]);G.ci=G.ord.indexOf(q[3]);
   var o=G.ord.map(function(x,k){return'<button class="opt" onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
-  app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
+  app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><button id="mb" class="pwb" style="flex:none;min-height:36px;padding:4px 10px" aria-label="الصوت" onclick="toggleSnd(1)">'+spk()+'</button><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
   '<div class="card" style="padding:8px"><div class="row"><span class="sm">'+mName(G.lv)+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
   '<div id="mon" style="text-align:center;filter:hue-rotate('+hueOf()+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv,S.eq.ch)+'</div></div></div>'+
   '<div class="row"><span class="sm">جولة '+G.lv+(G.lv%5===0?' (زعيم)':'')+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+G.T+'</div></div>'+
@@ -196,12 +191,12 @@ function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,msg;
-  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);roomAdd(gain);anim('hit')}
-  else{G.h--;G.combo=0;G.bad.push(q);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب';anim('atk');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
+  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1;G.combo++;G.ok++;msg='إجابة صح! +'+gain+' عملة';if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain;G.earned+=gain;addPts(gain);roomAdd(gain);anim('hit');sfxOk(G.combo%3===0)}
+  else{G.h--;G.combo=0;G.bad.push(q);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب';anim('atk');sfxBad();if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
-  if(win)msg+=' • الوحش اتهزم!';
+  if(win){msg+=' • الوحش اتهزم!';setTimeout(sfxWin,450)}
   $('#fb').innerHTML='<div class="card"><div style="font-weight:900">'+msg+'</div><div class="sm">'+q[4]+'</div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>';
 }
 function next(){G.i++;show()}
@@ -447,6 +442,36 @@ function roomJoinUi(){
 function roomSay(i){if(!S.rm||Date.now()-LSAY<3000)return;LSAY=Date.now();FB.roomMsg(S.rm.code,S.rm.side,i).then(function(){roomSync(drawRoom)}).catch(function(){})}
 function roomShare(){var c=S.rm.code,t='تعالى نتحدّى بعض في تحدّي الأصحاب! كود الروم: '+c+' '+location.href.split('?')[0].split('#')[0]+'?room='+c;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
+var AC=null,VO=null,VOK=true,VP=0.4;
+try{VO=new Audio('shatouli.mp3');VO.preload='auto';VO.volume=0.7;VO.onerror=function(){VOK=false}}catch(e){VO=null;VOK=false}
+function ac(){if(S.mute)return null;try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C()}if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+function tone(f,t0,d,type,v,f2){var c=ac();if(!c)return;var o=c.createOscillator(),g=c.createGain(),t=c.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.05)}
+function noise(t0,d,v,f,q){var c=ac();if(!c)return;var n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0),i;for(i=0;i<n;i++)a[i]=Math.random()*2-1;var s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+t0;s.buffer=b;fl.type='bandpass';fl.frequency.value=f||2000;fl.Q.value=q||0.7;g.gain.setValueAtTime(v||0.2,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);s.connect(fl);fl.connect(g);g.connect(c.destination);s.start(t)}
+function clap(dur){for(var i=0;i<28;i++){var t=Math.random()*dur;noise(t,0.05+Math.random()*0.04,0.16*(1-t/dur*0.7),1400+Math.random()*2200,0.8)}}
+function roar(){
+  var c=ac();if(!c)return;var t=c.currentTime,o=c.createOscillator(),l=c.createOscillator(),lg=c.createGain(),f=c.createBiquadFilter(),g=c.createGain();
+  o.type='sawtooth';o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(55,t+0.8);
+  l.frequency.value=22;lg.gain.value=14;l.connect(lg);lg.connect(o.frequency);
+  f.type='lowpass';f.frequency.setValueAtTime(900,t);f.frequency.exponentialRampToValueAtTime(250,t+0.8);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.35,t+0.08);g.gain.exponentialRampToValueAtTime(0.0001,t+0.85);
+  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);l.start(t);o.stop(t+0.9);l.stop(t+0.9);noise(0,0.5,0.12,300,0.6);
+}
+function voice(){
+  if(!VO||!VOK||!ac())return false;
+  try{VO.currentTime=0;var p=VO.play();if(p&&p.catch)p.catch(function(){})}catch(e){return false}
+  return true;
+}
+function ding(){tone(880,0,0.14,'triangle',0.18);tone(1320,0.1,0.2,'triangle',0.16)}
+function sfxOk(combo){
+  if(S.mute)return;
+  if(combo){clap(1.1);tone(659,0,0.12,'triangle',0.15);tone(988,0.1,0.2,'triangle',0.15);voice();return}
+  if(Math.random()<VP&&voice())return;
+  ding();
+}
+function sfxBad(){roar()}
+function sfxWin(){clap(1.8);[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.25,'triangle',0.16)})}
+function spk(){return S.mute?'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#6B4A3A"/><path d="M16 9l5 6M21 9l-5 6" stroke="#7A3B3B" stroke-width="2" stroke-linecap="round"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#2F5F5A"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#2F5F5A" stroke-width="2" stroke-linecap="round"/></svg>'}
+function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTML=spk()}else home()}
 var ST=null;
 function num(n){return Number(n).toLocaleString('en')}
 function statsHtml(r){
