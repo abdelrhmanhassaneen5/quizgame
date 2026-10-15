@@ -30,14 +30,9 @@ select{width:auto}
 .lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
@@ -51,7 +46,7 @@ const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&
 if(!window.FIREBASE_CONFIG){app.innerHTML='<div class="card">الصق إعدادات Firebase في أول الملف (السطر window.FIREBASE_CONFIG) وارفعه تاني.</div>'}
 else{
 const fb=initializeApp(window.FIREBASE_CONFIG),db=FS.getFirestore(fb),auth=getAuth(fb);
-let stage='m',off=0,rows=[],user=null;
+let stage='m',off=0,rows=[],user=null,note='';
 function cairo(){const p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(new Date()).forEach((x)=>{p[x.type]=+x.value})}catch(e){}
   if(!p.year){const t=new Date(Date.now()+3*36e5);return{year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate()}}return p}
 function wkKey(){const p=cairo();return Math.floor((Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5)-2)/7)}
@@ -77,15 +72,25 @@ async function load(){
     const [sc,lb,bn]=await Promise.all([FS.getDocs(FS.query(FS.collection(db,'weeks',id,'scores'),FS.orderBy('pts','desc'),FS.limit(200))),FS.getDocs(FS.collection(db,'labels')),FS.getDocs(FS.collection(db,'bans'))]);
     const lab={},ban={};lb.docs.forEach((d)=>{lab[d.id]=d.data().n});bn.docs.forEach((d)=>{ban[d.id]=1});
     rows=sc.docs.map((d)=>Object.assign({id:d.id},d.data(),{label:lab[d.id]||'',banned:!!ban[d.id]}));
+    const errs=[];note='';
     await Promise.all(rows.map(async(r)=>{try{
       const a=await FS.getAggregateFromServer(FS.query(FS.collection(db,'logs'),FS.where('u','==',r.id),FS.where('w','==',id)),{c:FS.count(),g:FS.sum('g'),s:FS.sum('sec'),r:FS.sum('r')});
-      const x=a.data();r.c=x.c;r.g=x.g||0;r.s=x.s||0;r.nr=x.r||0}catch(e){r.c=-1;r.g=0;r.s=0;r.nr=0}}));
+      const x=a.data();r.c=x.c;r.g=x.g||0;r.s=x.s||0;r.nr=x.r||0}catch(e){errs.push(e.code||e.message||'error');r.c=-1;r.g=0;r.s=0;r.nr=0}}));
+    if(rows.some((r)=>r.c<0)){
+      try{
+        const q=await FS.getDocs(FS.query(FS.collection(db,'logs'),FS.where('w','==',id),FS.limit(5000)));
+        const m={};q.docs.forEach((d)=>{const x=d.data(),o=m[x.u]||(m[x.u]={c:0,g:0,s:0,r:0});o.c++;o.g+=x.g||0;o.s+=x.sec||0;o.r+=x.r||0});
+        rows.forEach((r)=>{if(r.c<0){const o=m[r.id]||{c:0,g:0,s:0,r:0};r.c=o.c;r.g=o.g;r.s=o.s;r.nr=o.r}});
+        note='الحساب السريع فشل ('+(errs[0]||'?')+') فاستخدمنا الطريقة البديلة على '+q.size+' تسجيل'+(q.size>=5000?' (وصلنا للحد الأقصى فالأرقام ناقصة)':'')+'.';
+      }catch(e){note='مقدرناش نقرا التسجيلات: '+(e.code||e.message)+'. غالبًا قواعد Firebase ناقصة أو الإيميل مش إيميل الأدمن.'}
+    }
     render();
   }catch(e){L.innerHTML='<div class="card">مقدرناش نحمّل البيانات ('+esc(e.code||e.message)+'). لو الكود permission-denied يبقى قواعد Firebase ما اتحدّثتش أو الإيميل مش هو إيميل الأدمن في القواعد.</div>'}
 }
 function flags(r){
   const f=[],diff=r.pts-r.g;
   if(r.banned)f.push(['محظور','bad']);
+  if(r.c<0)f.push(['لم يتم التحقق من تسجيلاته','warn']);
   if(r.c===0&&r.pts>0)f.push(['مفيش تسجيل لنقاطه (طبيعي لو لعب قبل التحديث)','warn']);
   else if(r.c>0&&diff>1000)f.push(['نقاطه أكتر من المسجّل بـ '+diff,'bad']);
   else if(r.c>0&&diff>300)f.push(['فرق '+diff+' عن المسجّل','warn']);
@@ -95,13 +100,13 @@ function flags(r){
 }
 function render(){
   const id=wid(),k=wkKey()+off;
-  let tot=0,bad=0;
-  const html=rows.map((r,i)=>{tot+=r.pts;const f=flags(r);if(f.some((x)=>x[1]==='bad'))bad++;
+  let tot=0,bad=0,un=0;
+  const html=rows.map((r,i)=>{tot+=r.pts;const f=flags(r);if(r.c<0)un++;if(f.some((x)=>x[1]==='bad'))bad++;
     return'<div class="card"><div class="row"><b style="min-width:28px">'+(i+1)+'</b><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.name)+(r.label?' <span class="fl ok">'+esc(r.label)+'</span>':'')+'</div><div class="sm">جهاز: …'+esc(r.id.slice(-5))+' • آخر تحديث: '+tm(ms(r.t))+'</div></div><div class="big">'+r.pts+'</div></div>'+
     '<div>'+f.map((x)=>'<span class="fl '+x[1]+'">'+esc(x[0])+'</span>').join('')+'</div>'+
     '<div class="sm">مسجّل: '+r.g+' نقطة • '+(r.c<0?'؟':r.c)+' تسجيل • '+r.nr+' جولة</div>'+
     '<div class="row" style="margin-top:6px"><button class="btn t" data-a="d" data-u="'+esc(r.id)+'">تفاصيل</button><button class="btn g" data-a="l" data-u="'+esc(r.id)+'">اسمه الحقيقي</button><button class="btn" data-a="b" data-u="'+esc(r.id)+'">'+(r.banned?'فك الحظر':'حظر')+'</button><button class="btn" data-a="x" data-u="'+esc(r.id)+'">مسح نقاطه</button></div><div id="dt-'+esc(r.id)+'"></div></div>'}).join('');
-  document.getElementById('sum').innerHTML='<div class="card row" style="justify-content:space-around"><div><div class="sm">الأسبوع</div><b>'+dTxt(7*k+2)+' → '+dTxt(7*k+8)+'</b></div><div><div class="sm">لاعبين</div><div class="big">'+rows.length+'</div></div><div><div class="sm">إجمالي النقاط</div><div class="big">'+tot+'</div></div><div><div class="sm">مشتبه فيهم</div><div class="big" style="color:'+(bad?'#8B2E2E':'inherit')+'">'+bad+'</div></div></div>';
+  document.getElementById('sum').innerHTML='<div class="card row" style="justify-content:space-around"><div><div class="sm">الأسبوع</div><b>'+dTxt(7*k+2)+' → '+dTxt(7*k+8)+'</b></div><div><div class="sm">لاعبين</div><div class="big">'+rows.length+'</div></div><div><div class="sm">إجمالي النقاط</div><div class="big">'+tot+'</div></div><div><div class="sm">مشتبه فيهم</div><div class="big" style="color:'+(bad?'#8B2E2E':'inherit')+'">'+bad+'</div></div><div><div class="sm">لم يتحقق</div><div class="big" style="color:'+(un?'#B07A00':'inherit')+'">'+un+'</div></div></div>'+(note?'<div class="card sm" style="margin-top:8px">'+esc(note)+'</div>':'');
   document.getElementById('list').innerHTML=html||'<div class="card">مفيش لاعبين في الأسبوع ده.</div>';
 }
 async function details(u){
