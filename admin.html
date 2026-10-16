@@ -30,14 +30,9 @@ select{width:auto}
 .lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
@@ -97,8 +92,11 @@ function flags(r){
   if(r.banned)f.push(['محظور','bad']);
   if(r.c<0)f.push(['لم يتم التحقق من تسجيلاته','warn']);
   if(r.c===0&&r.pts>0)f.push(['مفيش تسجيل لنقاطه (طبيعي لو لعب قبل التحديث)','warn']);
-  else if(r.c>0&&diff>1000)f.push(['نقاطه أكتر من المسجّل بـ '+diff,'bad']);
-  else if(r.c>0&&diff>300)f.push(['فرق '+diff+' عن المسجّل','warn']);
+  else if(r.c>0&&diff>300){
+    if((wkKey()+off)<=2962)f.push(['فرق '+diff+' عن المسجّل (الأسبوع ده فيه نقاط قبل بدء التسجيل)','warn']);
+    else if(diff>1000)f.push(['نقاطه أكتر من المسجّل بـ '+diff,'bad']);
+    else f.push(['فرق '+diff+' عن المسجّل','warn']);
+  }
   if(r.c>=3&&r.s>=60&&r.g/(r.s/60)>250)f.push(['معدل عالي: '+Math.round(r.g/(r.s/60))+' نقطة/دقيقة','bad']);
   if(!f.length&&r.c>0)f.push(['سليم','ok']);
   return f;
@@ -110,7 +108,7 @@ function render(){
     return'<div class="card"><div class="row"><b style="min-width:28px">'+(i+1)+'</b><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.name)+(r.label?' <span class="fl ok">'+esc(r.label)+'</span>':'')+'</div><div class="sm">جهاز: …'+esc(r.id.slice(-5))+' • آخر تحديث: '+tm(ms(r.t))+'</div></div><div class="big">'+r.pts+'</div></div>'+
     '<div>'+f.map((x)=>'<span class="fl '+x[1]+'">'+esc(x[0])+'</span>').join('')+'</div>'+
     '<div class="sm">مسجّل: '+r.g+' نقطة • '+(r.c<0?'؟':r.c)+' تسجيل • '+r.nr+' جولة</div>'+
-    '<div class="row" style="margin-top:6px"><button class="btn t" data-a="d" data-u="'+esc(r.id)+'">تفاصيل</button><button class="btn g" data-a="l" data-u="'+esc(r.id)+'">اسمه الحقيقي</button><button class="btn" data-a="b" data-u="'+esc(r.id)+'">'+(r.banned?'فك الحظر':'حظر')+'</button><button class="btn" data-a="x" data-u="'+esc(r.id)+'">مسح نقاطه</button></div><div id="dt-'+esc(r.id)+'"></div></div>'}).join('');
+    '<div class="row" style="margin-top:6px"><button class="btn t" data-a="d" data-u="'+esc(r.id)+'">تفاصيل</button><button class="btn g" data-a="l" data-u="'+esc(r.id)+'">اسمه الحقيقي</button><button class="btn" data-a="b" data-u="'+esc(r.id)+'">'+(r.banned?'فك الحظر':'حظر')+'</button><button class="btn" data-a="x" data-u="'+esc(r.id)+'">مسح نقاطه</button>'+(off===0&&r.c>=0&&r.pts>r.g?'<button class="btn" data-a="fx" data-u="'+esc(r.id)+'">امسح غير المسجّل فقط</button>':'')+'</div><div id="dt-'+esc(r.id)+'"></div></div>'}).join('');
   document.getElementById('sum').innerHTML='<div class="card row" style="justify-content:space-around"><div><div class="sm">الأسبوع</div><b>'+dTxt(7*k+2)+' → '+dTxt(7*k+8)+'</b></div><div><div class="sm">لاعبين</div><div class="big">'+rows.length+'</div></div><div><div class="sm">إجمالي النقاط</div><div class="big">'+tot+'</div></div><div><div class="sm">مشتبه فيهم</div><div class="big" style="color:'+(bad?'#8B2E2E':'inherit')+'">'+bad+'</div></div><div><div class="sm">لم يتحقق</div><div class="big" style="color:'+(un?'#B07A00':'inherit')+'">'+un+'</div></div></div>'+(note?'<div class="card sm" style="margin-top:8px">'+esc(note)+'</div>':'');
   document.getElementById('list').innerHTML=html||'<div class="card">مفيش لاعبين في الأسبوع ده.</div>';
 }
@@ -135,6 +133,18 @@ async function act(a,u){
     if(a==='l'){const v=prompt('الاسم الحقيقي للطالب (خاص بيك بس)، سيبه فاضي للمسح',r.label||'');if(v===null)return;
       if(v.trim())await FS.setDoc(FS.doc(db,'labels',u),{n:v.trim().slice(0,40)});else await FS.deleteDoc(FS.doc(db,'labels',u));r.label=v.trim();render()}
     if(a==='b'){if(r.banned){await FS.deleteDoc(FS.doc(db,'bans',u));r.banned=false}else{if(!confirm('حظر '+r.name+'؟ مش هيقدر يسجّل نقاط جديدة.'))return;await FS.setDoc(FS.doc(db,'bans',u),{n:r.name,t:FS.serverTimestamp()});r.banned=true}render()}
+    if(a==='fx'){
+      if(off!==0){alert('التصحيح متاح للأسبوع الحالي بس');return}
+      const diff=r.pts-r.g;
+      if(r.c<0){alert('لازم نتحقق من تسجيلاته الأول');return}
+      if(diff<=0){alert('مفيش نقاط غير مسجّلة');return}
+      if(!confirm('نقاط '+r.name+': '+r.pts+' • المسجّل: '+r.g+'\nهيتمسح '+diff+' نقطة غير مسجّلة وتفضل '+r.g+' نقطة بس.\nتنبيه: لو لعب قبل ما التسجيل يبدأ، النقاط دي ممكن تكون سليمة. تكمّل؟'))return;
+      const id=wid(),np=Math.max(0,r.g);
+      await FS.updateDoc(FS.doc(db,'weeks',id,'scores',u),{pts:np});
+      for(let g=1;g<=6;g++){const ref=FS.doc(db,'weeks',id+'g'+g,'scores',u);const sn=await FS.getDoc(ref);if(sn.exists())await FS.updateDoc(ref,{pts:np})}
+      await FS.setDoc(FS.doc(db,'adj',u),{w:id,p:np,t:FS.serverTimestamp()});
+      r.pts=np;render();return;
+    }
     if(a==='x'){if(!confirm('مسح نقاط '+r.name+' من الأسبوع ده؟'))return;const id=wid();await FS.deleteDoc(FS.doc(db,'weeks',id,'scores',u));for(let g=1;g<=6;g++)await FS.deleteDoc(FS.doc(db,'weeks',id+'g'+g,'scores',u));rows=rows.filter((x)=>x.id!==u);render()}
   }catch(e){alert('حصل خطأ: '+(e.code||e.message))}
 }
