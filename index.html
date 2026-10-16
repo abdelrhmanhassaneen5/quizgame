@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 </head>
@@ -80,6 +75,13 @@ if(window.FIREBASE_CONFIG){
     submit:(wk,uid,name,pts)=>FS.setDoc(FS.doc(db,'weeks',String(wk),'scores',uid),{name:name,pts:pts,t:FS.serverTimestamp()}),
     top:async(wk,n)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wk),'scores'),FS.orderBy('pts','desc'),FS.limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
     log:(d)=>FS.addDoc(FS.collection(db,'logs'),Object.assign({},d,{t:FS.serverTimestamp()})),
+    saveGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'saves',c));return x.exists()?x.data():null},
+    saveSet:(c,d)=>FS.setDoc(FS.doc(db,'saves',c),Object.assign({},d,{t:FS.serverTimestamp()})),
+    groupsGet:async(wk)=>{
+      const q=(w)=>FS.getDocs(FS.query(FS.collection(db,'gscores'),FS.where('w','==',w)));
+      const r=await Promise.all([FS.getDocs(FS.collection(db,'groups')),q(wk),q(wk-1)]);
+      return {groups:r[0].docs.map((d)=>Object.assign({id:d.id},d.data())),cur:r[1].docs.map((d)=>d.data()),prev:r[2].docs.map((d)=>d.data())};
+    },
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
     board:async(wk,lo,hi,mine,n)=>{
@@ -162,19 +164,19 @@ function submitP(){
   try{a.push(FB.submit(wkId(w),S.uid,S.nick,pt));if(S.grade)a.push(FB.submit(gId(w),S.uid,S.nick,pt))}catch(e){}
   return Promise.all(a.map(function(x){return x.catch(function(){})}));
 }
-function submit(){submitP()}
+function submit(){submitP();cloudSave()}
 function heart(o){return'<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.5-8 11-8 11z" fill="'+(o?'#B23A3A':'#CDB88A')+'" stroke="#6B4A3A" stroke-width="1.5"/></svg>'}
 function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z" fill="'+(o?'#C9973F':'#E3C98F')+'" stroke="#6B4A3A" stroke-width="1.2"/></svg>'}
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
-function home(){setTimeout(function(){fillStats();fillMk();refreshStats()},0);
+function home(){setTimeout(function(){fillStats();fillMk();fillGroups();refreshStats();refreshGroups()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div><div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+'</span></div><button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button></div>'+'<div class="card" id="st" style="display:none"></div><div class="card" id="mk" style="display:none"></div><div class="card" id="gp" style="display:none"></div>'+(S.rcOk&&!S.rcSeen?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">تقدمك اتحفظ على النت!<br>احتفظ بكودك علشان ترجّعه لو غيّرت الموبايل<br><button class="btn t" style="font-size:14px;margin-top:6px" onclick="saveScr()">شوف كودك</button></div>':'')+
   (DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة (أيام ورا بعض: '+S.streak+')</div>':'')+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+'<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات</div><div class="sm">تصفيق وصوت الوحش وأصوات المرح</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="toggleSnd()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
-  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button>';
+  '<div class="sp"></div><button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button><button class="btn t" onclick="board()">ترتيب الأسبوع</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button><button class="btn t" style="font-size:15px" onclick="saveScr()">حفظ التقدم (كود الاسترجاع)</button>';
 }
 function map(){
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
@@ -370,7 +372,7 @@ function doBuy(id){
   save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
 }
 
-function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'')}
+function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'<button class="btn t" style="font-size:14px" onclick="saveScr()">عندي كود استرجاع</button>')}
 function gradeScr(){
   var G6=S.stage==='p'?GP:GM;
   app.innerHTML='<div class="hd"><h1>اختار صفّك</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • هتتنافس مع طلاب صفّك</div></div><div class="sp"></div>'+G6.map(function(n,i){return'<button class="btn'+(S.grade===i+1?'':' t')+'" onclick="setGrade('+(i+1)+')">'+n+'</button>'}).join('')+'<button class="btn t" onclick="stageScr()" style="font-size:14px">رجوع</button>';
@@ -487,6 +489,62 @@ function sfxBad(){roar()}
 function sfxWin(){clap(1.8);[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.25,'triangle',0.16)})}
 function spk(){return S.mute?'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#6B4A3A"/><path d="M16 9l5 6M21 9l-5 6" stroke="#7A3B3B" stroke-width="2" stroke-linecap="round"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#2F5F5A"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#2F5F5A" stroke-width="2" stroke-linecap="round"/></svg>'}
 function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTML=spk()}else home()}
+var CSAVE_AT=0;
+function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
+function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,grp:S.grp||''})}
+function cloudSave(force){
+  if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
+  var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
+  CSAVE_AT=now;if(!S.rc)S.rc=genRC();
+  return FB.saveSet(S.rc,{d:snap(),u:S.uid}).then(function(){S.rcOk=1;S.rcAt=Date.now();save()}).catch(function(){if(!S.rcOk)S.rc=null;save()});
+}
+function rcCopy(){try{navigator.clipboard.writeText(fmtRC(S.rc)).then(function(){rmsg('اتنسخ')}).catch(function(){rmsg('انسخه يدويًا')})}catch(e){rmsg('انسخه يدويًا')}}
+function rcWA(){window.open('https://wa.me/?text='+encodeURIComponent('كود استرجاع تقدمي في تحدّي الأصحاب: '+fmtRC(S.rc)),'_blank')}
+function saveScr(){
+  S.rcSeen=1;save();
+  var back=S.stage?'home()':'stageScr()',hd='<div class="hd"><h1>حفظ التقدم</h1><div>ارجّع تقدمك لو غيّرت الموبايل</div></div>';
+  if(!window.FB){app.innerHTML=hd+'<div class="card">الميزة دي لسه متفعّلتش.</div><div class="sp"></div><button class="btn t" onclick="'+back+'">رجوع</button>';return}
+  var mine=S.rc&&S.rcOk?'<div class="card" style="text-align:center"><div class="sm">كود الاسترجاع بتاعك</div><div class="big" style="font-size:30px;letter-spacing:3px;direction:ltr">'+fmtRC(S.rc)+'</div><div class="sm">آخر حفظ: '+(S.rcAt?new Date(S.rcAt).toLocaleString('ar-EG',{hour:'numeric',minute:'2-digit',day:'numeric',month:'numeric'}):'-')+'</div><div style="font-size:13px;line-height:1.7;margin-top:6px">اكتبه أو صوّره، ومتبعتوش لحد. أي حد معاه الكود يقدر يدخل بتقدمك.</div><div class="row" style="margin-top:8px"><button class="btn t sp" onclick="rcCopy()">نسخ الكود</button><button class="btn t sp" onclick="rcWA()">ابعته لنفسك</button></div><button class="btn" style="width:100%;margin-top:8px;font-size:15px" onclick="cloudSave(true).then(saveScr)">احفظ دلوقتي</button></div>':'<div class="card" style="text-align:center"><div style="font-size:14px;line-height:1.7">لسه محفوظش تقدمك على النت.</div><button class="btn" style="margin-top:8px" onclick="cloudSave(true).then(saveScr)">احفظ تقدمي واعمل كود</button></div>';
+  app.innerHTML=hd+mine+'<div class="card"><div class="tag">عندك كود استرجاع؟</div><input id="rcin" class="inp" maxlength="12" placeholder="XXXXX-XXXXX" style="direction:ltr;margin-top:8px;text-transform:uppercase"><button class="btn t" style="width:100%;margin-top:8px" onclick="rcRestore()">استرجع تقدمي</button><div style="font-size:12px;margin-top:6px">الاسترجاع بيستبدل التقدم اللي على الجهاز ده.</div></div><div id="rmsg" class="sm" style="text-align:center;font-weight:900"></div><div class="sp"></div><button class="btn t" onclick="'+back+'">رجوع</button>';
+}
+function rcRestore(){
+  var c=$('#rcin').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(c.length!==10){rmsg('اكتب الكود كامل (10 حروف وأرقام)');return}
+  rmsg('بندوّر...');
+  FB.saveGet(c).then(function(r){
+    if(!r){rmsg('الكود غلط أو مش موجود');return}
+    var o;try{o=JSON.parse(r.d)}catch(e){rmsg('الكود تالف');return}
+    if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
+    if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
+    var n=function(x){return Number(x)||0},iv=o.inv||{};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),grp:o.grp?String(o.grp).slice(0,40):undefined,nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1};
+    save();applyTheme();CSAVE_AT=Date.now();
+    if(!S.stage)stageScr();else if(!S.grade)gradeScr();else home();
+  }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
+}
+var GD=null,GLAST=0;
+function fillGroups(){
+  var e=$('#gp');if(!e||!GD)return;
+  if(!GD.groups.length){e.style.display='none';return}
+  var sc={};GD.cur.forEach(function(x){sc[x.g]=x.p||0});
+  var list=GD.groups.map(function(g){return{id:g.id,n:g.n,c:g.c,p:sc[g.id]||0}}).sort(function(a,b){return b.p-a.p});
+  var h='<div class="tag">مجموعات الأسبوع (نقاط الحصة)</div><div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">'+list.map(function(g,i){var me=g.id===S.grp;return'<div class="row'+(me?' me':'')+'"><b style="min-width:24px">'+(i+1)+'</b><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'+esc(g.c||'#6B4A3A')+'"></span><span class="sp">'+esc(g.n)+(me?' (مجموعتك)':'')+'</span><b>'+g.p+'</b></div>'}).join('')+'</div>';
+  var pm=0;GD.prev.forEach(function(x){if((x.p||0)>pm)pm=x.p});
+  if(pm>0){var w=GD.prev.filter(function(x){return x.p===pm}).map(function(x){return esc(x.n)});h+='<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;margin-top:8px">مجموعة الأسبوع اللي فات: '+w.join(' و ')+' ('+pm+' نقطة)</div>'}
+  h+='<button class="btn t" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="groupScr()">'+(S.grp?'غيّر مجموعتي':'اختار مجموعتي')+'</button>';
+  e.style.display='';e.innerHTML=h;
+}
+function refreshGroups(f){
+  if(!window.FB||!FB.groupsGet)return;
+  var now=Date.now();if(!f&&now-GLAST<180000)return;GLAST=now;
+  FB.groupsGet(wkKey()).then(function(r){GD=r;fillGroups()}).catch(function(){});
+}
+function groupScr(){
+  if(!GD||!GD.groups.length){home();return}
+  app.innerHTML='<div class="hd"><h1>اختار مجموعتك</h1><div>نقاطها من الحصة بتتحسب لمجموعتك</div></div><div class="sp"></div>'+GD.groups.map(function(g){return'<button class="btn'+(g.id===S.grp?'':' t')+'" onclick="setGrp(\''+esc(g.id)+'\')">'+esc(g.n)+'</button>'}).join('')+'<button class="btn t" style="font-size:14px" onclick="setGrp(\'\')">من غير مجموعة</button><button class="btn t" style="font-size:14px" onclick="home()">رجوع</button>';
+}
+function setGrp(id){S.grp=id||undefined;save();home()}
 var ST=null;
 function num(n){return Number(n).toLocaleString('en')}
 function statsHtml(r){
@@ -506,7 +564,7 @@ function refreshStats(f){
 window.onFB=function(){
   var first=!S.reg;FB.ping(S.uid,first).catch(function(){});if(first){S.reg=1;save()}
   setInterval(function(){if(document.visibilityState==='visible')FB.beat(S.uid).catch(function(){})},60000);
-  setInterval(function(){refreshStats(true)},60000);refreshStats(true);
+  setInterval(function(){refreshStats(true);refreshGroups()},60000);refreshStats(true);refreshGroups(true);
 };
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():home());if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
 </script>
