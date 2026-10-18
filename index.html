@@ -56,16 +56,12 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
+<script src="words.js"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -130,7 +126,7 @@ if(window.FIREBASE_CONFIG){
 }
 </script>
 <script>
-var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟"};
+var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح"};
 var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -198,10 +194,47 @@ function map(){
   app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div></div><div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
+function others(L,i,k){var a=[];shuffle(L.map(function(_,j){return j})).forEach(function(j){if(a.length<k&&j!==i&&L[j][0]!==L[i][0]&&L[j][1]!==L[i][1])a.push(j)});return a}
+function misspell(w){
+  var set=[],tries=0,i;
+  while(set.length<3&&tries++<60){
+    var r=Math.floor(Math.random()*4),x;
+    if(r===0){i=1+Math.floor(Math.random()*(w.length-2));x=w.slice(0,i)+w[i+1]+w[i]+w.slice(i+2)}
+    else if(r===1){i=1+Math.floor(Math.random()*(w.length-1));x=w.slice(0,i)+w.slice(i+1)}
+    else if(r===2){i=1+Math.floor(Math.random()*(w.length-1));x=w.slice(0,i)+w[i]+w.slice(i)}
+    else{var vs='aeiou',idx=[],c;for(i=0;i<w.length;i++)if(vs.indexOf(w[i])>=0)idx.push(i);if(!idx.length)continue;i=idx[Math.floor(Math.random()*idx.length)];do{c=vs[Math.floor(Math.random()*5)]}while(c===w[i]);x=w.slice(0,i)+c+w.slice(i+1)}
+    if(x!==w&&set.indexOf(x)<0)set.push(x);
+  }
+  return set.length===3?set:null;
+}
+function mkWord(L,i){
+  var en=L[i][0],ar=L[i][1],r=Math.random(),ms=(r>0.8&&en.length>=5&&/^[a-z]+$/.test(en))?misspell(en):null,o,t,q;
+  if(ms){o=[en].concat(ms);t='sp';q=['Choose the correct spelling:','اختار الإملاء الصح لكلمة: '+ar]}
+  else if(r<0.55){o=[ar].concat(others(L,i,3).map(function(j){return L[j][1]}));t='tr';q=['What does "'+en+'" mean?','ايه معنى كلمة '+en+'؟']}
+  else{o=[en].concat(others(L,i,3).map(function(j){return L[j][0]}));t='ar';q=['Choose the English word for: '+ar,'اختار الكلمة بالإنجليزي اللي معناها: '+ar]}
+  var correct=o[0];o=shuffle(o);
+  return[q[0],q[1],o,o.indexOf(correct),en+' = '+ar,t,S.stage];
+}
+function genQs(g){
+  if(typeof WORDS==='undefined'||g<=0)return[];
+  var L=WORDS[S.stage==='p'?'p':'m'];if(!L||L.length<8)return[];
+  S.wrec=S.wrec||[];var out=[],used=[],tries=0;
+  while(out.length<g&&tries++<80){
+    var i=Math.floor(Math.random()*L.length);
+    if(S.wrec.indexOf(i)>=0||used.indexOf(i)>=0)continue;
+    used.push(i);out.push(mkWord(L,i));S.wrec.push(i);
+  }
+  var keep=Math.floor(L.length*0.6);if(S.wrec.length>keep)S.wrec=S.wrec.slice(-keep);
+  return out;
+}
+function revTxt(q){return q[0].indexOf('____')>=0?q[0].replace('____',q[2][q[3]]):q[0]+' → '+q[2][q[3]]}
 function pickQs(n){
-  var all=Q.map(function(_,i){return i}).filter(function(i){return Q[i][6]===(S.stage||'m')}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,n);
-  if(out.length<n){S.seen=[];out=out.concat(shuffle(all.filter(function(i){return out.indexOf(i)<0})).slice(0,n-out.length))}
-  S.seen=S.seen.concat(out);save();return out.map(function(i){return Q[i]});
+  var g=(typeof WORDS==='undefined')?0:Math.max(1,Math.round(n*0.4)),m=n-g;
+  var all=Q.map(function(_,i){return i}).filter(function(i){return Q[i][6]===(S.stage||'m')}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,m);
+  if(out.length<m){S.seen=[];out=out.concat(shuffle(all.filter(function(i){return out.indexOf(i)<0})).slice(0,m-out.length))}
+  S.seen=S.seen.concat(out);save();
+  var gen=genQs(g);
+  return shuffle(out.map(function(i){return Q[i]}).concat(gen));
 }
 function start(lv){var b=lv%5===0,t=Math.floor((lv-1)/5),n=b?[7,8,9,10][t]:(lv>10?6:5),base=Math.max(7,13-Math.ceil(lv/2)),T=b?Math.max(6,base-2):base,mx=Math.ceil(n*[.6,.7,.8,.85][t]);
   G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
@@ -209,7 +242,7 @@ function hearts(){var r='';for(var i=1;i<=3;i++)r+=heart(i<=G.h);return r}
 function show(){
   var q=G.qs[G.i];G.left=G.T;G.done=false;G.f50=false;
   G.ord=shuffle([0,1,2,3]);G.ci=G.ord.indexOf(q[3]);
-  var o=G.ord.map(function(x,k){return'<button class="opt" onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
+  var o=G.ord.map(function(x,k){return'<button class="opt"'+(/[\u0600-\u06FF]/.test(q[2][x])?' style="direction:rtl"':'')+' onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
   app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><button id="mb" class="pwb" style="flex:none;min-height:36px;padding:4px 10px" aria-label="الصوت" onclick="toggleSnd(1)">'+spk()+'</button><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
   '<div class="card" style="padding:8px"><div class="row"><span class="sm">'+mName(G.lv)+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
   '<div id="mon" style="text-align:center;filter:hue-rotate('+hueOf()+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv,S.eq.ch)+'</div></div></div>'+
@@ -236,7 +269,7 @@ function endRound(){
   var win=G.mhp<=0,lv=G.lv,bonus=0;S.nr=(S.nr||0)+1;
   if(win){bonus=20+10*G.h;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++;save()}
   dayRoundDone();submit();
-  var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+q[0].replace('____',q[2][q[3]])+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
+  var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+'</div>':'';
   app.innerHTML='<div class="hd"><h1>'+(win?(lv===20?'خلّصت كل الجولات!':'الوحش اتهزم!'):(G.h<=0?'القلوب خلصت':'الوحش هرب'))+'</h1><div>'+(win?'عدّيت الجولة '+lv:'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
