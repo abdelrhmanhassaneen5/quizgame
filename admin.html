@@ -30,14 +30,9 @@ select{width:auto}
 .lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
@@ -102,7 +97,7 @@ function flags(r){
     else if(diff>1000)f.push(['نقاطه أكتر من المسجّل بـ '+diff,'bad']);
     else f.push(['فرق '+diff+' عن المسجّل','warn']);
   }
-  if(r.c>=3&&r.s>=60&&r.g/(r.s/60)>250)f.push(['معدل عالي: '+Math.round(r.g/(r.s/60))+' نقطة/دقيقة','bad']);
+  if(r.c>=3&&r.s>=60&&r.g/(r.s/60)>450)f.push(['معدل عالي: '+Math.round(r.g/(r.s/60))+' نقطة/دقيقة','bad']);
   if(!f.length&&r.c>0)f.push(['سليم','ok']);
   return f;
 }
@@ -124,7 +119,7 @@ async function details(u){
   try{
     const s=await FS.getDocs(FS.query(FS.collection(db,'logs'),FS.where('u','==',u),FS.where('w','==',wid()),FS.limit(300)));
     const a=s.docs.map((d)=>d.data()).sort((x,y)=>ms(y.t)-ms(x.t));
-    box.innerHTML='<div class="lg"><b>الوقت</b><b>النقاط</b><b>ثواني</b><b>جولات</b><b>ملاحظة</b></div>'+(a.map((x)=>{const n=[];if(x.g>1500)n.push('قفزة كبيرة');if(x.sec>0&&x.g>0&&x.g/(x.sec/60)>250)n.push('سريع');if(x.g<0)n.push('شراء');
+    box.innerHTML='<div class="lg"><b>الوقت</b><b>النقاط</b><b>ثواني</b><b>جولات</b><b>ملاحظة</b></div>'+(a.map((x)=>{const n=[];if(x.g>1500)n.push('قفزة كبيرة');if(x.sec>0&&x.g>0&&x.g/(x.sec/60)>450)n.push('سريع');if(x.g<0)n.push('شراء');
       return'<div class="lg"><span>'+tm(ms(x.t))+'</span><span>'+x.g+'</span><span>'+x.sec+'</span><span>'+x.r+'</span><span style="color:#8B2E2E;font-weight:700">'+n.join(' • ')+'</span></div>'}).join('')||'<div class="sm">مفيش تسجيلات</div>');
   }catch(e){box.textContent='خطأ: '+(e.code||e.message)}
 }
