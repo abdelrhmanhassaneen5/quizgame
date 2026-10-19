@@ -56,14 +56,9 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 @keyframes pl{50%{opacity:.3}}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -131,7 +126,7 @@ if(window.FIREBASE_CONFIG){
 }
 </script>
 <script>
-var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح"};
+var TT={v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",lm:"اسمع واختار المعنى",lw:"اسمع واختار الكلمة",lp:"اسمع واختار الإملاء الصح",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح"};
 var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -213,7 +208,14 @@ function misspell(w){
   return set.length===3?set:null;
 }
 function mkWord(L,i){
-  var en=L[i][0],ar=L[i][1],r=Math.random(),ms=(r>0.8&&en.length>=5&&/^[a-z]+$/.test(en))?misspell(en):null,o,t,q;
+  var en=L[i][0],ar=L[i][1],r=Math.random(),ms=(r>0.8&&en.length>=5&&/^[a-z]+$/.test(en))?misspell(en):null,o,t,q,sp=null;
+  if(HASV&&!S.mute&&Math.random()<0.4){
+    var z=Math.random(),m2=(en.length>=5&&/^[a-z]+$/.test(en))?misspell(en):null;
+    if(z<0.45||(z>=0.75&&!m2)){o=[ar].concat(others(L,i,3).map(function(j){return L[j][1]}));t='lm';q=['Listen: '+en,'اسمع الكلمة واختار معناها']}
+    else if(z<0.75){o=[en].concat(others(L,i,3).map(function(j){return L[j][0]}));t='lw';q=['Listen: '+en,'اسمع الكلمة واختار الكلمة اللي سمعتها']}
+    else{o=[en].concat(m2);t='lp';q=['Listen: '+en,'اسمع الكلمة واختار إملاءها الصح']}
+    var c0=o[0];o=shuffle(o);return[q[0],q[1],o,o.indexOf(c0),en+' = '+ar,t,S.stage,en];
+  }
   if(ms){o=[en].concat(ms);t='sp';q=['Choose the correct spelling:','اختار الإملاء الصح لكلمة: '+ar]}
   else if(r<0.55){o=[ar].concat(others(L,i,3).map(function(j){return L[j][1]}));t='tr';q=['What does "'+en+'" mean?','ايه معنى كلمة '+en+'؟']}
   else{o=[en].concat(others(L,i,3).map(function(j){return L[j][0]}));t='ar';q=['Choose the English word for: '+ar,'اختار الكلمة بالإنجليزي اللي معناها: '+ar]}
@@ -245,14 +247,15 @@ function start(lv){var b=lv%5===0,t=Math.floor((lv-1)/5),n=b?[7,8,9,10][t]:(lv>1
   G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
 function hearts(){var r='';for(var i=1;i<=3;i++)r+=heart(i<=G.h);return r}
 function show(){
-  var q=G.qs[G.i];G.left=G.T;G.done=false;G.f50=false;
+  var q=G.qs[G.i];G.left=G.T+(q[7]?3:0);G.done=false;G.f50=false;
   G.ord=shuffle([0,1,2,3]);G.ci=G.ord.indexOf(q[3]);
   var o=G.ord.map(function(x,k){return'<button class="opt"'+(/[\u0600-\u06FF]/.test(q[2][x])?' style="direction:rtl"':'')+' onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
   app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><button id="mb" class="pwb" style="flex:none;min-height:36px;padding:4px 10px" aria-label="الصوت" onclick="toggleSnd(1)">'+spk()+'</button><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
   '<div class="card" style="padding:8px"><div class="row"><span class="sm">'+mName(G.lv)+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
   '<div id="mon" style="text-align:center;filter:hue-rotate('+hueOf()+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv,S.eq.ch)+'</div></div></div>'+
   '<div class="row"><span class="sm">جولة '+G.lv+(G.lv%5===0?' (زعيم)':'')+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+G.T+'</div></div>'+
-  '<div class="row" id="pw">'+pwHtml()+'</div>'+'<div class="card"><div class="tag g">'+TT[q[5]]+'</div><div class="en">'+q[0]+'</div>'+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+o+'<div id="fb"></div>';
+  '<div class="row" id="pw">'+pwHtml()+'</div>'+'<div class="card"><div class="tag g">'+TT[q[5]]+'</div>'+(q[7]?lsBtn():'<div class="en">'+q[0]+'</div>')+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+o+'<div id="fb"></div>';
+  if(q[7]&&!S.mute)setTimeout(speakQ,350);
   clearInterval(G.t);
   G.t=setInterval(function(){G.left-=0.1;if(G.left<=0){pick(-1);return}$('#bf').style.width=Math.min(100,G.left/G.T*100)+'%';$('#tm').textContent=Math.ceil(G.left);$('#ms').style.transform='scale('+(0.85+Math.max(0,1-G.left/G.T)*0.4)+')'},100);
 }
@@ -596,6 +599,15 @@ function dayCard(){
   (D.raw<DCAP[0]&&!D.chest?'<br><span class="sm">باقي '+(DCAP[0]-D.raw)+' للصندوق (+'+DCHEST+' عملة)</span>':(D.chest?'<br><span class="sm">فتحت صندوق النهاردة</span>':''))+
   '<br><span class="sm">بعد حد معين في اليوم نقاط الترتيب بتقل، لكن العملات من غير حد.</span></div></div>';
 }
+var VOICE=null,HASV=false;
+function loadVoices(){try{var v=speechSynthesis.getVoices()||[],en=v.filter(function(x){return/^en/i.test(x.lang)});HASV=en.length>0;VOICE=en.filter(function(x){return/en[-_]US/i.test(x.lang)})[0]||en.filter(function(x){return/en[-_]GB/i.test(x.lang)})[0]||en[0]||null}catch(e){HASV=false}}
+try{if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}}catch(e){}
+function speak(t){
+  if(!('speechSynthesis' in window))return false;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang=VOICE?VOICE.lang:'en-US';if(VOICE)u.voice=VOICE;u.rate=0.8;u.pitch=1;u.volume=1;speechSynthesis.speak(u);return true}catch(e){return false}
+}
+function speakQ(){var q=G&&G.qs[G.i];if(q&&q[7])speak(q[7])}
+function lsBtn(){return'<div style="text-align:center;margin:10px 0"><button class="btn" style="display:inline-flex;gap:10px;align-items:center;font-size:20px" onclick="speakQ()"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFE9B8"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#FFE9B8" stroke-width="2" stroke-linecap="round"/></svg><span>اسمع الكلمة</span></button></div>'}
 var ST=null;
 function num(n){return Number(n).toLocaleString('en')}
 function statsHtml(r){
