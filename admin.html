@@ -30,14 +30,9 @@ select{width:auto}
 .lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
@@ -51,7 +46,7 @@ const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&
 if(!window.FIREBASE_CONFIG){app.innerHTML='<div class="card">الصق إعدادات Firebase في أول الملف (السطر window.FIREBASE_CONFIG) وارفعه تاني.</div>'}
 else{
 const fb=initializeApp(window.FIREBASE_CONFIG),db=FS.getFirestore(fb),auth=getAuth(fb);
-let stage='m',off=0,rows=[],user=null,note='';
+let stage='m',off=0,rows=[],user=null,note='',mode='p';
 function cairo(){const p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(new Date()).forEach((x)=>{p[x.type]=+x.value})}catch(e){}
   if(!p.year){const t=new Date(Date.now()+3*36e5);return{year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate()}}return p}
 function wkKey(){const p=cairo();return Math.floor((Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5)-2)/7)}
@@ -66,11 +61,12 @@ function loginUI(m){
 }
 function panel(){
   app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1><div class="sm" style="color:#FFE9B8">'+esc(user.email)+'</div></div>'+
-  '<div class="card row"><select id="st"><option value="m">إعدادي</option><option value="p">ابتدائي</option></select><button class="btn t" data-a="wk" data-u="0">الأسبوع الحالي</button><button class="btn g" data-a="wk" data-u="-1">الأسبوع اللي فات</button><button class="btn" data-a="r">تحديث</button><span class="sp"></span><button class="btn g" data-a="o">خروج</button></div><div id="sum"></div><div id="list" class="row" style="flex-direction:column;align-items:stretch"></div>';
+  '<div class="card row"><button class="btn t" data-a="md" data-u="p">اللاعبين</button><button class="btn t" data-a="md" data-u="r">تقرير الضعف</button><select id="st"><option value="m">إعدادي</option><option value="p">ابتدائي</option></select><button class="btn t" data-a="wk" data-u="0">الأسبوع الحالي</button><button class="btn g" data-a="wk" data-u="-1">الأسبوع اللي فات</button><button class="btn" data-a="r">تحديث</button><span class="sp"></span><button class="btn g" data-a="o">خروج</button></div><div id="sum"></div><div id="list" class="row" style="flex-direction:column;align-items:stretch"></div>';
   const s=document.getElementById('st');s.value=stage;s.onchange=()=>{stage=s.value;load()};
   load();
 }
 async function load(){
+  if(mode==='r')return report();
   const L=document.getElementById('list');L.innerHTML='<div class="card">بنحمّل...</div>';
   try{
     const id=wid();
@@ -128,9 +124,32 @@ async function details(u){
       return'<div class="lg"><span>'+tm(ms(x.t))+'</span><span>'+x.g+'</span><span>'+x.sec+'</span><span>'+x.r+'</span><span style="color:#8B2E2E;font-weight:700">'+n.join(' • ')+'</span></div>'}).join('')||'<div class="sm">مفيش تسجيلات</div>');
   }catch(e){box.textContent='خطأ: '+(e.code||e.message)}
 }
+async function report(){
+  const L=document.getElementById('list');L.innerHTML='<div class="card">بنحمّل...</div>';document.getElementById('sum').innerHTML='';
+  try{
+    const [s,lb]=await Promise.all([FS.getDocs(FS.query(FS.collection(db,'saves'),FS.limit(500))),FS.getDocs(FS.collection(db,'labels'))]);
+    const lab={};lb.docs.forEach((d)=>{lab[d.id]=d.data().n});
+    const CN={voc:'مفردات',gram:'قواعد',fix:'تصحيح جمل',spell:'إملاء',listen:'استماع'},tot={};
+    Object.keys(CN).forEach((k)=>{tot[k]=[0,0]});
+    const st=[];
+    s.docs.forEach((d)=>{
+      let o;try{o=JSON.parse(d.data().d)}catch(e){return}
+      if(!o||!o.ts||o.stage!==stage)return;
+      const r={u:o.u,nick:o.nick||'—',grade:o.grade,mis:(o.mis||[]).length,t:ms(d.data().t),cat:{},weak:101};
+      Object.keys(CN).forEach((k)=>{const x=o.ts[k];if(x&&x[1]>0){tot[k][0]+=x[0];tot[k][1]+=x[1];r.cat[k]=x;if(x[1]>=5)r.weak=Math.min(r.weak,Math.round(x[0]/x[1]*100))}});
+      st.push(r);
+    });
+    st.sort((x,y)=>x.weak-y.weak);
+    const pc=(x)=>Math.round(x[0]/x[1]*100),col=(p)=>p<60?'bad':(p<75?'warn':'ok');
+    const classRow=Object.keys(CN).filter((k)=>tot[k][1]>0).sort((x,y)=>pc(tot[x])-pc(tot[y])).map((k)=>{const p=pc(tot[k]);return'<div class="row"><span style="min-width:90px;font-weight:700">'+CN[k]+'</span><div class="bar" style="flex:1;height:14px;border-radius:7px;background:#E3C98F;border:2px solid #8A6A4A;overflow:hidden"><i style="display:block;height:100%;width:'+p+'%;background:'+(p<60?'#8B2E2E':(p<75?'#E3B03F':'#2F6B4A'))+'"></i></div><b>'+p+'%</b><span class="sm">'+tot[k][1]+' إجابة</span></div>'}).join('');
+    document.getElementById('sum').innerHTML='<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="sm">مستوى الفصل كله ('+(stage==='p'?'ابتدائي':'إعدادي')+') • '+st.length+' طالب</div>'+(classRow||'<div class="sm">لسه مفيش بيانات كفاية. البيانات بتبدأ تتجمّع بعد تحديث اللعبة.</div>')+'</div>';
+    L.innerHTML=st.map((r)=>'<div class="card"><div class="row"><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.nick)+(lab[r.u]?' <span class="fl ok">'+esc(lab[r.u])+'</span>':'')+'</div><div class="sm">صف '+esc(r.grade||'؟')+' • آخر حفظ: '+tm(r.t)+'</div></div>'+(r.mis?'<span class="fl warn">'+r.mis+' سؤال للمراجعة</span>':'')+'</div><div style="margin-top:6px">'+Object.keys(CN).map((k)=>{const x=r.cat[k];if(!x)return'';if(x[1]<5)return'<span class="fl" style="background:#D9C39A">'+CN[k]+': قليل</span>';const p=pc(x);return'<span class="fl '+col(p)+'">'+CN[k]+' '+p+'%</span>'}).join('')+'</div></div>').join('')||'<div class="card">مفيش طلاب ليهم بيانات في المرحلة دي لسه.</div>';
+  }catch(e){L.innerHTML='<div class="card">مقدرناش نحمّل التقرير ('+esc(e.code||e.message)+'). لو permission-denied يبقى لازم تضيف قاعدة saves للأدمن في Firebase.</div>'}
+}
 async function act(a,u){
   try{
     if(a==='o'){await signOut(auth);return}
+    if(a==='md'){mode=u;load();return}
     if(a==='r'){load();return}
     if(a==='wk'){off=+u;load();return}
     if(a==='d'){details(u);return}
