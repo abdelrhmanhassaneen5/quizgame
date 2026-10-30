@@ -73,15 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
-
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -207,7 +201,7 @@ function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function monster(lv){var b=lv%5===0;return'<svg viewBox="0 0 120 110" width="'+(b?110:94)+'" aria-hidden="true">'+(b?'<path d="M28 34L34 8L50 30zM92 34L86 8L70 30z" fill="#6B4A3A" stroke="#4A2F22" stroke-width="2"/>':'')+'<path d="M15 98C5 58 30 24 60 24S115 58 105 98Z" fill="#7B9E6B" stroke="#4A2F22" stroke-width="3"/><circle cx="45" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="75" cy="60" r="11" fill="#fff" stroke="#4A2F22" stroke-width="2"/><circle cx="47" cy="62" r="5" fill="#4A2F22"/><circle cx="73" cy="62" r="5" fill="#4A2F22"/><path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/></svg>'}
-function canChange(){return!!S.t0&&Date.now()-S.t0<20*60000}
+function canChange(){return true;}
 function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   setTimeout(function(){fillStats();fillLb();ensureReg();claimPrev();refreshLb();refreshStats()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
@@ -486,7 +480,7 @@ function gradeScr(){
   app.innerHTML='<div class="hd"><h1>اختار صفّك</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • هتتنافس مع طلاب صفّك</div></div><div class="sp"></div>'+G6.map(function(n,i){return'<button class="btn'+(S.grade===i+1?'':' t')+'" onclick="setGrade('+(i+1)+')">'+n+'</button>'}).join('')+'<button class="btn t" onclick="stageScr()" style="font-size:14px">رجوع</button>';
 }
 function setGrade(g){S.grade=g;save();if(!S.nick)nickReq();else{submit();home()}}
-function setStage(x){if(S.stage!==x){S.stage=x;S.seen=[];S.grade=0;S.max=1;S.stars={};S.mis=[];S.ts={}}save();gradeScr()}
+function setStage(x){if(S.stage===x){gradeScr();return;}if(S.stage){S['prog_'+S.stage]={grade:S.grade,max:S.max,stars:S.stars,mis:S.mis,ts:S.ts,seen:S.seen,wk:S.wk,ls:S.ls,adjT:S.adjT,nr:S.nr};}S.stage=x;var p=S['prog_'+x]||{};S.grade=p.grade||0;S.max=p.max||1;S.stars=p.stars||{};S.mis=p.mis||[];S.ts=p.ts||{};S.seen=p.seen||[];S.wk=p.wk||null;S.ls=p.ls||null;S.adjT=p.adjT||0;S.nr=p.nr||0;save();gradeScr();}
 function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
 var QM=['جاهز للتحدّي؟','يلا نلعب!','شد حيلك','برافو عليك','جولة حلوة!','هكسبك المرة دي','تحدّي تاني؟'],RT=0,RMD=null,NEXT=null,LSAY=0,RTRY=0;
 var RQ=(function(){try{return new URLSearchParams(location.search).get('room')}catch(e){return null}})();
@@ -602,7 +596,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:S.bdg||[],aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{}})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:S.bdg||[],aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -628,7 +622,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,10):[],aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,10):[],aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
