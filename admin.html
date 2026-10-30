@@ -28,33 +28,49 @@ select{width:auto}
 .fl.ok{background:#2F6B4A;color:#fff}
 .big{font-size:26px;font-weight:900;text-align:center}
 .lg{font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:4px;padding:3px 0;border-bottom:1px dashed #8A6A4A}
+
+/* --- Design Improvements --- */
+#toast { position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: var(--ok); color: #fff; padding: 12px 24px; border-radius: 25px; font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 9999; transition: bottom 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease; opacity: 0; pointer-events: none; font-size: 15px; white-space: nowrap; }
+#toast.show { bottom: 40px; opacity: 1; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* Dark Mode Overrides */
+body.dark { background: #121212; --paper: #1E1E1E; --card: #2C2C2C; --ink: #F5F5F5; --teal: #498A82; --brown: #7A5947; --gold: #C29642; --red: #944242; color: var(--ink); }
+body.dark #app { background: var(--paper) !important; }
+body.dark .opt, body.dark .lv, body.dark .pwb { border-color: #555; box-shadow: 0 3px 0 #555; }
+body.dark .inp, body.dark select { background: #1A1A1A; border-color: #555; color: #fff; }
+body.dark .sw { background: #555; border-color: #777; }
+body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
-
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
 <div id="app">جاري التحميل...</div>
+<div id="toast"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import * as FS from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const app=document.getElementById('app');
+if(localStorage.getItem('adminDark')==='1') document.body.classList.add('dark');
+
+
+var toastT=null;
+function showToast(m,b){var t=document.getElementById('toast');if(!t)return;t.textContent=m;t.style.background=b?'var(--bad)':'var(--ok)';t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show')},3000)}
+
 const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 if(!window.FIREBASE_CONFIG){app.innerHTML='<div class="card">الصق إعدادات Firebase في أول الملف (السطر window.FIREBASE_CONFIG) وارفعه تاني.</div>'}
 else{
 const fb=initializeApp(window.FIREBASE_CONFIG),db=FS.getFirestore(fb),auth=getAuth(fb);
 let stage='m',off=0,rows=[],user=null,note='',mode='p';
+function egOff(){var n=new Date(),y=n.getUTCFullYear(),d=new Date(Date.UTC(y,3,30)),e=new Date(Date.UTC(y,9,31));while(d.getUTCDay()!==5)d.setUTCDate(d.getUTCDate()-1);while(e.getUTCDay()!==4)e.setUTCDate(e.getUTCDate()-1);var st=Date.UTC(y,3,d.getUTCDate(),0)-2*36e5,en=Date.UTC(y,9,e.getUTCDate()+1,0)-3*36e5,t=n.getTime();return(t>=st&&t<en)?3:2}
 function cairo(){const p={};try{new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}).formatToParts(new Date()).forEach((x)=>{p[x.type]=+x.value})}catch(e){}
-  if(!p.year){const t=new Date(Date.now()+3*36e5);return{year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate()}}return p}
+  if(!p.year){const t=new Date(Date.now()+egOff()*36e5);return{year:t.getUTCFullYear(),month:t.getUTCMonth()+1,day:t.getUTCDate()}}return p}
 function wkKey(){const p=cairo();return Math.floor((Math.floor(Date.UTC(p.year,p.month-1,p.day)/864e5)-2)/7)}
 function dTxt(dn){const t=new Date(dn*864e5);return['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][t.getUTCDay()]+' '+t.getUTCDate()+'/'+(t.getUTCMonth()+1)}
 const wid=()=>String(wkKey()+off)+(stage==='p'?'p':'');
@@ -62,12 +78,12 @@ const tm=(ms)=>ms?new Date(ms).toLocaleString('ar-EG',{timeZone:'Africa/Cairo',d
 const ms=(t)=>t&&t.toMillis?t.toMillis():0;
 function loginUI(m){
   app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><input id="em" class="inp" type="email" placeholder="الإيميل" autocomplete="username" style="direction:ltr"><input id="pw" class="inp" type="password" placeholder="الباسورد" autocomplete="current-password" style="direction:ltr"><button class="btn" id="go">دخول</button><div id="er" class="sm" style="color:#8B2E2E">'+esc(m||'')+'</div></div>';
-  const go=()=>signInWithEmailAndPassword(auth,document.getElementById('em').value.trim(),document.getElementById('pw').value).catch(()=>loginUI('الإيميل أو الباسورد غلط'));
+  const go=()=>signInWithEmailAndPassword(auth,document.getElementById('em').value.trim(),document.getElementById('pw').value).catch(()=>loginUI('الإيميل أو الباسورد غلط');showToast('الإيميل أو الباسورد غير صحيح', true));
   document.getElementById('go').onclick=go;document.getElementById('pw').onkeydown=(e)=>{if(e.key==='Enter')go()};
 }
 function panel(){
   app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1><div class="sm" style="color:#FFE9B8">'+esc(user.email)+'</div></div>'+
-  '<div class="card row"><button class="btn t" data-a="md" data-u="p">اللاعبين</button><button class="btn t" data-a="md" data-u="r">تقرير الضعف</button><button class="btn t" data-a="md" data-u="q">أسئلة الطلاب</button><select id="st"><option value="m">إعدادي</option><option value="p">ابتدائي</option></select><button class="btn t" data-a="wk" data-u="0">الأسبوع الحالي</button><button class="btn g" data-a="wk" data-u="-1">الأسبوع اللي فات</button><button class="btn" data-a="r">تحديث</button><span class="sp"></span><button class="btn g" data-a="o">خروج</button></div><div id="sum"></div><div id="list" class="row" style="flex-direction:column;align-items:stretch"></div>';
+  '<div class="card row"><button class="btn t" data-a="md" data-u="p">اللاعبين</button><button class="btn t" data-a="md" data-u="r">تقرير الضعف</button><button class="btn t" data-a="md" data-u="q">أسئلة الطلاب</button><select id="st"><option value="m">إعدادي</option><option value="p">ابتدائي</option></select><button class="btn t" data-a="wk" data-u="0">الأسبوع الحالي</button><button class="btn g" data-a="wk" data-u="-1">الأسبوع الماضي</button><button class="btn" data-a="r">تحديث</button><span class="sp"></span><button class="btn t" data-a="dm">الوضع الداكن</button><button class="btn g" data-a="o">خروج</button></div><div id="sum"></div><div id="list" class="row" style="flex-direction:column;align-items:stretch"></div>';
   const s=document.getElementById('st');s.value=stage;s.onchange=()=>{stage=s.value;load()};
   load();
 }
@@ -136,21 +152,28 @@ async function report(){
   try{
     const [s,lb]=await Promise.all([FS.getDocs(FS.query(FS.collection(db,'saves'),FS.limit(500))),FS.getDocs(FS.collection(db,'labels'))]);
     const lab={};lb.docs.forEach((d)=>{lab[d.id]=d.data().n});
-    const CN={voc:'مفردات',gram:'قواعد',fix:'تصحيح جمل',spell:'إملاء',listen:'استماع'},tot={};
+    const CN={voc:'مفردات',gram:'قواعد',fix:'تصحيح جمل',spell:'إملاء',listen:'استماع',clock:'الساعة'},tot={};
     Object.keys(CN).forEach((k)=>{tot[k]=[0,0]});
     const st=[];
     s.docs.forEach((d)=>{
       let o;try{o=JSON.parse(d.data().d)}catch(e){return}
-      if(!o||!o.ts||o.stage!==stage)return;
-      const r={u:o.u,nick:o.nick||'—',grade:o.grade,mis:(o.mis||[]).length,t:ms(d.data().t),cat:{},weak:101};
-      Object.keys(CN).forEach((k)=>{const x=o.ts[k];if(x&&x[1]>0){tot[k][0]+=x[0];tot[k][1]+=x[1];r.cat[k]=x;if(x[1]>=5)r.weak=Math.min(r.weak,Math.round(x[0]/x[1]*100))}});
+      if(!o)return;
+      let target_prog = null;
+      if (stage === 'p') {
+          target_prog = (o.stage === 'p') ? o : (o.prog_p || null);
+      } else {
+          target_prog = (o.stage === 'm') ? o : (o.prog_m || null);
+      }
+      if(!target_prog || !target_prog.ts)return;
+      const r={u:o.u,nick:o.nick||'—',grade:target_prog.grade,mis:(target_prog.mis||[]).length,t:ms(d.data().t),cat:{},weak:101,dh:o.dhp!==undefined?o.dhp:3};
+      Object.keys(CN).forEach((k)=>{const x=target_prog.ts[k];if(x&&x[1]>0){tot[k][0]+=x[0];tot[k][1]+=x[1];r.cat[k]=x;if(x[1]>=5)r.weak=Math.min(r.weak,Math.round(x[0]/x[1]*100))}});
       st.push(r);
     });
     st.sort((x,y)=>x.weak-y.weak);
     const pc=(x)=>Math.round(x[0]/x[1]*100),col=(p)=>p<60?'bad':(p<75?'warn':'ok');
     const classRow=Object.keys(CN).filter((k)=>tot[k][1]>0).sort((x,y)=>pc(tot[x])-pc(tot[y])).map((k)=>{const p=pc(tot[k]);return'<div class="row"><span style="min-width:90px;font-weight:700">'+CN[k]+'</span><div class="bar" style="flex:1;height:14px;border-radius:7px;background:#E3C98F;border:2px solid #8A6A4A;overflow:hidden"><i style="display:block;height:100%;width:'+p+'%;background:'+(p<60?'#8B2E2E':(p<75?'#E3B03F':'#2F6B4A'))+'"></i></div><b>'+p+'%</b><span class="sm">'+tot[k][1]+' إجابة</span></div>'}).join('');
     document.getElementById('sum').innerHTML='<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="sm">مستوى الفصل كله ('+(stage==='p'?'ابتدائي':'إعدادي')+') • '+st.length+' طالب</div>'+(classRow||'<div class="sm">لسه مفيش بيانات كفاية. البيانات بتبدأ تتجمّع بعد تحديث اللعبة.</div>')+'</div>';
-    L.innerHTML=st.map((r)=>'<div class="card"><div class="row"><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.nick)+(lab[r.u]?' <span class="fl ok">'+esc(lab[r.u])+'</span>':'')+'</div><div class="sm">صف '+esc(r.grade||'؟')+' • آخر حفظ: '+tm(r.t)+'</div></div>'+(r.mis?'<span class="fl warn">'+r.mis+' سؤال للمراجعة</span>':'')+'</div><div style="margin-top:6px">'+Object.keys(CN).map((k)=>{const x=r.cat[k];if(!x)return'';if(x[1]<5)return'<span class="fl" style="background:#D9C39A">'+CN[k]+': قليل</span>';const p=pc(x);return'<span class="fl '+col(p)+'">'+CN[k]+' '+p+'%</span>'}).join('')+'</div></div>').join('')||'<div class="card">مفيش طلاب ليهم بيانات في المرحلة دي لسه.</div>';
+    L.innerHTML=st.map((r)=>'<div class="card"><div class="row"><div class="sp"><div style="font-weight:900;font-size:17px">'+esc(r.nick)+(lab[r.u]?' <span class="fl ok">'+esc(lab[r.u])+'</span>':'')+'</div><div class="sm">صف '+esc(r.grade||'؟')+' • آخر حفظ: '+tm(r.t)+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+(r.dh<=0?'<span class="fl bad">استنفد القلوب لليوم</span>':'<span class="fl ok">عنده '+r.dh+' قلوب</span>')+(r.mis?'<span class="fl warn">'+r.mis+' سؤال للمراجعة</span>':'')+'</div></div><div style="margin-top:6px">'+Object.keys(CN).map((k)=>{const x=r.cat[k];if(!x)return'';if(x[1]<5)return'<span class="fl" style="background:#D9C39A">'+CN[k]+': قليل</span>';const p=pc(x);return'<span class="fl '+col(p)+'">'+CN[k]+' '+p+'%</span>'}).join('')+'</div></div>').join('')||'<div class="card">مفيش طلاب ليهم بيانات في المرحلة دي لسه.</div>';
   }catch(e){L.innerHTML='<div class="card">مقدرناش نحمّل التقرير ('+esc(e.code||e.message)+'). لو permission-denied يبقى لازم تضيف قاعدة saves للأدمن في Firebase.</div>'}
 }
 async function askInbox(){
@@ -169,10 +192,15 @@ async function askInbox(){
 async function act(a,u){
   try{
     if(a==='o'){await signOut(auth);return}
+    if(a==='dm'){
+      document.body.classList.toggle('dark');
+      localStorage.setItem('adminDark', document.body.classList.contains('dark')?'1':'0');
+      return;
+    }
     if(a==='md'){mode=u;load();return}
-    if(a==='qa'){const t=document.getElementById('ans-'+u).value.trim().slice(0,600);if(!t){alert('اكتب الرد الأول');return}await FS.updateDoc(FS.doc(db,'askq',u),{a:t});askInbox();return}
+    if(a==='qa'){const t=document.getElementById('ans-'+u).value.trim().slice(0,600);if(!t){showToast('اكتب الرد الأول', true);return}await FS.updateDoc(FS.doc(db,'askq',u),{a:t});askInbox();return}
     if(a==='qd'){if(!confirm('حذف السؤال ده؟'))return;await FS.deleteDoc(FS.doc(db,'askq',u));askInbox();return}
-    if(a==='qc'){const r=(window.__askRows||[]).find((x)=>x.id===u),t=document.getElementById('ans-'+u).value.trim();if(r){const txt='سؤال من طالب: '+r.q+'\nرد مستر: '+t;try{await navigator.clipboard.writeText(txt);alert('اتنسخ')}catch(e){prompt('انسخ النص:',txt)}}return}
+    if(a==='qc'){const r=(window.__askRows||[]).find((x)=>x.id===u),t=document.getElementById('ans-'+u).value.trim();if(r){const txt='سؤال من طالب: '+r.q+'\nرد مستر: '+t;try{await navigator.clipboard.writeText(txt);showToast('تم نسخ النص بنجاح')}catch(e){prompt('انسخ النص:',txt)}}return}
     if(a==='r'){load();return}
     if(a==='wk'){off=+u;load();return}
     if(a==='d'){details(u);return}
@@ -181,10 +209,10 @@ async function act(a,u){
       if(v.trim())await FS.setDoc(FS.doc(db,'labels',u),{n:v.trim().slice(0,40)});else await FS.deleteDoc(FS.doc(db,'labels',u));r.label=v.trim();render()}
     if(a==='b'){if(r.banned){await FS.deleteDoc(FS.doc(db,'bans',u));r.banned=false}else{if(!confirm('حظر '+r.name+'؟ مش هيقدر يسجّل نقاط جديدة.'))return;await FS.setDoc(FS.doc(db,'bans',u),{n:r.name,t:FS.serverTimestamp()});r.banned=true}render()}
     if(a==='fx'){
-      if(off!==0){alert('التصحيح متاح للأسبوع الحالي بس');return}
+      if(off!==0){showToast('التصحيح متاح للأسبوع الحالي بس', true);return}
       const diff=r.pts-r.g;
-      if(r.c<0){alert('لازم نتحقق من تسجيلاته الأول');return}
-      if(diff<=0){alert('مفيش نقاط غير مسجّلة');return}
+      if(r.c<0){showToast('لازم نتحقق من تسجيلاته الأول', true);return}
+      if(diff<=0){showToast('مفيش نقاط غير مسجّلة', true);return}
       if(!confirm('نقاط '+r.name+': '+r.pts+' • المسجّل: '+r.g+'\nهيتمسح '+diff+' نقطة غير مسجّلة وتفضل '+r.g+' نقطة بس.\nتنبيه: لو لعب قبل ما التسجيل يبدأ، النقاط دي ممكن تكون سليمة. تكمّل؟'))return;
       const id=wid(),np=Math.max(0,r.g);
       await FS.updateDoc(FS.doc(db,'weeks',id,'scores',u),{pts:np});
@@ -193,7 +221,7 @@ async function act(a,u){
       r.pts=np;render();return;
     }
     if(a==='x'){if(!confirm('مسح نقاط '+r.name+' من الأسبوع ده؟'))return;const id=wid();await FS.deleteDoc(FS.doc(db,'weeks',id,'scores',u));for(let g=1;g<=6;g++)await FS.deleteDoc(FS.doc(db,'weeks',id+'g'+g,'scores',u));rows=rows.filter((x)=>x.id!==u);render()}
-  }catch(e){alert('حصل خطأ: '+(e.code||e.message))}
+  }catch(e){showToast('خطأ: '+(e.code||e.message), true)}
 }
 app.addEventListener('click',(ev)=>{const b=ev.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.u)});
 onAuthStateChanged(auth,(u)=>{user=u;if(u)panel();else loginUI()});
