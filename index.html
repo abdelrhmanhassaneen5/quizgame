@@ -73,17 +73,13 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
+<script src="curriculum.js"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -151,7 +147,7 @@ if(window.FIREBASE_CONFIG){
 }
 </script>
 <script>
-var TT={tf:"صح أم خطأ",v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",lm:"اسمع واختار المعنى",lw:"اسمع واختار الكلمة",lp:"اسمع واختار الإملاء الصح",ck:"اقرا الساعة",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح"};
+var TT={tf:"صح أم خطأ",v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",lm:"اسمع واختار المعنى",lw:"اسمع واختار الكلمة",lp:"اسمع واختار الإملاء الصح",ck:"اقرا الساعة",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح",mc:"امتحان الوحدة",st:"أسئلة القصة"};
 var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -214,7 +210,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="S.cm=null;save();home()">تمام</button></div>':'')+
   (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
   '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
-  (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
+  (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب (عشوائي)</button><button class="btn t" onclick="curriculum()">تدريبات المنهج (الوحدات والقصة)</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
   (S.mis&&S.mis.length?'<button class="btn t" onclick="startReview()">جولة تصحيح ('+S.mis.length+' سؤال)</button>':'')+
   '<div class="card" id="lbh" style="display:none"></div>'+
   eventCard()+missionCard()+dayCard()+misterCard()+
@@ -225,6 +221,31 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
   '<button class="btn t" onclick="askScr()">اسأل مستر عبدالرحمن'+(askNew()?' • فيه رد':'')+'</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button><button class="btn t" style="font-size:15px" onclick="saveScr()">حفظ التقدم (كود الاسترجاع)</button>';
 }
+
+function curriculum(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم!');return}
+  if(typeof CURRICULUM==='undefined'){app.innerHTML='<div class="hd"><h1>تدريبات المنهج</h1></div><div class="card">جاري تحديث المنهج، يرجى التأكد من رفع ملف curriculum.js</div><button class="btn t" onclick="home()">رجوع</button>';return;}
+  var gData=CURRICULUM[S.stage==='p'?'p':'m']||{};var gUnits=gData[S.grade]||{units:[],story:[]};
+  var html='<div class="hd"><h1>تدريبات المنهج</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' - صف '+S.grade+'</div></div><div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="chip"><div style="display:flex;gap:4px">'+stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div></div>';
+  html+='<div class="tag g">الوحدات (الترم الأول)</div><div class="grid" style="grid-template-columns:1fr 1fr 1fr">';
+  for(var i=1;i<=6;i++){var hasU=gUnits.units[i-1]&&gUnits.units[i-1].length>0;html+='<button class="lv" '+(hasU?'onclick="startCurriculum(\'u\','+(i-1)+')"':'disabled')+'><b>Unit '+i+'</b></button>';}
+  html+='</div><div class="tag" style="margin-top:10px">القصة (Story)</div><div class="grid" style="grid-template-columns:1fr 1fr 1fr">';
+  for(var j=1;j<=3;j++){var hasS=gUnits.story[j-1]&&gUnits.story[j-1].length>0;html+='<button class="lv" style="border-color:#C9973F" '+(hasS?'onclick="startCurriculum(\'s\','+(j-1)+')"':'disabled')+'><b>Ch '+j+'</b></button>';}
+  html+='</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+  app.innerHTML=html;
+}
+function startCurriculum(type,idx){
+  var gData=CURRICULUM[S.stage==='p'?'p':'m'][S.grade];
+  var rawQs=type==='u'?gData.units[idx]:gData.story[idx];
+  if(!rawQs||!rawQs.length)return;
+  var qs=shuffle(rawQs.slice()).slice(0,10);
+  var formattedQs = qs.map(function(q){
+    return [q.q, q.ar||'', q.o, q.a, q.hint||'', type==='u'?'mc':'st', S.stage];
+  });
+  var n=formattedQs.length, mx=Math.ceil(n*0.7);
+  G={lv:(type==='u'?idx+1:idx+1),tier:0,n:n,T:15,qs:formattedQs,i:0,h:S.dhp,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:15,done:false,currType:type};show();
+}
+
 function map(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
     g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
@@ -327,14 +348,15 @@ function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function endRound(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var win=G.mhp<=0,lv=G.lv,bonus=0;S.nr=(S.nr||0)+1;mTick('r');if(G.mhp<=0)mTick('w');
-  if(win){bonus=20+10*G.h;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){if(S.dhp<3)S.dhp++;STMSG='رجعت قلب لرصيدك اليومي!';}else{S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++}save()}
+  var isCurr=!!G.currType;
+  if(win){bonus=20+10*G.h;if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){if(S.dhp<3)S.dhp++;STMSG='رجعت قلب لرصيدك اليومي!';}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++}save()}
   dayRoundDone();submit();var mmsg=[mCheck(),STMSG].filter(function(x){return x}).join(' • ');STMSG='';
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+(S.mis&&S.mis.length&&!G.rev?'<button class="btn t" style="font-size:14px;min-height:38px" onclick="startReview()">راجع أخطاءك دلوقتي ('+S.mis.length+')</button>':'')+'</div>':'';
-  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(lv===20?'خلّصت كل الجولات!':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':'عدّيت الجولة '+lv):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
-  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="map()">الخريطة</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':'')+
-  '<button class="btn'+(win&&lv<20?' t':'')+'" onclick="start('+lv+')">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="map()">الخريطة</button>');
+  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':''))+
+  '<button class="btn'+(win&&lv<20&&!isCurr?' t':'')+'" onclick="'+(isCurr?'startCurriculum(\''+G.currType+'\','+(lv-1)+')':'start('+lv+')')+'">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="'+(isCurr?'curriculum()':'map()')+'">رجوع</button>');
 }
 function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
@@ -662,7 +684,7 @@ function speak(t){
 }
 function speakQ(){var q=G&&G.qs[G.i];if(q&&q[7])speak(q[7])}
 function lsBtn(){return'<div style="text-align:center;margin:10px 0"><button class="btn" style="display:inline-flex;gap:10px;align-items:center;font-size:20px" onclick="speakQ()"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFE9B8"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#FFE9B8" stroke-width="2" stroke-linecap="round"/></svg><span>اسمع الكلمة</span></button></div>'}
-var CATS={tf:'voc',ck:'clock',v:'voc',tr:'voc',ar:'voc',g:'gram',w:'fix',sp:'spell',lm:'listen',lw:'listen',lp:'listen'};
+var CATS={tf:'voc',ck:'clock',v:'voc',tr:'voc',ar:'voc',g:'gram',w:'fix',sp:'spell',lm:'listen',lw:'listen',lp:'listen',mc:'gram',st:'voc'};
 function misRef(q){if(q[8])return q[8];var i=Q.indexOf(q);return i>=0?'q:'+i:null}
 function misAdd(q){var r=misRef(q);if(!r)return;S.mis=(S.mis||[]).filter(function(x){return x!==r});S.mis.unshift(r);if(S.mis.length>40)S.mis.length=40}
 function misDel(q){var r=misRef(q);if(!r||!S.mis)return;S.mis=S.mis.filter(function(x){return x!==r})}
