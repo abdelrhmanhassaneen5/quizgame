@@ -44,14 +44,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* الصق هنا نفس إعدادات Firebase اللي في index.html بدل null:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 </head>
 <body>
@@ -83,7 +78,7 @@ const tm=(ms)=>ms?new Date(ms).toLocaleString('ar-EG',{timeZone:'Africa/Cairo',d
 const ms=(t)=>t&&t.toMillis?t.toMillis():0;
 function loginUI(m){
   app.innerHTML='<div class="hd"><h1>لوحة المدرّس</h1></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><input id="em" class="inp" type="email" placeholder="الإيميل" autocomplete="username" style="direction:ltr"><input id="pw" class="inp" type="password" placeholder="الباسورد" autocomplete="current-password" style="direction:ltr"><button class="btn" id="go">دخول</button><div id="er" class="sm" style="color:#8B2E2E">'+esc(m||'')+'</div></div>';
-  const go=()=>signInWithEmailAndPassword(auth,document.getElementById('em').value.trim(),document.getElementById('pw').value).catch(()=>loginUI('الإيميل أو الباسورد غلط');showToast('الإيميل أو الباسورد غير صحيح', true));
+  const go=()=>signInWithEmailAndPassword(auth,document.getElementById('em').value.trim(),document.getElementById('pw').value).catch(()=>{loginUI('الإيميل أو الباسورد غلط');showToast('الإيميل أو الباسورد غير صحيح', true)});
   document.getElementById('go').onclick=go;document.getElementById('pw').onkeydown=(e)=>{if(e.key==='Enter')go()};
 }
 function panel(){
@@ -205,7 +200,7 @@ async function act(a,u){
     if(a==='md'){mode=u;load();return}
     if(a==='qa'){const t=document.getElementById('ans-'+u).value.trim().slice(0,600);if(!t){showToast('اكتب الرد الأول', true);return}await FS.updateDoc(FS.doc(db,'askq',u),{a:t});askInbox();return}
     if(a==='qd'){if(!confirm('حذف السؤال ده؟'))return;await FS.deleteDoc(FS.doc(db,'askq',u));askInbox();return}
-    if(a==='qc'){const r=(window.__askRows||[]).find((x)=>x.id===u),t=document.getElementById('ans-'+u).value.trim();if(r){const txt='سؤال من طالب: '+r.q+'\nرد مستر: '+t;try{await navigator.clipboard.writeText(txt);showToast('تم نسخ النص بنجاح')}catch(e){prompt('انسخ النص:',txt)}}return}
+    if(a==='qc'){const r=(window.__askRows||[]).find((x)=>x.id===u),t=document.getElementById('ans-'+u).value.trim();if(r){const txt='سؤال من طالب: '+r.q+'\nرد مستر عبدالرحمن: '+t;try{await navigator.clipboard.writeText(txt);showToast('تم نسخ النص بنجاح')}catch(e){prompt('انسخ النص:',txt)}}return}
     if(a==='r'){load();return}
     if(a==='wk'){off=+u;load();return}
     if(a==='d'){details(u);return}

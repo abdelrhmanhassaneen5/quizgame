@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -156,7 +151,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=S.dhp||3;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -212,7 +207,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="S.cm=null;save();home()">تمام</button></div>':'')+
-  (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
+  (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
   '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
   (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
   (S.mis&&S.mis.length?'<button class="btn t" onclick="startReview()">جولة تصحيح ('+S.mis.length+' سؤال)</button>':'')+
@@ -223,7 +218,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات</div><div class="sm">تصفيق وصوت الوحش وأصوات المرح</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="toggleSnd()"><i></i></button></div>'+
   '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
-  '<button class="btn t" onclick="askScr()">اسأل مستر'+(askNew()?' • فيه رد':'')+'</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button><button class="btn t" style="font-size:15px" onclick="saveScr()">حفظ التقدم (كود الاسترجاع)</button>';
+  '<button class="btn t" onclick="askScr()">اسأل مستر عبدالرحمن'+(askNew()?' • فيه رد':'')+'</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button><button class="btn t" style="font-size:15px" onclick="saveScr()">حفظ التقدم (كود الاسترجاع)</button>';
 }
 function map(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
@@ -774,7 +769,7 @@ function misterImg(kind,z){var src=kind==='c'?'mister-cheer.png':(kind==='h'?'mi
 function cheer(){return CHEERS[Math.floor(Math.random()*CHEERS.length)]}
 function askNew(){return(S.aq||[]).some(function(x){return x.nw})}
 function misterCard(){
-  return'<div class="card"><div class="tag g">نصيحة مستر النهاردة</div><div class="row" style="margin-top:8px;align-items:flex-start">'+misterImg('a',58)+'<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">'+TIPS[cDay()%TIPS.length]+'</div></div><button class="btn t" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="askScr()">عندك سؤال؟ اسأل مستر</button></div>';
+  return'<div class="card"><div class="tag g">نصيحة مستر عبدالرحمن النهاردة</div><div class="row" style="margin-top:8px;align-items:flex-start">'+misterImg('a',58)+'<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">'+TIPS[cDay()%TIPS.length]+'</div></div><button class="btn t" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="askScr()">عندك سؤال؟ اسأل مستر عبدالرحمن</button></div>';
 }
 function qErr(v){
   if(v.length<3)return'اكتب سؤالك (3 حروف على الأقل)';
@@ -783,10 +778,10 @@ function qErr(v){
 }
 function askScr(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var list=S.aq||[],today=cDay(),left=3-((S.ad&&S.ad.d===today)?S.ad.n:0);
-  var rows=list.slice(0,10).map(function(x){return'<div class="card" style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:700;font-size:14px">'+esc(x.q)+'</div>'+(x.a?'<div class="card" style="background:#E3B03F;font-size:14px;line-height:1.7"><b>رد مستر:</b> '+esc(x.a)+'</div>':'<div class="sm">مستني رد مستر...</div>')+'</div>'}).join('');
+  var rows=list.slice(0,10).map(function(x){return'<div class="card" style="display:flex;flex-direction:column;gap:6px"><div style="font-weight:700;font-size:14px">'+esc(x.q)+'</div>'+(x.a?'<div class="card" style="background:#E3B03F;font-size:14px;line-height:1.7"><b>رد مستر عبدالرحمن:</b> '+esc(x.a)+'</div>':'<div class="sm">مستني رد مستر عبدالرحمن...</div>')+'</div>'}).join('');
   list.forEach(function(x){x.nw=false});save();
-  app.innerHTML='<div class="hd"><h1>اسأل مستر</h1><div>اكتب سؤالك عن أي كلمة أو قاعدة</div></div>'+
-  '<div class="card row" style="align-items:flex-start">'+misterImg('a',64)+'<div class="sp" style="font-size:14px;line-height:1.8;font-weight:700">أنا مستر! اسألني عن أي كلمة أو قاعدة. هقرا سؤالك وأرد عليك هنا في اللعبة.</div></div>'+
+  app.innerHTML='<div class="hd"><h1>اسأل مستر عبدالرحمن</h1><div>اكتب سؤالك عن أي كلمة أو قاعدة</div></div>'+
+  '<div class="card row" style="align-items:flex-start">'+misterImg('a',64)+'<div class="sp" style="font-size:14px;line-height:1.8;font-weight:700">أنا مستر عبدالرحمن! اسألني عن أي كلمة أو قاعدة. هقرا سؤالك وأرد عليك هنا في اللعبة.</div></div>'+
   (window.FB?'<div class="card"><textarea id="aq" class="inp" maxlength="240" rows="3" placeholder="مثلًا: إيه الفرق بين much وmany؟" style="resize:none"></textarea><div class="sm" style="margin-top:6px">باقي لك '+Math.max(0,left)+' سؤال النهاردة • ماتكتبش رقم تليفون أو اسمك كامل</div><button class="btn" style="width:100%;margin-top:8px" onclick="askSend()">ابعت السؤال</button></div>':'<div class="card">الميزة دي لسه متفعّلتش.</div>')+
   '<div id="rmsg" class="sm" style="text-align:center;font-weight:900"></div>'+(rows?'<div class="tag">أسئلتي</div>'+rows:'')+'<div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
