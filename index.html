@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -216,6 +211,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
   (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب (عشوائي)</button><button class="btn t" onclick="curriculum()">تدريبات المنهج (الوحدات والقصة)</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
   (S.mis&&S.mis.length?'<button class="btn t" onclick="startReview()">جولة تصحيح ('+S.mis.length+' سؤال)</button>':'')+
+  '<button class="btn t" onclick="reportScr()">📊 تقرير مستوايا (نقاط القوة والضعف)</button>'+
   '<div class="card" id="lbh" style="display:none"></div>'+
   eventCard()+missionCard()+dayCard()+misterCard()+
   '<div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+' • اسمك: '+esc(S.nick||'')+'</span></div>'+(canChange()?'<button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button>':'')+'</div>'+
@@ -723,6 +719,64 @@ function startReview(){
   if(!qs.length){save();home();return}
   var n=qs.length,mx=Math.max(1,Math.ceil(n*0.6));
   G={lv:1,tier:0,n:n,T:13,qs:qs,i:0,h:S.dhp>0?S.dhp:1,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:13,done:false,rev:true};show();
+}
+var SKILL_META=[
+  {k:'voc',n:'الكلمات والمفردات (Vocabulary)',tip:'راجع كلمات الوحدات والعب جولات أكتر لتثبيت المعاني.'},
+  {k:'gram',n:'القواعد والجرامر (Grammar)',tip:'ركّز في تلميحات مستر عبدالرحمن بعد كل سؤال قواعد.'},
+  {k:'spell',n:'الإملاء والكتابة (Spelling)',tip:'اقرأ الكلمة بالحروف بصوت عالي قبل ما تختار الإملاء الصح.'},
+  {k:'listen',n:'الاستماع والنطق (Listening)',tip:'شغّل الصوت واسمع الكلمة مرتين قبل الاختيار.'},
+  {k:'fix',n:'اكتشاف الأخطاء (Find Mistake)',tip:'اقرأ الجملة كاملة وركّز في الفاعل وزمن الفعل.'},
+  {k:'clock',n:'قراءة الساعة (Telling Time)',tip:'تذكّر: العقرب الصغير للساعات والكبير للدقائق.'}
+];
+function reportScr(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var ts=S.ts||{},totOk=0,totAll=0,best=null,weak=null;
+  var skillRows=SKILL_META.map(function(m){
+    var a=ts[m.k]||[0,0],ok=a[0]||0,all=a[1]||0;
+    totOk+=ok;totAll+=all;
+    var pct=all>0?Math.round(ok/all*100):0;
+    if(all>=3){
+      if(!best||pct>best.pct)best={n:m.n,pct:pct};
+      if(!weak||pct<weak.pct)weak={n:m.n,pct:pct,tip:m.tip};
+    }
+    var col=all===0?'#9A8566':(pct>=80?'#2F6B4A':(pct>=55?'#C9973F':'#B23A3A'));
+    var badge=all===0?'لسه مجربتش':(pct>=80?'ممتاز 🌟':(pct>=55?'جيد 👍':'محتاج تركيز 💪'));
+    return '<div style="margin-top:10px">'+
+      '<div class="row"><span class="sp" style="font-weight:900;font-size:14px">'+m.n+'</span>'+
+      '<span class="sm" style="color:'+col+'">'+badge+(all>0?' ('+pct+'%)':'')+'</span></div>'+
+      '<div class="bar" style="margin-top:4px"><i style="width:'+(all>0?pct:0)+'%;background:'+col+'"></i></div>'+
+      '<div class="sm" style="margin-top:2px;font-size:11px">'+(all>0?'جاوبت صح '+ok+' من '+all+' سؤال':'العب جولات عشان نقيس مستواك في المهارة دي')+'</div>'+
+    '</div>';
+  }).join('');
+  var ovPct=totAll>0?Math.round(totOk/totAll*100):0;
+  var totStars=0;Object.keys(S.stars||{}).forEach(function(k){totStars+=(S.stars[k]||0)});
+  var misCnt=(S.mis||[]).length;
+  var mrMsg='';
+  if(totAll<5){
+    mrMsg='أهلاً يا بطل! العب كام جولة الأول في الخريطة أو تدريبات المنهج عشان أقدر أحلل مستواك وأقولك نقاط قوتك والمهارات اللي محتاجة تركيز.';
+  }else{
+    mrMsg='دقتك العامة <b>'+ovPct+'%</b> ('+totOk+' صح من '+totAll+'). ';
+    if(best)mrMsg+='أقوى مهارة عندك هي <b>'+best.n+'</b>! ';
+    if(weak&&weak.pct<75)mrMsg+='<br>نصيحتي ليك: ركّز شوية على <b>'+weak.n+'</b> — '+weak.tip;
+    else mrMsg+='<br>مستواك متوازن ورائع في كل المهارات، استمر يا بطل!';
+  }
+  function statBox(lbl,val,sub){
+    return '<div class="card" style="text-align:center;padding:10px 6px"><div class="sm">'+lbl+'</div><div class="big" style="font-size:24px;margin:2px 0">'+val+'</div><div class="sm" style="font-size:11px">'+sub+'</div></div>';
+  }
+  app.innerHTML='<div class="hd"><h1>تقرير مستوايا 📊</h1><div>تحليل شامل لنقاط قوتك وأدائك في الإنجليزي</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg(ovPct>=70?'c':'h',58)+
+      '<div class="sp"><div class="tag g" style="margin-bottom:6px">تقييم مستر عبدالرحمن</div><div style="font-size:14px;line-height:1.7;font-weight:700">'+mrMsg+'</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      statBox('دقة الإجابات',ovPct+'%','صح '+totOk+' من '+totAll)+
+      statBox('نجوم الخريطة',totStars+' / 60','وصلت للجولة '+S.max)+
+      statBox('سلسلة الالتزام',skAlive()+' يوم','اللعب اليومي المتواصل')+
+      statBox('أخطاء للمراجعة',misCnt+' سؤال',misCnt>0?'ادخل جولة التصحيح':'سجلك خالي من الأخطاء!')+
+    '</div>'+
+    '<div class="card"><div class="tag">إتقان المهارات</div>'+skillRows+'</div>'+
+    (misCnt>0?'<button class="btn" onclick="startReview()">صلّح أخطاءك دلوقتي ('+misCnt+' سؤال)</button>':'')+
+    '<button class="btn t" onclick="curriculum()">تدريبات المنهج</button>'+
+    '<button class="btn t" onclick="home()">الرئيسية</button>';
 }
 var MP={
   a15:{t:'جاوب 15 سؤال صح',k:'a',n:15,r:60},a30:{t:'جاوب 30 سؤال صح',k:'a',n:30,r:90},
