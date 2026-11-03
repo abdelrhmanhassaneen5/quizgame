@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -613,8 +608,13 @@ function roomJoinUi(){
 function roomSay(i){if(!S.rm||Date.now()-LSAY<3000)return;LSAY=Date.now();FB.roomMsg(S.rm.code,S.rm.side,i).then(function(){roomSync(drawRoom)}).catch(function(){})}
 function roomShare(){var c=S.rm.code,t='تعالى نتحدّى بعض في تحدّي الأصحاب! كود الروم: '+c+' '+location.href.split('?')[0].split('#')[0]+'?room='+c;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
-var AC=null,VO=null,VOK=true,VP=0.4;
-try{VO=new Audio('shatouli.mp3');VO.preload='auto';VO.volume=0.7;VO.onerror=function(){VOK=false}}catch(e){VO=null;VOK=false}
+var AC=null,VP=0.5,VOS={},VOKS={};
+['ok','bad','win','report','shatouli'].forEach(function(k){
+  try{
+    var a=new Audio(k+'.mp3');a.preload='auto';a.volume=0.85;
+    VOKS[k]=true;a.onerror=function(){VOKS[k]=false};VOS[k]=a;
+  }catch(e){VOKS[k]=false}
+});
 function ac(){if(S.mute)return null;try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C()}if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
 function tone(f,t0,d,type,v,f2){var c=ac();if(!c)return;var o=c.createOscillator(),g=c.createGain(),t=c.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.05)}
 function noise(t0,d,v,f,q){var c=ac();if(!c)return;var n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0),i;for(i=0;i<n;i++)a[i]=Math.random()*2-1;var s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+t0;s.buffer=b;fl.type='bandpass';fl.frequency.value=f||2000;fl.Q.value=q||0.7;g.gain.setValueAtTime(v||0.2,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);s.connect(fl);fl.connect(g);g.connect(c.destination);s.start(t)}
@@ -627,20 +627,27 @@ function roar(){
   g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.35,t+0.08);g.gain.exponentialRampToValueAtTime(0.0001,t+0.85);
   o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);l.start(t);o.stop(t+0.9);l.stop(t+0.9);noise(0,0.5,0.12,300,0.6);
 }
-function voice(){
-  if(!VO||!VOK||!ac())return false;
-  try{VO.currentTime=0;var p=VO.play();if(p&&p.catch)p.catch(function(){})}catch(e){return false}
-  return true;
+function playVoice(k){
+  if(S.mute)return false;
+  var key=VOKS[k]?k:(k==='ok'&&VOKS['shatouli']?'shatouli':null);
+  if(!key||!VOS[key])return false;
+  try{
+    Object.keys(VOS).forEach(function(x){if(VOS[x]&&!VOS[x].paused){VOS[x].pause();VOS[x].currentTime=0}});
+    VOS[key].currentTime=0;
+    var p=VOS[key].play();if(p&&p.catch)p.catch(function(){});
+    return true;
+  }catch(e){return false}
 }
 function ding(){tone(880,0,0.14,'triangle',0.18);tone(1320,0.1,0.2,'triangle',0.16)}
 function sfxOk(combo){
   if(S.mute)return;
-  if(combo){clap(1.1);tone(659,0,0.12,'triangle',0.15);tone(988,0.1,0.2,'triangle',0.15);voice();return}
-  if(Math.random()<VP&&voice())return;
+  if(combo){clap(1.1);tone(659,0,0.12,'triangle',0.15);tone(988,0.1,0.2,'triangle',0.15);playVoice('ok');return}
   ding();
+  if(Math.random()<VP)playVoice('ok');
 }
-function sfxBad(){roar()}
-function sfxWin(){clap(1.8);[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.25,'triangle',0.16)})}
+function sfxBad(){if(S.mute)return;roar();playVoice('bad')}
+function sfxWin(){if(S.mute)return;clap(1.8);[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.25,'triangle',0.16)});playVoice('win')}
+function sfxReport(){if(S.mute)return;playVoice('report')}
 function spk(){return S.mute?'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#6B4A3A"/><path d="M16 9l5 6M21 9l-5 6" stroke="#7A3B3B" stroke-width="2" stroke-linecap="round"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#2F5F5A"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#2F5F5A" stroke-width="2" stroke-linecap="round"/></svg>'}
 function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTML=spk()}else home()}
 var CSAVE_AT=0;
@@ -735,6 +742,7 @@ var SKILL_META=[
 ];
 function reportScr(){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  sfxReport();
   var ts=S.ts||{},totOk=0,totAll=0,best=null,weak=null;
   var skillRows=SKILL_META.map(function(m){
     var a=ts[m.k]||[0,0],ok=a[0]||0,all=a[1]||0;
