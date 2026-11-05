@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -207,12 +202,15 @@ function star(o,s){s=s||16;return'<svg width="'+s+'" height="'+s+'" viewBox="0 0
 function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#E3B03F" stroke="#8A6A4A" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#8A6A4A" stroke-width="1.5"/></svg>'}
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function canChange(){return true;}
+function totStarsCount(){var s=0;Object.keys(S.stars||{}).forEach(function(k){s+=(S.stars[k]||0)});return s}
+function mapDone(){return S.stars&&S.stars[20]>0}
 function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   setTimeout(function(){fillStats();fillLb();ensureReg();claimPrev();refreshLb();refreshStats()},0);
   app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><div class="row" style="justify-content:center;margin-top:6px">'+(S.cert?'<button class="btn" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="certScr()">🎓 استلم شهادتك</button>':'')+'<button class="btn t" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="S.cm=null;save();home()">تمام</button></div></div>':'')+
   (S.cert&&!S.cm?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="certScr()">🎓 شهادتي التقديرية (المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][(S.cert.rk||1)-1]+')</button>':'')+
+  (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
   (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
   '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
   (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب (عشوائي)</button><button class="btn t" onclick="curriculum()">تدريبات المنهج (الوحدات والقصة)</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
@@ -256,8 +254,9 @@ function map(){app.classList.remove('fade-in');void app.offsetWidth;app.classLis
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
     g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
   if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم!');return}
+  var mapCertBtn=mapDone()?'<div class="card" style="background:linear-gradient(135deg,#FFE8B5,#E3B03F);text-align:center;font-weight:900">👑 مبروك! ختمت كل جولات الخريطة ('+totStarsCount()+' / 60 نجمة)<br><button class="btn" style="width:100%;margin-top:8px;font-size:16px" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">🎓 استلم شهادة ختم الخريطة وحمّلها</button></div>':'';
   app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div></div><div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">النجوم: '+totStarsCount()+' / 60</div></div>'+mapCertBtn+'<div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
 function others(L,i,k){var a=[];shuffle(L.map(function(_,j){return j})).forEach(function(j){if(a.length<k&&j!==i&&L[j][0]!==L[i][0]&&L[j][1]!==L[i][1])a.push(j)});return a}
 function misspell(w){
@@ -355,10 +354,13 @@ function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده �
 var CUR_CERT=null;
 function certScr(custom){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var c=custom||S.cert||{rk:1,pts:wkPts(),wk:wkKey(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade};
+  var c=custom||S.cert||(mapDone()?{mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade}:{rk:1,pts:wkPts(),wk:wkKey(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade});
   CUR_CERT=c;
+  var isMap=c.mode==='map';
   var rNames=['الأول','الثاني','الثالث'],rName=rNames[(c.rk||1)-1]||'الأول';
-  app.innerHTML='<div class="hd"><h1>شهادة تقدير الأوائل 🎓</h1><div>المركز '+rName+' في تحدّي الأصحاب</div></div>'+
+  var hdTitle=isMap?'شهادة ختم الخريطة 👑':'شهادة تقدير الأوائل 🎓';
+  var hdSub=isMap?'اجتياز ٢٠ جولة بنجاح في تحدّي الأصحاب':'المركز '+rName+' في تحدّي الأصحاب';
+  app.innerHTML='<div class="hd"><h1>'+hdTitle+'</h1><div>'+hdSub+'</div></div>'+
     '<div class="card" style="text-align:center;padding:10px">'+
       '<div class="sm" style="margin-bottom:6px">تقدر تعدّل اسمك اللي هيظهر في الشهادة من هنا:</div>'+
       '<input id="certNameInp" class="inp" maxlength="22" value="'+esc(c.name||S.nick||'')+'" placeholder="اكتب اسمك الثلاثي أو لقبك" oninput="CUR_CERT.name=this.value;drawCertCanvas()" style="margin-bottom:10px;font-size:17px">'+
@@ -366,26 +368,26 @@ function certScr(custom){
     '</div>'+
     '<button class="btn" style="font-size:18px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="certDownload()">📥 تحميل الشهادة كصورة (PNG)</button>'+
     '<button class="btn t" style="font-size:17px;background:#1E7E48;box-shadow:0 5px 0 #114B2A;display:flex;align-items:center;justify-content:center;gap:8px" onclick="certShareWA()">📲 مشاركة الشهادة على واتساب</button>'+
-    '<button class="btn t" onclick="board()">العودة للترتيب</button>'+
+    '<button class="btn t" onclick="'+(isMap?'map()':'board()')+'">'+(isMap?'العودة للخريطة':'العودة للترتيب')+'</button>'+
     '<button class="btn t" onclick="home()">الرئيسية</button>';
   setTimeout(drawCertCanvas, 50);
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(drawCertCanvas, 150)})}
 }
 function drawCertCanvas(){
   var cv=document.getElementById('certCv');if(!cv||!CUR_CERT)return;
-  var ctx=cv.getContext('2d'),c=CUR_CERT;
+  var ctx=cv.getContext('2d'),c=CUR_CERT,isMap=c.mode==='map';
   var W=cv.width,H=cv.height;
   ctx.direction='rtl';
   // Background gradient
   var bg=ctx.createLinearGradient(0,0,W,H);
   bg.addColorStop(0,'#FFFDF7');
-  bg.addColorStop(0.5,'#FBE7B5');
-  bg.addColorStop(1,'#F5D78E');
+  bg.addColorStop(0.5,isMap?'#EAF3FA':'#FBE7B5');
+  bg.addColorStop(1,isMap?'#D6E8F5':'#F5D78E');
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,W,H);
 
   // Decorative corners & borders
-  ctx.strokeStyle='#2F5F5A';
+  ctx.strokeStyle=isMap?'#7A3B3B':'#2F5F5A';
   ctx.lineWidth=16;
   ctx.strokeRect(24,24,W-48,H-48);
 
@@ -399,7 +401,7 @@ function drawCertCanvas(){
     ctx.save();
     ctx.translate(p[0],p[1]);
     ctx.scale(p[2],p[3]);
-    ctx.fillStyle='#2F5F5A';
+    ctx.fillStyle=isMap?'#7A3B3B':'#2F5F5A';
     ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(55,0);ctx.lineTo(0,55);ctx.closePath();ctx.fill();
     ctx.fillStyle='#C9973F';
     ctx.beginPath();ctx.arc(24,24,8,0,Math.PI*2);ctx.fill();
@@ -407,9 +409,9 @@ function drawCertCanvas(){
   });
 
   // Top Header Banner
-  ctx.fillStyle='#2F5F5A';
+  ctx.fillStyle=isMap?'#7A3B3B':'#2F5F5A';
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(W/2-310, 62, 620, 74, 20) : ctx.rect(W/2-310, 62, 620, 74);
+  ctx.roundRect ? ctx.roundRect(W/2-330, 62, 660, 74, 20) : ctx.rect(W/2-330, 62, 660, 74);
   ctx.fill();
   ctx.strokeStyle='#C9973F';
   ctx.lineWidth=4;
@@ -417,24 +419,25 @@ function drawCertCanvas(){
 
   ctx.textAlign='center';
   ctx.fillStyle='#FFE9B8';
-  ctx.font='900 38px "Lemonada", "Cairo", sans-serif';
-  ctx.fillText('شهادة تقدير وتفوق', W/2, 112);
+  ctx.font='900 36px "Lemonada", "Cairo", sans-serif';
+  ctx.fillText(isMap?'شهادة ختم خريطة الأبطال':'شهادة تقدير وتفوق', W/2, 112);
 
   // Subtitle
   ctx.fillStyle='#6B4A3A';
   ctx.font='700 24px "Cairo", sans-serif';
   ctx.fillText('منصة Grammora التعليمية • لعبة تحدّي الأصحاب في اللغة الإنجليزية', W/2, 178);
 
-  // Rank Medal Badge
+  // Rank or Map Medal Badge
   var rk=c.rk||1;
   var medalColors=[['#FFD700','#B8860B','المركز الأول 🥇'],['#E0E6ED','#7A8B99','المركز الثاني 🥈'],['#E6A15C','#8C4A27','المركز الثالث 🥉']][rk-1]||['#FFD700','#B8860B','المركز الأول 🥇'];
-  ctx.fillStyle=medalColors[1];
+  var badgeText = isMap ? 'قاهر الزعماء — اجتياز ٢٠ جولة كاملة 👑' : ('بطل الأسبوع — ' + medalColors[2]);
+  ctx.fillStyle=isMap?'#2F5F5A':medalColors[1];
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(W/2-170, 200, 340, 56, 28) : ctx.rect(W/2-170, 200, 340, 56);
+  ctx.roundRect ? ctx.roundRect(W/2-230, 200, 460, 56, 28) : ctx.rect(W/2-230, 200, 460, 56);
   ctx.fill();
   ctx.fillStyle='#FFF';
-  ctx.font='900 30px "Cairo", sans-serif';
-  ctx.fillText('بطل الأسبوع — ' + medalColors[2], W/2, 238);
+  ctx.font='900 28px "Cairo", sans-serif';
+  ctx.fillText(badgeText, W/2, 238);
 
   // Presenter Line (Mr. Abdelrahman's name)
   ctx.fillStyle='#2F5F5A';
@@ -442,7 +445,7 @@ function drawCertCanvas(){
   ctx.fillText('يتشرف مستر / عبدالرحمن حسانين بتكريم الطالب(ة) المتفوق(ة):', W/2, 305);
 
   // Student Name Box
-  ctx.fillStyle='rgba(255, 255, 255, 0.75)';
+  ctx.fillStyle='rgba(255, 255, 255, 0.82)';
   ctx.beginPath();
   ctx.roundRect ? ctx.roundRect(W/2-360, 326, 720, 88, 18) : ctx.rect(W/2-360, 326, 720, 88);
   ctx.fill();
@@ -459,12 +462,19 @@ function drawCertCanvas(){
   var stgTxt = (c.st||S.stage)==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية';
   var grdTxt = gName(c.gr||S.grade);
   ctx.fillStyle='#4A2F22';
-  ctx.font='700 26px "Cairo", sans-serif';
-  ctx.fillText('وذلك لحصوله على ' + medalColors[2] + ' في منافسات اللغة الإنجليزية (' + stgTxt + (grdTxt?' - الصف '+grdTxt:'') + ')', W/2, 462);
-
-  ctx.fillStyle='#2F6B4A';
-  ctx.font='900 28px "Cairo", sans-serif';
-  ctx.fillText('بإجمالي رصيد نقاط: ' + (c.pts||0) + ' نقطة • (' + wkRange(c.wk!=null?c.wk:wkKey()) + ')', W/2, 506);
+  ctx.font='700 25px "Cairo", sans-serif';
+  if(isMap){
+    ctx.fillText('وذلك لختم جميع جولات الخريطة بنجاح وهزيمة كل الزعماء (' + stgTxt + (grdTxt?' - الصف '+grdTxt:'') + ')', W/2, 462);
+    ctx.fillStyle='#2F6B4A';
+    ctx.font='900 28px "Cairo", sans-serif';
+    var stCnt = c.stars || totStarsCount();
+    ctx.fillText('بإجمالي نجوم: ' + stCnt + ' من 60 نجمة ⭐ • والوصول للجولة 20 بنجاح!', W/2, 506);
+  }else{
+    ctx.fillText('وذلك لحصوله على ' + medalColors[2] + ' في منافسات اللغة الإنجليزية (' + stgTxt + (grdTxt?' - الصف '+grdTxt:'') + ')', W/2, 462);
+    ctx.fillStyle='#2F6B4A';
+    ctx.font='900 28px "Cairo", sans-serif';
+    ctx.fillText('بإجمالي رصيد نقاط: ' + (c.pts||0) + ' نقطة • (' + wkRange(c.wk!=null?c.wk:wkKey()) + ')', W/2, 506);
+  }
 
   ctx.fillStyle='#6B4A3A';
   ctx.font='700 22px "Cairo", sans-serif';
@@ -527,7 +537,8 @@ function certDownload(){
   try{
     var a=document.createElement('a');
     var nm=(CUR_CERT&&CUR_CERT.name?CUR_CERT.name:S.nick||'hero').replace(/\s+/g,'-');
-    a.download='شهادة-تقدير-مستر-عبدالرحمن-'+nm+'.png';
+    var prefix=(CUR_CERT&&CUR_CERT.mode==='map')?'شهادة-ختم-الخريطة-':'شهادة-تقدير-مستر-عبدالرحمن-';
+    a.download=prefix+nm+'.png';
     a.href=cv.toDataURL('image/png');
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     rmsg('تم تحميل الشهادة بنجاح! 🎓');
@@ -536,9 +547,11 @@ function certDownload(){
 function certShareWA(){
   var cv=document.getElementById('certCv');
   var c=CUR_CERT||{rk:1,pts:wkPts(),name:S.nick};
+  var isMap=c.mode==='map';
   var rNames=['الأول 🥇','الثاني 🥈','الثالث 🥉'],rName=rNames[(c.rk||1)-1]||'الأول 🥇';
-  var txt='الحمد لله! حصلت على شهادة تقدير (المركز '+rName+') برصيد '+c.pts+' نقطة في لعبة "تحدّي الأصحاب" للغة الإنجليزية مع مستر عبدالرحمن حسانين! 🎓🔥
-تقدر تدخل التحدي من هنا: '+location.href.split('?')[0];
+  var txt=isMap
+    ? ('الحمد لله! ختمت الـ ٢٠ جولة كاملة في خريطة لعبة "تحدّي الأصحاب" للغة الإنجليزية وهزمت كل الزعماء مع مستر عبدالرحمن حسانين! 👑🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0])
+    : ('الحمد لله! حصلت على شهادة تقدير (المركز '+rName+') برصيد '+c.pts+' نقطة في لعبة "تحدّي الأصحاب" للغة الإنجليزية مع مستر عبدالرحمن حسانين! 🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0]);
   if(cv&&cv.toBlob&&navigator.canShare){
     cv.toBlob(function(blob){
       if(!blob){window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');return}
@@ -564,7 +577,7 @@ function endRound(){app.classList.remove('fade-in');void app.offsetWidth;app.cla
   app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
-  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':''))+
+  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':(win&&lv===20&&!isCurr?'<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">👑 استلم شهادة ختم الخريطة (٢٠ جولة)!</button>':'')))+
   '<button class="btn'+(win&&lv<20&&!isCurr?' t':'')+'" onclick="'+(isCurr?'startCurriculum(\''+G.currType+'\','+(lv-1)+')':'start('+lv+')')+'">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="'+(isCurr?'curriculum()':'map()')+'">رجوع</button>');
 }
 function nick(){
