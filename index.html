@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -215,7 +210,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><div class="row" style="justify-content:center;margin-top:6px">'+(S.cert?'<button class="btn" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="certScr()">🎓 استلم شهادتك</button>':'')+'<button class="btn t" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="S.cm=null;save();home()">تمام</button></div></div>':'')+
   (S.cert&&!S.cm?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="certScr()">🎓 شهادتي التقديرية (المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][(S.cert.rk||1)-1]+')</button>':'')+
-  (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
+  (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certMap()">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
   (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
   '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
   (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب (عشوائي)</button><button class="btn t" onclick="curriculum()">تدريبات المنهج (الوحدات والقصة)</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح.</div>')+
@@ -259,7 +254,7 @@ function map(){app.classList.remove('fade-in');void app.offsetWidth;app.classLis
   var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
     g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
   if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم!');return}
-  var mapCertBtn=mapDone()?'<div class="card" style="background:linear-gradient(135deg,#FFE8B5,#E3B03F);text-align:center;font-weight:900">👑 مبروك! ختمت كل جولات الخريطة ('+totStarsCount()+' / 60 نجمة)<br><button class="btn" style="width:100%;margin-top:8px;font-size:16px" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">🎓 استلم شهادة ختم الخريطة وحمّلها</button></div>':'';
+  var mapCertBtn=mapDone()?'<div class="card" style="background:linear-gradient(135deg,#FFE8B5,#E3B03F);text-align:center;font-weight:900">👑 مبروك! ختمت كل جولات الخريطة ('+totStarsCount()+' / 60 نجمة)<br><button class="btn" style="width:100%;margin-top:8px;font-size:16px" onclick="certMap()">🎓 استلم شهادة ختم الخريطة وحمّلها</button></div>':'';
   app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">النجوم: '+totStarsCount()+' / 60</div></div>'+mapCertBtn+'<div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
@@ -357,6 +352,7 @@ function pick(k){
 function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 var CUR_CERT=null;
+function certMap(){certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})}
 function certScr(custom){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var c=custom||S.cert||(mapDone()?{mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade}:{rk:1,pts:wkPts(),wk:wkKey(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade});
@@ -582,7 +578,7 @@ function endRound(){app.classList.remove('fade-in');void app.offsetWidth;app.cla
   app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
-  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':(win&&lv===20&&!isCurr?'<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})">👑 استلم شهادة ختم الخريطة (٢٠ جولة)!</button>':'')))+
+  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':(win&&lv===20&&!isCurr?'<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certMap()">👑 استلم شهادة ختم الخريطة (٢٠ جولة)!</button>':'')))+
   '<button class="btn'+(win&&lv<20&&!isCurr?' t':'')+'" onclick="'+(isCurr?'startCurriculum(\''+G.currType+'\','+(lv-1)+')':'start('+lv+')')+'">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="'+(isCurr?'curriculum()':'map()')+'">رجوع</button>');
 }
 function nick(){
