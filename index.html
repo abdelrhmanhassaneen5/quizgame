@@ -73,14 +73,9 @@ body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -105,6 +100,7 @@ if(window.FIREBASE_CONFIG){
     adjGet:async(u)=>{const x=await FS.getDoc(FS.doc(db,'adj',u));return x.exists()?x.data():null},
     askAdd:(d)=>FS.addDoc(FS.collection(db,'askq'),Object.assign({a:''},d,{t:FS.serverTimestamp()})).then((r)=>r.id),
     askGet:async(id)=>{const x=await FS.getDoc(FS.doc(db,'askq',id));return x.exists()?x.data():null},
+    giftGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'gifts',c));return x.exists()?x.data():null},
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
     board:async(wk,lo,hi,mine,n)=>{
@@ -157,7 +153,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -222,6 +218,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<button class="btn" style="background:linear-gradient(135deg,#B23A3A,#6B1D1D);border-color:#FFD700" onclick="survIntro()">⏱️ تحدي النجاة (60 ثانية)'+(S.survBest?' • رقمك: '+S.survBest:' • جديد 🔥')+'</button>'+
   (S.mis&&S.mis.length?'<button class="btn t" onclick="startReview()">جولة تصحيح ('+S.mis.length+' سؤال)</button>':'')+
   '<button class="btn t" onclick="reportScr()">📊 تقرير مستوايا (نقاط القوة والضعف)</button>'+
+  '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;display:flex;justify-content:center;align-items:center;gap:8px" onclick="giftScr()"><span>🎁 صندوق هدايا وأكواد مستر عبدالرحمن</span></button>'+
   '<div class="card" id="lbh" style="display:none"></div>'+
   eventCard()+missionCard()+dayCard()+misterCard()+
   '<div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+' • اسمك: '+esc(S.nick||'')+'</span></div>'+(canChange()?'<button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button>':'')+'</div>'+
@@ -735,6 +732,7 @@ function store(t,m){app.classList.remove('fade-in');void app.offsetWidth;app.cla
   app.innerHTML='<div class="hd"><div style="display:flex;justify-content:center">'+shopIcon(54)+'</div><h1>المتجر</h1><div>اصرف عملاتك بحكمة</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="chip"><span class="sm">نقاط الأسبوع:</span><span>'+wkPts()+'</span></div></div>'+
   '<div class="card" style="background:#E3B03F"><div class="tag">تنبيه قبل ما تصرف</div><div style="font-size:14px;margin-top:8px;line-height:1.8">• أي حاجة تشتريها بتتخصم من عملاتك، وكمان من نقاطك في ترتيب الأسبوع. لو صرفت كل عملاتك ممكن تنزل في الترتيب.<br>• المساعدات غالية وبتخلص بعد الاستخدام، فاشتري لما تحتاج بس.<br>• في تحديثات جاية هتحتاج فيها عملات (حاجات جديدة وألعاب)، فخلّي باقي من رصيدك.</div></div>'+
+  '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);font-size:15px;min-height:42px;padding:8px" onclick="giftScr()">🎁 معاك كود هدية سري من المستر؟ افتح صندوقك!</button>'+
   (m?'<div class="card" style="text-align:center;font-weight:900">'+m+'</div>':'')+
   '<div class="row">'+tabs+'</div>'+cards+'<div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
@@ -888,7 +886,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:S.bdg||[],aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:S.bdg||[],aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -914,7 +912,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,10):[],aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,10):[],aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
@@ -1167,6 +1165,96 @@ function shareSurv(){
   var best=Math.max(G?G.ok:0,S.survBest||0);
   var t='حققت '+best+' إجابة صحيحة في "تحدي النجاة (60 ثانية)" في لعبة تحدّي الأصحاب مع مستر عبدالرحمن! ⏱️🔥 تقدر تكسر رقمي القياسي؟ '+location.href.split('?')[0];
   window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+}
+var PROMO_CODES={
+  'GRAMMORA':{t:'هدية منصة Grammora التعليمية 🌟',c:150,p:100,h:1,pw:{fifty:1},m:'عاش يا بطل! استمر في متابعة فيديوهات الشرح والمراجعة على Grammora.'},
+  'ENGLIFOCUS':{t:'هدية قناة EngliFocus 🎥',c:150,p:100,h:0,pw:{time:1},m:'ممتاز! متابعتك لـ EngliFocus هتخليك دايماً سابق بخطوة في الإنجليزي.'},
+  'ALEXHERO':{t:'بطل حصة السنتر 🏫',c:200,p:150,h:3,pw:{fifty:1},m:'نورت الحصة النهاردة يا بطل! شد حيلك وعاوز أشوف اسمك في أوائل الأسبوع.'},
+  'HEART3':{t:'شحن القلوب اليومية ❤️',c:50,p:0,h:3,pw:{},m:'قلوبك اتشحنت بالكامل (3 قلوب)! يلا ارجع للخريطة واهزم الزعماء.'},
+  'QUIZ100':{t:'مكافأة التحدي السريع ⚡',c:120,p:100,h:0,pw:{time:1},m:'برافو عليك! 120 عملة و100 نقطة و+5 ثواني إضافية عشان تكسر الدنيا.'},
+  'SUPERSTAR':{t:'صندوق التميز الذهبي 👑',c:250,p:200,h:2,pw:{sc:1},m:'أنت نجم حقيقي! خدت الفرصة التانية + 250 عملة + 200 نقطة ترتيب.'},
+  'FRIDAY':{t:'هدية جمعة الأبطال المسائية 🔥',c:180,p:150,h:1,pw:{fifty:1,time:1},ws:1,m:'فرصتك الأخيرة قبل التصفير الأسبوعي! انطلق دلوقتي للمراكز التلاتة الأولى.'},
+  'CHAMPION':{t:'كنز أبطال مستر عبدالرحمن 🏆',c:300,p:250,h:3,pw:{fifty:1,time:1,sc:1},m:'مفاجأة كبرى! خدت الباقة الكاملة (300 عملة + 250 نقطة + 3 قلوب + كل المساعدات)!'}
+};
+var GIFT_HISTORY_NAMES={
+  'GRAMMORA':'هدية منصة Grammora 🌟',
+  'ENGLIFOCUS':'هدية قناة EngliFocus 🎥',
+  'ALEXHERO':'بطل حصة السنتر 🏫',
+  'HEART3':'شحن القلوب اليومية ❤️',
+  'QUIZ100':'مكافأة التحدي السريع ⚡',
+  'SUPERSTAR':'صندوق التميز الذهبي 👑',
+  'FRIDAY':'هدية جمعة الأبطال 🔥',
+  'CHAMPION':'كنز أبطال المستر 🏆'
+};
+function giftKey(code,obj){
+  return obj&&obj.ws ? (code+'_w'+wkKey()) : code;
+}
+function giftScr(rewardHtml){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  S.gifts=S.gifts||[];
+  var usedList=S.gifts.slice().reverse().slice(0,8).map(function(k){
+    var base=k.split('_w')[0];
+    var lbl=GIFT_HISTORY_NAMES[base]||('كود هدية ('+base+')');
+    return '<div class="row" style="padding:4px 8px;background:rgba(47,95,90,0.1);border-radius:8px;font-size:13px"><span class="sp">✅ <b>'+esc(lbl)+'</b></span><span class="sm" style="direction:ltr">'+esc(base)+'</span></div>';
+  }).join('');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#C9973F,#7A4E12);border-color:#FFE9B8"><h1>صندوق الهدايا السرية 🎁</h1><div>أكواد جوائز مستر عبدالرحمن حسانين</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg('c',58)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">معاك كود سري من حصة السنتر أو من فيديوهات <b>Grammora & EngliFocus</b> أو جروب الواتساب؟ اكتبه هنا وافتح صندوق هديتك فوراً! 🎉</div>'+
+    '</div>'+
+    (rewardHtml?rewardHtml:'')+
+    '<div class="card" style="text-align:center;background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border:2px solid #C9973F">'+
+      '<div class="tag" style="background:#7A3B3B;margin-bottom:10px">🔑 اكتب كود الهدية السري</div>'+
+      '<input id="gcin" class="inp" maxlength="18" placeholder="مثلًا: GRAMMORA" style="direction:ltr;text-transform:uppercase;letter-spacing:2px;font-size:22px;border-color:#C9973F">'+
+      '<button class="btn" style="width:100%;margin-top:10px;font-size:19px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="redeemGift()">🔓 افتح صندوق الهدية!</button>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.8;font-size:13px">'+
+      '<div class="tag g" style="margin-bottom:6px">إزاي تجيب الأكواد السرية؟ 💡</div>'+
+      '• <b>في حصة السنتر:</b> مستر عبدالرحمن بيوزع كود خاص لأبطال الحصة بيشحن قلوبك ويزود نقاطك.<br>'+
+      '• <b>على اليوتيوب وفيسبوك:</b> تابع فيديوهات <b>Grammora</b> و<b>EngliFocus</b> وركز في الكود اللي بيظهر جوه الفيديو!<br>'+
+      '• <b>يوم الجمعة:</b> كود خاص بينزل على جروب الواتساب لمساعدتك قبل التصفير الأسبوعي!<br>'+
+      '• <b>هدية الترحيب:</b> لو لسه مجربتش، اكتب كود <b style="color:#7A3B3B;direction:ltr;display:inline-block">GRAMMORA</b> وخد أول هدية مجانية!'+
+    '</div>'+
+    (usedList?'<div class="card" style="display:flex;flex-direction:column;gap:6px"><div class="tag">الهدايا اللي استلمتها ('+S.gifts.length+')</div>'+usedList+'</div>':'')+
+    '<div class="sp"></div>'+
+    '<button class="btn t" onclick="store()">الذهاب للمتجر</button>'+
+    '<button class="btn t" onclick="home()">الرئيسية</button>';
+}
+function applyGiftObj(code,g){
+  var gk=giftKey(code,g);
+  S.gifts=S.gifts||[];
+  if(S.gifts.indexOf(gk)>=0){rmsg('استخدمت الكود ده قبل كده يا بطل!');return}
+  S.gifts.push(gk);
+  var cGain=Number(g.c)||0,pGain=Number(g.p)||0,hGain=Number(g.h)||0,pw=g.pw||{};
+  var rewards=[];
+  if(cGain>0){S.coins+=cGain;rewards.push('🪙 +'+cGain+' عملة ذهبية')}
+  if(pGain>0){addPts(pGain);rewards.push('🏆 +'+pGain+' نقطة في ترتيب الأسبوع')}
+  if(hGain>0){S.dhp=Math.max(S.dhp||0,Math.min(3,(S.dhp||0)+hGain));rewards.push('❤️ شحن القلوب اليومية ('+S.dhp+'/3)')}
+  if(pw.fifty){S.inv.fifty=(S.inv.fifty||0)+pw.fifty;rewards.push('✂️ مساعدة حذف إجابتين ×'+pw.fifty)}
+  if(pw.time){S.inv.time=(S.inv.time||0)+pw.time;rewards.push('⏱️ مساعدة +5 ثواني ×'+pw.time)}
+  if(pw.sc){S.inv.sc=(S.inv.sc||0)+pw.sc;rewards.push('🛡️ مساعدة الفرصة التانية ×'+pw.sc)}
+  save();submit();sfxWin();
+  var boxHtml='<div class="card" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border:3px solid #FFD700;text-align:center;animation:fadeIn 0.4s ease-out">'+
+    '<div style="font-size:22px;font-weight:900;color:#FFD700;margin-bottom:6px">🎉 مبروك! فتحت '+esc(g.t||'صندوق الهدية')+'</div>'+
+    '<div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:10px;margin:8px 0;font-weight:900;font-size:16px;line-height:1.9">'+rewards.join('<br>')+'</div>'+
+    (g.m?'<div style="font-size:14px;line-height:1.6;color:#fff">💬 <b>رسالة المستر:</b> '+esc(g.m)+'</div>':'')+
+  '</div>';
+  giftScr(boxHtml);
+}
+function redeemGift(){
+  var inp=$('#gcin');if(!inp)return;
+  var code=inp.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length<3){rmsg('اكتب الكود الأول يا بطل!');return}
+  var local=PROMO_CODES[code];
+  if(local){applyGiftObj(code,local);return}
+  if(window.FB&&FB.giftGet){
+    rmsg('بنتأكد من الكود...');
+    FB.giftGet(code).then(function(d){
+      if(d&&d.active!==false){applyGiftObj(code,d)}
+      else{sfxBad();rmsg('الكود ده غلط أو انتهت صلاحيته! تأكد من حروف الكود')}
+    }).catch(function(){sfxBad();rmsg('الكود ده غلط! تأكد من كتابته صح')});
+  }else{
+    sfxBad();rmsg('الكود ده غلط! تأكد من حروف الكود من مستر عبدالرحمن');
+  }
 }
 var MP={
   a15:{t:'جاوب 15 سؤال صح',k:'a',n:15,r:60},a30:{t:'جاوب 30 سؤال صح',k:'a',n:30,r:90},
