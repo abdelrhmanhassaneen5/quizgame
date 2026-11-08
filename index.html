@@ -71,16 +71,37 @@ body.dark .opt.ok { background: var(--ok); border-color: var(--gold); }
 body.dark .opt.bad { background: var(--bad); border-color: var(--bad); }
 body.dark .sw { background: #555; border-color: #777; }
 body.dark .sw.on { background: var(--ok); border-color: var(--gold); }
+
+/* --- Platform Dashboard & Bottom Nav --- */
+.prof-card{background:linear-gradient(135deg,#2F5F5A,#1B3B38);border:2px solid var(--gold);border-radius:16px;padding:12px 14px;color:#FFE9B8;box-shadow:0 4px 12px rgba(0,0,0,0.22)}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-pill{background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:8px 4px;text-align:center;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 3px 0 rgba(138,106,74,0.35)}
+.stat-pill .lbl{font-size:11px;color:var(--brown);font-weight:700}
+.stat-pill .val{font-size:16px;display:flex;align-items:center;gap:4px}
+.hero-play{background:linear-gradient(135deg,#8B2E2E,#521818);color:#FFE9B8;border:3px solid #FFD700;border-radius:18px;box-shadow:0 6px 0 #381010;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:right;font-family:'Cairo',sans-serif;transition:transform 0.1s}
+.hero-play:active{transform:translateY(3px);box-shadow:0 3px 0 #381010}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-tile{background:var(--card);border:2px solid #8A6A4A;border-radius:16px;box-shadow:0 4px 0 #8A6A4A;padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:right;font-family:'Cairo',sans-serif;color:var(--ink);position:relative;transition:transform 0.1s}
+.mode-tile:active{transform:translateY(3px);box-shadow:0 1px 0 #8A6A4A}
+.mode-tile .m-ic{font-size:24px;line-height:1}
+.mode-tile .m-tt{font-weight:900;font-size:15px;line-height:1.3}
+.mode-tile .m-sb{font-size:11px;color:var(--teal);font-weight:700}
+.mode-tile.surv{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:#D9742B;box-shadow:0 4px 0 #A65118}
+.mode-tile.curr{background:linear-gradient(135deg,#E6F4F1,#CFE3D4);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38}
+body.dark .mode-tile.surv{background:linear-gradient(135deg,#3A2318,#2A1810);color:#FFE9B8}
+body.dark .mode-tile.curr{background:linear-gradient(135deg,#1E3532,#152624);color:#FFE9B8}
+body.dark .stat-pill .lbl{color:#CDB88A}
+.bnav-spacer{height:72px;flex:none}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--teal);border-top:3px solid var(--gold);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:900;box-shadow:0 -4px 16px rgba(0,0,0,0.35);box-sizing:border-box}
+.bnav button{background:none;border:none;color:rgba(255,233,184,0.68);font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;cursor:pointer;border-radius:10px;position:relative}
+.bnav button .ni{font-size:20px;line-height:1.1}
+.bnav button.act{color:#FFE9B8;background:rgba(255,255,255,0.14);font-weight:900}
+.bnav .bdot{position:absolute;top:3px;right:18px;width:8px;height:8px;border-radius:50%;background:#FF4D4D;border:1.5px solid var(--teal)}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -210,28 +231,116 @@ function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function canChange(){return true;}
 function totStarsCount(){var s=0;Object.keys(S.stars||{}).forEach(function(k){s+=(S.stars[k]||0)});return s}
 function mapDone(){return S.stars&&S.stars[20]>0}
+function bnav(active){
+  var hasCert = !!(S.cert || mapDone());
+  var tabs=[
+    ['home','🏠','الرئيسية','home()',0],
+    ['rep','📊','مستوايا','reportScr()',hasCert],
+    ['lb','🏆','الترتيب','board()',0],
+    ['shop','🛒','المتجر','store()',0],
+    ['acc','⚙️','حسابي','accountScr()',S.rcOk&&!S.rcSeen]
+  ];
+  return '<div class="bnav-spacer"></div><nav class="bnav" aria-label="التنقل الرئيسي">'+tabs.map(function(t){
+    return '<button class="'+(active===t[0]?'act':'')+'" onclick="'+t[3]+'">'+(t[4]?'<span class="bdot"></span>':'')+'<span class="ni">'+t[1]+'</span><span>'+t[2]+'</span></button>';
+  }).join('')+'</nav>';
+}
 function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  setTimeout(function(){fillStats();fillLb();ensureReg();claimPrev();refreshLb();refreshStats()},0);
-  app.innerHTML='<div class="hd"><h1>تحدّي الأصحاب</h1><div>اهزم الوحش بالإنجليزي!</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">وصلت للجولة '+S.max+'</div></div>'+
+  setTimeout(function(){ensureReg();claimPrev();askSync()},0);
+  var misCnt=(S.mis||[]).length;
+  var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
+  app.innerHTML=
+  /* 1. Student Profile Header */
+  '<div class="prof-card">'+
+    '<div class="row">'+
+      misterImg('c',48)+
+      '<div class="sp">'+
+        '<div style="font-family:'Lemonada',sans-serif;font-size:16px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
+        '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+' • <span style="color:#CFE3D4">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+')</span></div>'+
+      '</div>'+
+      '<button class="btn" style="font-size:12px;padding:4px 10px;min-height:32px;border-width:2px" onclick="stageScr()">تغيير الصف</button>'+
+    '</div>'+
+  '</div>'+
+
+  /* 2. Unified Status Strip (Coins, Daily Hearts, Streak) */
+  '<div class="stat-strip">'+
+    '<div class="stat-pill" onclick="store()" style="cursor:pointer"><span class="lbl">رصيد العملات</span><div class="val">'+coin()+'<span>'+S.coins+'</span></div></div>'+
+    '<div class="stat-pill"><span class="lbl">القلوب اليومية</span><div class="val" style="gap:2px">'+dhpStars+'</div></div>'+
+    '<div class="stat-pill"><span class="lbl">سلسلة الأيام</span><div class="val">'+flame(18)+'<span>'+skAlive()+' يوم</span></div></div>'+
+  '</div>'+
+
+  /* Alerts & Notifications (if any) */
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><div class="row" style="justify-content:center;margin-top:6px">'+(S.cert?'<button class="btn" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="certScr()">🎓 استلم شهادتك</button>':'')+'<button class="btn t" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="S.cm=null;save();home()">تمام</button></div></div>':'')+
-  (S.cert&&!S.cm?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="certScr()">🎓 شهادتي التقديرية (المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][(S.cert.rk||1)-1]+')</button>':'')+
-  (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certMap()">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
-  (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد</button></div>':'')+(DB?'<div class="card" style="text-align:center;font-weight:900">مكافأة اليوم: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم)':'')+'</div>':'')+
-  '<div class="card row" style="justify-content:center;gap:15px;background:'+(S.dhp>0?'#2F6B4A':'#8B2E2E')+';color:#fff"><div style="font-weight:900;font-size:18px">قلوبك اليومية:</div><div style="display:flex;gap:4px">'+stars(S.dhp,24).replace(/fill="[^"]+"/g,'fill="#FFE9B8"').replace(/#E3C98F/g,'#555')+'</div></div>'+
-  (S.dhp>0?'<button class="btn" style="font-size:20px" onclick="map()">ابدأ اللعب (عشوائي)</button><button class="btn t" onclick="curriculum()">تدريبات المنهج (الوحدات والقصة)</button>':'<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك خلصت! استنى لبكرة عشان تتجدد أو ادخل جولة تصحيح أو تحدي النجاة.</div>')+
-  '<button class="btn" style="background:linear-gradient(135deg,#B23A3A,#6B1D1D);border-color:#FFD700" onclick="survIntro()">⏱️ تحدي النجاة (60 ثانية)'+(S.survBest?' • رقمك: '+S.survBest:' • جديد 🔥')+'</button>'+
-  (S.mis&&S.mis.length?'<button class="btn t" onclick="startReview()">جولة تصحيح ('+S.mis.length+' سؤال)</button>':'')+
-  '<button class="btn t" onclick="reportScr()">📊 تقرير مستوايا (نقاط القوة والضعف)</button>'+
-  '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;display:flex;justify-content:center;align-items:center;gap:8px" onclick="giftScr()"><span>🎁 صندوق هدايا وأكواد مستر عبدالرحمن</span></button>'+
-  '<div class="card" id="lbh" style="display:none"></div>'+
-  eventCard()+missionCard()+dayCard()+misterCard()+
-  '<div class="card row"><div class="sp"><span class="sm">المرحلة: '+(S.stage==='p'?'ابتدائي':'إعدادي')+' • '+gName()+' • اسمك: '+esc(S.nick||'')+'</span></div>'+(canChange()?'<button class="btn t" style="font-size:13px;padding:4px 12px;min-height:34px" onclick="stageScr()">غيّر</button>':'')+'</div>'+
-  '<div class="card" id="st" style="display:none"></div>'+(S.rcOk&&!S.rcSeen?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">تقدمك اتحفظ على النت!<br>احتفظ بكودك علشان ترجّعه لو غيّرت الموبايل<br><button class="btn t" style="font-size:14px;margin-top:6px" onclick="saveScr()">شوف كودك</button></div>':'')+
-  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">تظهر تحت كل سؤال</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;home()"><i></i></button></div>'+
-  '<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات</div><div class="sm">تصفيق وصوت الوحش وأصوات المرح</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="toggleSnd()"><i></i></button></div>'+
-  '<div class="card"><div class="tag">إزاي تلعب</div><div style="font-size:14px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الوحش. الإجابة الغلط أو خلاص الوقت بيخسّرك قلب. 3 إجابات صح ورا بعض = ضربة قوية!</div></div>'+
-  '<button class="btn t" onclick="askScr()">اسأل مستر عبدالرحمن'+(askNew()?' • فيه رد':'')+'</button><button class="btn t" onclick="roomScr()">تحدّي صاحب (روم)'+(S.rm?' • شغالة':'')+'</button><button class="btn t" style="display:flex;justify-content:center;align-items:center;gap:10px" onclick="store()">'+shopIcon(30)+'<span>المتجر</span></button><button class="btn t" style="font-size:15px" onclick="saveScr()">حفظ التقدم (كود الاسترجاع)</button>';
+  (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">💬 مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد دلوقتي</button></div>':'')+
+  (DB?'<div class="card" style="text-align:center;font-weight:900;background:#CFE3D4;border-color:#2F6B4A">🎉 مكافأة دخولك النهاردة: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم 🔥)':'')+'</div>':'')+
+
+  /* 3. Primary Adventure Banner */
+  (S.dhp>0
+    ? '<button class="hero-play" onclick="map()">'+
+        '<div>'+
+          '<div style="font-family:'Lemonada',sans-serif;font-size:19px;font-weight:900;color:#FFD700">🗺️ خريطة المغامرات</div>'+
+          '<div style="font-size:13px;font-weight:700;margin-top:3px">وصلت للجولة '+S.max+' من 20 • اجمع النجوم واهزم الزعماء!</div>'+
+        '</div>'+
+        '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:8px 14px;border-radius:12px;font-size:15px;white-space:nowrap">العب الآن ▶</div>'+
+      '</button>'
+    : '<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك اليومية خلصت! تقدر تلعب <b>تحدي النجاة</b> أو <b>جولة التصحيح</b> أو تشحن قلوبك بكود هدية 🎁</div>')+
+
+  /* 4. 2x2 Game Modes Grid */
+  '<div class="mode-grid">'+
+    '<button class="mode-tile curr" onclick="curriculum()">'+
+      '<span class="m-ic">📚</span>'+
+      '<span class="m-tt">تدريبات المنهج</span>'+
+      '<span class="m-sb">الوحدات والقصة ('+gName()+')</span>'+
+    '</button>'+
+    '<button class="mode-tile surv" onclick="survIntro()">'+
+      '<span class="m-ic">⏱️</span>'+
+      '<span class="m-tt">تحدي النجاة (60ث)</span>'+
+      '<span class="m-sb" style="color:#B23A3A">'+(S.survBest?'أعلى رقم: '+S.survBest+' صح 🔥':'بدون خصم قلوب • جديد 🔥')+'</span>'+
+    '</button>'+
+    '<button class="mode-tile" onclick="roomScr()">'+
+      '<span class="m-ic">⚔️</span>'+
+      '<span class="m-tt">تحدّي صاحب (1 ضد 1)</span>'+
+      '<span class="m-sb">'+(S.rm?'روم شغالة حالياً 🔴':'ابعت كود واتحدى صاحبك')+'</span>'+
+    '</button>'+
+    '<button class="mode-tile" onclick="'+(misCnt>0?'startReview()':'giftScr()')+'">'+
+      '<span class="m-ic">'+(misCnt>0?'🛠️':'🎁')+'</span>'+
+      '<span class="m-tt">'+(misCnt>0?'جولة التصحيح':'صندوق الهدايا')+'</span>'+
+      '<span class="m-sb">'+(misCnt>0?'صحّح '+misCnt+' سؤال واسترجع قلب':'افتح أكواد مستر عبدالرحمن')+'</span>'+
+    '</button>'+
+  '</div>'+
+
+  /* Quick Gift & Ask Teacher Row */
+  '<div class="row">'+
+    '<button class="btn" style="flex:1;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;font-size:14px;padding:8px;min-height:42px" onclick="giftScr()">🎁 كود هدية سري</button>'+
+    '<button class="btn t" style="flex:1;font-size:14px;padding:8px;min-height:42px" onclick="askScr()">💬 اسأل المستر'+(askNew()?' 🔴':'')+'</button>'+
+  '</div>'+
+
+  /* 5. Daily Missions & Teacher Tip */
+  eventCard()+missionCard()+misterCard()+
+  bnav('home');
+}
+
+function accountScr(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  setTimeout(function(){fillStats();refreshStats()},0);
+  app.innerHTML=
+  '<div class="hd"><h1>حسابي والإعدادات ⚙️</h1><div>تحكّم في بياناتك، الصوت، وحفظ تقدمك</div></div>'+
+  '<div class="card row">'+
+    misterImg('a',52)+
+    '<div class="sp">'+
+      '<div style="font-weight:900;font-size:16px">'+esc(S.nick||'بطل التحدي')+'</div>'+
+      '<div class="sm">'+(S.stage==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية')+' • الصف '+gName()+'</div>'+
+    '</div>'+
+    '<button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="nick()">تعديل الاسم</button>'+
+  '</div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">المرحلة والصف الدراسي</div><div class="sm">تغيير المرحلة يحفظ تقدمك في كل مرحلة لوحدها</div></div><button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="stageScr()">تغيير الصف</button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">حفظ واسترجاع التقدم ☁️</div><div class="sm">'+(S.rc&&S.rcOk?'كودك: '+fmtRC(S.rc):'احفظ تقدمك عشان لو غيّرت الموبايل')+'</div></div><button class="btn" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="saveScr()">كود الاسترجاع</button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">إظهار ترجمة السؤال تحت الإنجليزي</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;accountScr()"><i></i></button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات والتشجيع الصوتى</div><div class="sm">صوت مستر عبدالرحمن والمؤثرات الصوتية</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="S.mute=!S.mute;save();accountScr()"><i></i></button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الوضع الليلي (Dark Mode) 🌙</div><div class="sm">مريح للعين وقت اللعب بالليل</div></div><button class="sw'+(S.dark?' on':'')+'" aria-label="الوضع الليلي" onclick="S.dark=!S.dark;save();applyTheme();accountScr()"><i></i></button></div>'+
+  dayCard()+
+  '<div class="card" id="st" style="display:none"></div>'+
+  '<div class="card"><div class="tag">إزاي تلعب وتتصدر؟</div><div style="font-size:13px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الزعيم. 3 إجابات صح ورا بعض = كومبو وضربة مضاعفة! اجمع النقاط طوال الأسبوع لحد يوم الجمعة الساعة 12 بالليل عشان تكسب شهادة تقدير رسمية من مستر عبدالرحمن.</div></div>'+
+  bnav('acc');
 }
 
 function curriculum(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
@@ -613,7 +722,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
   '<div class="row" style="flex-wrap:wrap">'+tab('all','كل اللاعبين')+tab('lg','دوري '+LG[li].n)+tab('gr','صفّي')+tab('gs','الصفوف')+'</div>'+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل...</div>'+
   '<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>'+
-  '<div class="sp"></div><button class="btn" onclick="share()">تحدّى صاحبك</button><button class="btn t" onclick="home()">الرئيسية</button>';
+  '<div class="sp"></div><button class="btn" onclick="share()">📲 تحدّى صاحبك على واتساب</button>'+bnav('lb');
   var lb=$('#lb'),pv=$('#pv');
   if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';pv.style.display='none';$('#mr').style.display='none';return}
   var p=pts>0?submitP():Promise.resolve();
@@ -739,7 +848,7 @@ function store(t,m){app.classList.remove('fade-in');void app.offsetWidth;app.cla
   '<div class="card" style="background:#E3B03F"><div class="tag">تنبيه قبل ما تصرف</div><div style="font-size:14px;margin-top:8px;line-height:1.8">• أي حاجة تشتريها بتتخصم من عملاتك، وكمان من نقاطك في ترتيب الأسبوع. لو صرفت كل عملاتك ممكن تنزل في الترتيب.<br>• المساعدات غالية وبتخلص بعد الاستخدام، فاشتري لما تحتاج بس.<br>• في تحديثات جاية هتحتاج فيها عملات (حاجات جديدة وألعاب)، فخلّي باقي من رصيدك.</div></div>'+
   '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);font-size:15px;min-height:42px;padding:8px" onclick="giftScr()">🎁 معاك كود هدية سري من المستر؟ افتح صندوقك!</button>'+
   (m?'<div class="card" style="text-align:center;font-weight:900">'+m+'</div>':'')+
-  '<div class="row">'+tabs+'</div>'+cards+'<div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+  '<div class="row">'+tabs+'</div>'+cards+bnav('shop');
 }
 function eq(k,id){S.eq[k]=id;save();applyTheme();store()}
 function ask(id){
@@ -1025,9 +1134,10 @@ function reportScr(){
       statBox('أخطاء للمراجعة',misCnt+' سؤال',misCnt>0?'ادخل جولة التصحيح':'سجلك خالي من الأخطاء!')+
     '</div>'+
     '<div class="card"><div class="tag">إتقان المهارات</div>'+skillRows+'</div>'+
-    (misCnt>0?'<button class="btn" onclick="startReview()">صلّح أخطاءك دلوقتي ('+misCnt+' سؤال)</button>':'')+
-    '<button class="btn t" onclick="curriculum()">تدريبات المنهج</button>'+
-    '<button class="btn t" onclick="home()">الرئيسية</button>';
+    (S.cert?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="certScr()">🎓 شهادة تقدير الأسبوع (المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][(S.cert.rk||1)-1]+')</button>':'')+
+    (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certMap()">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
+    (misCnt>0?'<button class="btn" onclick="startReview()">🛠️ صلّح أخطاءك دلوقتي ('+misCnt+' سؤال)</button>':'')+
+    bnav('rep');
 }
 function survIntro(){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
