@@ -11,7 +11,7 @@ html,body{margin:0;height:100%}
 body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 #app{max-width:430px;min-height:100%;margin:0 auto;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:18px 16px;display:flex;flex-direction:column;gap:12px}
 .hd{background:var(--teal);border:2px solid var(--gold);border-radius:16px;color:#FFE9B8;text-align:center;padding:14px}
-.hd h1{font-family:'Lemonada',sans-serif;font-size:24px;margin:0}
+.hd h1{font-family:Lemonada,sans-serif;font-size:24px;margin:0}
 .hd div{font-size:13px;margin-top:6px}
 .card{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:12px}
 .tag{background:var(--brown);color:#FFE9B8;border-radius:8px;padding:5px;text-align:center;font-weight:700;font-size:14px}
@@ -19,7 +19,7 @@ body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
 .row{display:flex;align-items:center;gap:10px}
 .sp{flex:1}
 .sm{font-size:12px;color:var(--teal);font-weight:700}
-.btn{background:var(--red);color:#FFE9B8;border:3px solid #D9A84E;border-radius:14px;box-shadow:0 5px 0 #4B2222;font-family:'Lemonada',sans-serif;font-size:18px;padding:12px;min-height:48px;cursor:pointer}
+.btn{background:var(--red);color:#FFE9B8;border:3px solid #D9A84E;border-radius:14px;box-shadow:0 5px 0 #4B2222;font-family:Lemonada,sans-serif;font-size:18px;padding:12px;min-height:48px;cursor:pointer}
 .btn.t{background:var(--teal);box-shadow:0 5px 0 #1B3B38}
 .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4B2222}
 .sw{width:52px;height:30px;border-radius:15px;border:2px solid var(--gold);background:#9A8566;position:relative;cursor:pointer;padding:0}
@@ -99,14 +99,9 @@ body.dark .stat-pill .lbl{color:#CDB88A}
 .bnav .bdot{position:absolute;top:3px;right:18px;width:8px;height:8px;border-radius:50%;background:#FF4D4D;border:1.5px solid var(--teal)}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -259,7 +254,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
     '<div class="row">'+
       misterImg('c',48)+
       '<div class="sp">'+
-        '<div style="font-family:'Lemonada',sans-serif;font-size:16px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
+        '<div style="font-family:Lemonada,sans-serif;font-size:16px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
         '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+' • <span style="color:#CFE3D4">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+')</span></div>'+
       '</div>'+
       '<button class="btn" style="font-size:12px;padding:4px 10px;min-height:32px;border-width:2px" onclick="stageScr()">تغيير الصف</button>'+
@@ -282,7 +277,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   (S.dhp>0
     ? '<button class="hero-play" onclick="map()">'+
         '<div>'+
-          '<div style="font-family:'Lemonada',sans-serif;font-size:19px;font-weight:900;color:#FFD700">🗺️ خريطة المغامرات</div>'+
+          '<div style="font-family:Lemonada,sans-serif;font-size:19px;font-weight:900;color:#FFD700">🗺️ خريطة المغامرات</div>'+
           '<div style="font-size:13px;font-weight:700;margin-top:3px">وصلت للجولة '+S.max+' من 20 • اجمع النجوم واهزم الزعماء!</div>'+
         '</div>'+
         '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:8px 14px;border-radius:12px;font-size:15px;white-space:nowrap">العب الآن ▶</div>'+
