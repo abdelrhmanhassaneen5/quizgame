@@ -128,14 +128,9 @@ body.dark .c-plot.empty{background:rgba(255,255,255,0.08);border-color:#aaa}
 body.dark .role-card.act{background:linear-gradient(135deg,#1E3532,#152624);border-color:#FFD700;color:#FFE9B8}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -1901,6 +1896,7 @@ function homeCityCard(){
   '</div>';
 }
 var CITY_TAB='build';
+function jumpToBld(id){CITY_TAB='build';cityScr();setTimeout(function(){var el=document.getElementById('bld_'+id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
 function cityScr(tab){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   if(tab)CITY_TAB=tab;
@@ -1910,7 +1906,7 @@ function cityScr(tab){
     var lv=bldLv(b.id);
     var ic=lv===0?'🚧':(lv===3?b.ic3:b.ic);
     var nm=lv===3?b.n3:b.n;
-    return '<div class="c-plot '+(lv===0?'empty':'')+'" onclick="CITY_TAB='build';cityScr();setTimeout(function(){var el=document.getElementById('bld_'+b.id+'');if(el)el.scrollIntoView({behavior:'smooth'})},80)">'+
+    return '<div class="c-plot '+(lv===0?'empty':'')+'" onclick="jumpToBld(\''+b.id+'\')">'+
       '<div class="b-ic">'+ic+'</div>'+
       '<div class="b-nm">'+nm+'</div>'+
       '<div class="b-lv">'+(lv===0?'أرض فاضية':'مستوى '+lv+'/3 '+('⭐'.repeat(lv)))+'</div>'+
@@ -1918,8 +1914,8 @@ function cityScr(tab){
   }).join('');
 
   var tabBtns='<div class="row" style="gap:8px">'+
-    '<button class="pwb" style="'+(CITY_TAB==='build'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr('build')">🏗️ تعمير المباني ('+totLv+'/18)</button>'+
-    '<button class="pwb" style="'+(CITY_TAB==='roles'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr('roles')">👮‍♂️ اختر شخصيتك ('+r.ic+')</button>'+
+    '<button class="pwb" style="'+(CITY_TAB==='build'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr(\'build\')">🏗️ تعمير المباني ('+totLv+'/18)</button>'+
+    '<button class="pwb" style="'+(CITY_TAB==='roles'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr(\'roles\')">👮‍♂️ اختر شخصيتك ('+r.ic+')</button>'+
   '</div>';
 
   var bodyHtml='';
@@ -1927,7 +1923,7 @@ function cityScr(tab){
     bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+'<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">اختار وظيفتك في المدينة! كل شخصية بتديك <b>قدرة خارقة أثناء حل الأسئلة</b> + مهمة خاصة تكسب منها ذهب للمدينة!</div></div>'+
     '<div class="role-grid">'+ROLES.map(function(ro){
       var isMe=(S.role===ro.id);
-      return '<div class="role-card '+(isMe?'act':'')+'" onclick="selectRole(''+ro.id+'')">'+
+      return '<div class="role-card '+(isMe?'act':'')+'" onclick="selectRole(\''+ro.id+'\')">'+
         '<div style="font-size:36px;line-height:1.1">'+ro.ic+'</div>'+
         '<div style="font-weight:900;font-size:15px;color:'+(isMe?'#2F6B4A':'#7A3B3B')+'">'+ro.n+'</div>'+
         '<div style="font-size:11px;line-height:1.4;font-weight:700;min-height:46px">'+ro.p+'</div>'+
@@ -1950,7 +1946,7 @@ function cityScr(tab){
         '</div>'+
         (maxed
           ? '<span class="sm" style="font-weight:900;color:#C9973F">مكتمل 👑</span>'
-          : '<button class="btn" style="font-size:13px;padding:6px 10px;min-height:40px;white-space:nowrap" onclick="buyBld(''+b.id+'')">'+(lv===0?'ابنِ الآن':'طوّر '+(lv+1)+'/3')+'<br><span style="font-size:11px">🪙 '+nxtCost+'</span></button>')+
+          : '<button class="btn" style="font-size:13px;padding:6px 10px;min-height:40px;white-space:nowrap" onclick="buyBld(\''+b.id+'\')">'+(lv===0?'ابنِ الآن':'طوّر '+(lv+1)+'/3')+'<br><span style="font-size:11px">🪙 '+nxtCost+'</span></button>')+
       '</div>';
     }).join('');
   }
