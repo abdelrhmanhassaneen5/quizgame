@@ -147,16 +147,17 @@ body.dark .pet-box{background:linear-gradient(135deg,#2C2518,#1E1A12);color:#FFE
 @keyframes petBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .pet-btn{background:linear-gradient(135deg,#2F5F5A,#1B3B38);color:#FFE9B8;border:2px solid #FFD700;border-radius:12px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 3px 0 #122826}
 .pet-btn:disabled{opacity:0.45;cursor:default;box-shadow:none}
+.cls-spotlight{background:linear-gradient(135deg,#7A3B3B,#4A1C1C);color:#FFE9B8;border:3px solid #FFD700;border-radius:18px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,0.3)}
+.cls-qbox{background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border:3px solid #2F5F5A;border-radius:18px;padding:16px;text-align:center;box-shadow:0 5px 14px rgba(0,0,0,0.18)}
+body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5F5F5;border-color:#FFD700}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:240px;overflow-y:auto;padding:4px}
+.st-pill{background:var(--card);border:2px solid #8A6A4A;border-radius:12px;padding:8px 10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 0 #8A6A4A}
+.st-pill.picked{background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border-color:#FFD700}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -174,6 +175,9 @@ if(window.FIREBASE_CONFIG){
   const cnt=(q)=>FS.getCountFromServer(q).then((x)=>x.data().count);
   window.FB={
     submit:(wk,uid,name,pts,meta)=>FS.setDoc(FS.doc(db,'weeks',String(wk),'scores',uid),Object.assign({name:name,pts:pts,t:FS.serverTimestamp()},meta||{})),
+    grpSet:(id,d)=>FS.setDoc(FS.doc(db,'cgroups',String(id)),Object.assign({},d,{t:FS.serverTimestamp()})),
+    grpDel:(id)=>FS.deleteDoc(FS.doc(db,'cgroups',String(id))),
+    grpList:async()=>{const s=await FS.getDocs(FS.collection(db,'cgroups'));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
     raidAdd:(toUid,d)=>FS.addDoc(FS.collection(db,'raids',String(toUid),'list'),Object.assign({},d,{t:FS.serverTimestamp()})),
     raidsGet:async(uid)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'raids',String(uid),'list'),FS.orderBy('t','desc'),FS.limit(8)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
     top:async(wk,n)=>{const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wk),'scores'),FS.orderBy('pts','desc'),FS.limit(n||10)));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -236,7 +240,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -313,16 +317,16 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v3.8',
-  title:'تحديث المرافق الذكي والمطاردات! 🦉🐉🚀',
-  sub:'إصدار المرافقين الأذكياء (v3.8)',
+  ver:'v3.9',
+  title:'تحديث بطولة الحصة وأبطال السنتر! 🏫🏆',
+  sub:'إصدار بطولة المجموعات والمرافق الذكي (v3.9)',
   gift:80,
-  intro:'أهلاً بيك يا بطل في التحديث الجديد من منصة «تحدّي الأصحاب»! شوف المفاجآت الجديدة اللي ضفناها ليك:',
+  intro:'أهلاً بيك يا بطل في التحديث الجديد من منصة «تحدّي الأصحاب»! شوف المفاجآت الجديدة:',
   items:[
-    {ic:'🦉',t:'المرافق الذكي الناطق (Smart Pets)',d:'تبنَّ مرافقك الذكي (بومة الحكمة 🦉 مجاناً، القط السريع 🐱، ثعلب التلميح 🦊، أو التنين الذهبي 🐉)! مرافقك بيصحى بنشاطك اليومي ويساعدك بقدرة خارقة مجانية في كل جولة!'},
+    {ic:'🏫',t:'لوحة شرف أبطال الحصة والسنتر (للطلاب وأولياء الأمور)',d:'دلوقتي كل سؤال بتجاوبه مع مستر عبدالرحمن جوه الحصة بيتسجل باسمك في مجموعتك! لما تروح البيت افتح «🏆 الترتيب ⬅️ 🏫 أبطال السنتر» وشوف ترتيبك وورّيه لولي أمرك!'},
+    {ic:'🦉',t:'المرافق الذكي الناطق (Smart Pets)',d:'تبنَّ مرافقك الذكي (بومة الحكمة 🦉 مجاناً، القط السريع 🐱، ثعلب التلميح 🦊، أو التنين الذهبي 🐉)! مرافقك بيصحى بنشاطك اليومي ويساعدك في كل جولة!'},
     {ic:'🚨',t:'رادار المطاردات والغارات بين اللاعبين',d:'لو إنت «ضابط شرطة 👮‍♂️» اختار أي لاعب وظيفته «لص 🦹‍♂️» واقبض عليه! ولو إنت «لص» اختار مدينة أي لاعب وادخل غارة على خزنته!'},
-    {ic:'🧩',t:'تحدي تركيب الجمل التفاعلي (Sentence Builder)',d:'اضغط على الكلمات المبعثرة لترتيبها وتكوين جملة إنجليزية صحيحة واسمع نطقها الصحيح!'},
-    {ic:'🏙️',t:'بناء المدينة والقصر الملكي',d:'اجمع العملات من حل الأسئلة وابنِ مدينتك خطوة بخطوة واستلم عوائد الخزينة اليومية!'}
+    {ic:'🧩',t:'تحدي تركيب الجمل التفاعلي (Sentence Builder)',d:'اضغط على الكلمات المبعثرة لترتيبها وتكوين جملة إنجليزية صحيحة واسمع نطقها الصحيح!'}
   ]
 };
 function checkWhatsNew(){
@@ -462,6 +466,21 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   /* Daily Arena Banner */
   dailyArenaCard()+
 
+  /* Classroom Live Arena & Center Champions Card */
+  '<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid #7A3B3B;box-shadow:0 4px 0 #4A1C1C;padding:11px 12px">'+
+    '<div class="row">'+
+      '<div style="font-size:32px;line-height:1">🏫</div>'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:15px;color:#7A3B3B">بطولة الحصة وأبطال السنتر 🏆</div>'+
+        '<div style="font-size:12px;font-weight:700;color:#4A2F22;margin-top:2px">شوف ترتيبك في حصة السنتر مع مستر عبدالرحمن لولي الأمر!</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:8px;gap:6px">'+
+      '<button class="btn" style="flex:2;font-size:13px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="board(\'cls\')">📊 نتائج وترتيب مجموعات السنتر</button>'+
+      '<button class="btn t" style="flex:1;font-size:12px;min-height:38px;padding:6px;background:#4A2F22" onclick="tPinScr()">🔐 لوحة المستر</button>'+
+    '</div>'+
+  '</div>'+
+
   /* Quick Badges, Gift & Ask Teacher Row */
   '<div class="row" style="gap:6px">'+
     '<button class="btn" style="flex:1;background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700;font-size:13px;padding:8px 4px;min-height:42px" onclick="badgesScr()">🏅 الأوسمة ('+(S.bdg||[]).length+'/'+BADGES.length+')</button>'+
@@ -488,6 +507,7 @@ function accountScr(){
     '<button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="nick()">تعديل الاسم</button>'+
   '</div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">المرحلة والصف الدراسي</div><div class="sm">تغيير المرحلة يحفظ تقدمك في كل مرحلة لوحدها</div></div><button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="stageScr()">تغيير الصف</button></div>'+
+  '<div class="card row" style="border-color:#7A3B3B;background:linear-gradient(135deg,#FFF8E7,#FFE8B5)"><div class="sp"><div style="font-weight:900;color:#7A3B3B">لوحة تحكم مستر عبدالرحمن 🔐🏫</div><div class="sm">إدارة مجموعات السنتر وإطلاق بطولة الحصة الحية</div></div><button class="btn" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="tPinScr()">دخول المستر</button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">حفظ واسترجاع التقدم ☁️</div><div class="sm">'+(S.rc&&S.rcOk?'كودك: '+fmtRC(S.rc):'احفظ تقدمك عشان لو غيّرت الموبايل')+'</div></div><button class="btn" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="saveScr()">كود الاسترجاع</button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">إظهار ترجمة السؤال تحت الإنجليزي</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;accountScr()"><i></i></button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات والتشجيع الصوتى</div><div class="sm">صوت مستر عبدالرحمن والمؤثرات الصوتية</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="S.mute=!S.mute;save();accountScr()"><i></i></button></div>'+
@@ -1021,13 +1041,19 @@ function lgIcon(i,z){return'<svg width="'+z+'" height="'+z+'" viewBox="0 0 24 24
 function rrow(x,rk,me,unit){return'<div class="row'+(me?' me':(rk===1?' gold':''))+'"><b style="min-width:28px">'+rk+'</b><span class="sp">'+esc(x.name)+'</span><b>'+x.pts+(unit?' '+unit:'')+'</b></div>'}
 function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   if(t)BT=t;
-  if(!S.nick){nick();return}
+  if(!S.nick&&BT!=='cls'){nick();return}
   var pts=wkPts(),li=lgIdx(pts),lo=BT==='lg'?LG[li].lo:0,hi=BT==='lg'&&li+1<LG.length?LG[li+1].lo:1e12,prog='';
   if(li<LG.length-1){var nx=LG[li+1];prog='<div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,(pts-LG[li].lo)/(nx.lo-LG[li].lo)*100)+'%"></i></div><div class="sm">باقي '+(nx.lo-pts)+' نقطة للدوري ال'+nx.n+'</div>'}
-  var tab=function(k,l){return'<button class="pwb" style="flex:1 1 30%;'+(BT===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="board(\''+k+'\')">'+l+'</button>'};
-  var isDC=(BT==='dc'),isSV=(BT==='sv');
+  var tab=function(k,l){return'<button class="pwb" style="flex:1 1 28%;font-size:12px;'+(BT===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="board(\''+k+'\')">'+l+'</button>'};
+  var isDC=(BT==='dc'),isSV=(BT==='sv'),isCLS=(BT==='cls');
   var topInfoCard='';
-  if(isDC){
+  if(isCLS){
+    topInfoCard='<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border-color:#7A3B3B;line-height:1.8;font-size:14px">'+
+      '<div class="tag" style="background:#7A3B3B">🏫 لوحة شرف أبطال الحصة والسنتر (للطالب وولي الأمر)</div>'+
+      '<div style="margin-top:6px">هنا بتظهر نتائج ونقاط الطلاب اللي شاركوا وجاوبوا مع <b>مستر عبدالرحمن حسانين</b> داخل حصة السنتر! اختار مجموعتك وشوف ترتيبك وتفوقك:</div>'+
+      '<button class="btn t" style="width:100%;margin-top:8px;font-size:13px;min-height:36px;padding:6px" onclick="tPinScr()">🔐 دخول مستر عبدالرحمن (إدارة البطولة والمجموعات)</button>'+
+    '</div>';
+  }else if(isDC){
     var myDC=dcPts();
     topInfoCard='<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border-color:#C9973F;line-height:1.8;font-size:14px"><div class="tag" style="background:#7A3B3B">🎯 ترتيب حلبة التحدي اليومية ('+dTxt(cDay())+')</div><div style="margin-top:6px">نفس الـ 5 أسئلة لكل الطلاب النهاردة! الترتيب بيتحدد حسب <b>الدقة وسرعة الحل</b>.<br>نقاطك في حلبة النهاردة: <b>'+(myDC>0?myDC+' نقطة':'لسه مدخلتش حلبة النهاردة!')+'</b></div>'+(myDC>0?'':'<button class="btn" style="width:100%;margin-top:8px;font-size:15px;min-height:40px" onclick="dailyIntro()">⚔️ ادخل حلبة التحدي اليومية الآن!</button>')+'</div>';
   }else if(isSV){
@@ -1041,18 +1067,22 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
   app.innerHTML='<div class="hd"><h1>لوحة الشرف والترتيب 🏆</h1><div>'+(S.stage==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية')+' • النهاردة '+dTxt(cDay())+'</div></div>'+
   '<div class="row" style="flex-wrap:wrap;gap:6px">'+
     tab('all','🏆 العام')+
+    tab('cls','🏫 أبطال السنتر')+
     tab('dc','🎯 حلبة اليوم')+
     tab('sv','⏱️ النجاة')+
     tab('lg','🛡️ دوري '+LG[li].n)+
     tab('gr','📚 صفّي')+
-    tab('gs','🏫 الصفوف')+
   '</div>'+
   topInfoCard+
   ((isDC||isSV)?'<div class="card" id="mr" style="font-weight:700;text-align:center">ترتيبك: ...</div>':'')+
   '<div class="card" id="lb" style="display:flex;flex-direction:column;gap:8px">بنحمّل الترتيب...</div>'+
-  (isDC||isSV?'':'<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>')+
-  '<div class="sp"></div><button class="btn" onclick="'+(isSV?'shareSurv()':(isDC?'shareDaily()':'share()'))+'">📲 اتحدّى صحابك على واتساب</button>'+bnav('lb');
+  (isDC||isSV||isCLS?'':'<div class="card" id="pv" style="display:flex;flex-direction:column;gap:8px"></div>')+
+  '<div class="sp"></div><button class="btn" onclick="'+(isCLS?'shareClsBoard()':(isSV?'shareSurv()':(isDC?'shareDaily()':'share()')))+'">📲 مشاركة الترتيب على واتساب</button>'+bnav('lb');
   var lb=$('#lb'),pv=$('#pv');
+  if(isCLS){
+    renderClsPublicBoard(lb);
+    return;
+  }
   if(!window.FB){lb.textContent='الترتيب لسه متفعّلش.';if(pv)pv.style.display='none';if($('#mr'))$('#mr').style.display='none';return}
   var p=(pts>0||S.survBest>0||dcPts()>0)?submitP():Promise.resolve();
   if(BT==='gs'){
@@ -2317,6 +2347,460 @@ function usePetSkill(){
     rmsg('🐉 التنين الذهبي أحرق الوحش (-1 صحة) ومنحك +25 عملة ذهبية!');
   }
   updPw();
+}
+/* === نظام بطولة الحصة الحية وأبطال السنتر (PIN: 4771) === */
+var T_AUTH=false,CLS_CUR_GRP='',CLS_GAME=null;
+function syncGrpsFromCloud(cb){
+  if(window.FB&&FB.grpList){
+    FB.grpList().then(function(list){
+      if(list&&list.length){
+        S.cgrps=list;
+        save();
+      }
+      if(cb)cb(S.cgrps||[]);
+    }).catch(function(){if(cb)cb(S.cgrps||[])});
+  }else{
+    if(cb)cb(S.cgrps||[]);
+  }
+}
+function saveGrpToCloud(grp){
+  S.cgrps=S.cgrps||[];
+  var idx=-1;
+  S.cgrps.forEach(function(g,i){if(g.id===grp.id)idx=i});
+  if(idx>=0)S.cgrps[idx]=grp;else S.cgrps.push(grp);
+  save();
+  if(window.FB&&FB.grpSet){
+    return FB.grpSet(grp.id,grp).catch(function(){});
+  }
+  return Promise.resolve();
+}
+function renderClsPublicBoard(lbEl){
+  if(!lbEl)return;
+  lbEl.innerHTML='بنحمّل نتائج مجموعات السنتر...';
+  syncGrpsFromCloud(function(grps){
+    if(!grps||!grps.length){
+      lbEl.innerHTML='<div style="text-align:center;padding:12px;font-weight:700">لسه مفيش مجموعات مسجلة حالياً.<br><span class="sm">مستر عبدالرحمن بيضيف المجموعات ونتائج الحصص من لوحة التحكم الخاصة به.</span></div>';
+      return;
+    }
+    if(!CLS_CUR_GRP||!grps.some(function(g){return g.id===CLS_CUR_GRP}))CLS_CUR_GRP=grps[0].id;
+    var curG=grps.filter(function(g){return g.id===CLS_CUR_GRP})[0]||grps[0];
+    var grpTabs='<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:8px">'+grps.map(function(g){
+      var act=(g.id===curG.id);
+      return '<button class="pwb" style="flex:1 1 42%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_CUR_GRP=\''+g.id+'\';renderClsPublicBoard($(\'#lb\'))">🏫 '+esc(g.name)+'</button>';
+    }).join('')+'</div>';
+
+    var stList=(curG.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+    var stRows=stList.map(function(st,i){
+      var rk=i+1;
+      var medal=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk));
+      var isMe=(S.nick&&st.name.trim()===S.nick.trim());
+      var certBtn=(rk<=3&&(st.pts||0)>0)?'<button class="btn" style="font-size:11px;min-height:26px;padding:2px 8px;margin-right:6px" onclick="certScr({rk:'+rk+',pts:'+(st.pts||0)+',wk:wkKey(),name:\''+esc(st.name)+'\',st:\''+(curG.stage||'m')+'\',gr:'+(curG.grade||1)+'})">🎓 شهادة</button>':'';
+      return '<div class="row'+(isMe?' me':(rk===1?' gold':''))+'" style="padding:6px 8px;border-radius:10px;border-bottom:1px dashed rgba(138,106,74,0.25)">'+
+        '<b style="min-width:32px;font-size:16px">'+medal+'</b>'+
+        '<div class="sp"><div style="font-weight:900;font-size:15px">'+esc(st.name)+'</div><div class="sm" style="font-size:11px;color:inherit">إجابات صحيحة بالحصة: '+(st.ok||0)+' ✅ '+(st.lastPts?'• آخر حصة: +'+st.lastPts+' نقطة':'')+'</div></div>'+
+        certBtn+
+        '<b style="font-size:16px">'+(st.pts||0)+' نقطة</b>'+
+      '</div>';
+    }).join('');
+
+    var stgName=(curG.stage==='p'?GP:GM)[(curG.grade||1)-1]||'';
+    lbEl.innerHTML=grpTabs+
+      '<div style="background:rgba(47,95,90,0.1);padding:8px 10px;border-radius:10px;text-align:center;margin-bottom:6px">'+
+        '<div style="font-weight:900;font-size:16px;color:#2F5F5A">🏫 '+esc(curG.name)+' ('+stgName+')</div>'+
+        '<div class="sm">آخر تحديث لنتائج الحصة: '+(curG.lastDate||'لم تبدأ بعد')+' • عدد الأبطال: '+stList.length+'</div>'+
+      '</div>'+
+      (stRows||'لا يوجد طلاب في هذه المجموعة بعد.');
+  });
+}
+function shareClsBoard(){
+  var grps=S.cgrps||[];
+  var curG=grps.filter(function(g){return g.id===CLS_CUR_GRP})[0]||grps[0];
+  if(!curG){share();return}
+  var stList=(curG.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+  var topTxt=stList.slice(0,10).map(function(s,i){
+    var m=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':(i+1)+'-'));
+    return m+' '+s.name+' ('+(s.pts||0)+' نقطة - '+(s.ok||0)+' صح ✅)';
+  }).join('\n');
+  var txt='🏆 *لوحة شرف أبطال حصة السنتر - مستر عبدالرحمن حسانين* 🏫\n'+
+    '📌 المجموعة: *'+curG.name+'* ('+(curG.lastDate||dTxt(cDay()))+')\n\n'+
+    topTxt+'\n\n🌟 يقدر كل طالب وولي أمر يتابع الترتيب الكامل والشهادات من المنصة: '+location.href.split('?')[0];
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+function tPinScr(){
+  if(T_AUTH){tPanelScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>لوحة تحكم المستر 🔐🏫</h1><div>خاصة بمستر عبدالرحمن حسانين لإدارة بطولات الحصة</div></div>'+
+    '<div class="card" style="text-align:center;padding:16px">'+
+      misterImg('c',64)+
+      '<div style="font-weight:900;font-size:16px;margin:8px 0">أدخل الرقم السري الخاص بالمستر:</div>'+
+      '<input id="tpin" type="password" inputmode="numeric" class="inp" maxlength="8" placeholder="••••" style="letter-spacing:6px;font-size:24px;max-width:220px;direction:ltr">'+
+      '<button class="btn" style="width:100%;margin-top:12px;font-size:18px" onclick="checkTPin()">🔓 فتح لوحة إدارة الحصة</button>'+
+    '</div>'+
+    '<div class="sp"></div>'+
+    '<button class="btn t" onclick="home()">رجوع للرئيسية</button>';
+}
+function checkTPin(){
+  var v=($('#tpin')&&$('#tpin').value.trim())||'';
+  if(v==='4771'){
+    T_AUTH=true;
+    ding();
+    rmsg('أهلاً بك يا مستر عبدالرحمن! 🎓🌟');
+    syncGrpsFromCloud(function(){tPanelScr()});
+  }else{
+    sfxBad();
+    rmsg('الرقم السري غير صحيح! 🔒');
+  }
+}
+function tPanelScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var grps=S.cgrps||[];
+  var grpCards=grps.map(function(g){
+    var stgName=(g.stage==='p'?GP:GM)[(g.grade||1)-1]||'';
+    var cnt=(g.students||[]).length;
+    return '<div class="card" style="border-color:#2F5F5A">'+
+      '<div class="row">'+
+        '<div style="font-size:28px">🏫</div>'+
+        '<div class="sp">'+
+          '<div style="font-weight:900;font-size:16px;color:#7A3B3B">'+esc(g.name)+'</div>'+
+          '<div class="sm">'+(g.stage==='p'?'ابتدائي':'إعدادي')+' • الصف '+stgName+' • <b>'+cnt+' طالب</b></div>'+
+          '<div class="sm" style="font-size:11px">آخر حصة: '+(g.lastDate||'لم تبدأ بعد')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">'+
+        '<button class="btn" style="flex:2;font-size:14px;min-height:40px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="clsSetupArena(\''+g.id+'\')">⚡ ابدأ بطولة الحصة الآن</button>'+
+        '<button class="btn t" style="flex:1;font-size:12px;min-height:40px;padding:6px" onclick="tEditGrpScr(\''+g.id+'\')">✏️ تعديل الأسماء</button>'+
+        '<button class="btn t" style="font-size:12px;min-height:40px;padding:6px;background:#8B2E2E" onclick="tResetGrpPts(\''+g.id+'\')">🔄 تصفير</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>إدارة مجموعات السنتر 🏫⚡</h1><div>شغّل المسابقة في الحصة من موبايلك وارفع الترتيب للطلاب وأولياء الأمور</div></div>'+
+    '<button class="btn" style="font-size:17px;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="tEditGrpScr()">➕ إضافة مجموعة سنتر جديدة</button>'+
+    (grpCards||'<div class="card" style="text-align:center;font-weight:700;padding:18px">مفيش مجموعات لسه يا مستر! اضغط على «➕ إضافة مجموعة سنتر جديدة» فوق واكتب أسماء طلاب المجموعة مرة واحدة.</div>')+
+    '<div class="sp"></div>'+
+    '<button class="btn t" onclick="board(\'cls\')">🏆 معاينة لوحة شرف السنتر للطلاب</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+}
+var EDIT_GRP_STG='m',EDIT_GRP_GRD=1;
+function tEditGrpScr(gid){
+  if(!T_AUTH){tPinScr();return}
+  var g=gid?(S.cgrps||[]).filter(function(x){return x.id===gid})[0]:null;
+  EDIT_GRP_STG=g?g.stage:(S.stage||'m');
+  EDIT_GRP_GRD=g?g.grade:(S.grade||1);
+  var namesTxt=g?(g.students||[]).map(function(s){return s.name}).join('\n'):'';
+  renderTEditForm(gid||'',g?g.name:'',namesTxt);
+}
+function renderTEditForm(gid,gname,namesTxt){
+  var GList=EDIT_GRP_STG==='p'?GP:GM;
+  if(EDIT_GRP_GRD>GList.length)EDIT_GRP_GRD=1;
+  app.innerHTML='<div class="hd"><h1>'+(gid?'تعديل المجموعة ✏️':'مجموعة سنتر جديدة ➕')+'</h1><div>اكتب اسم المجموعة وأسماء الطلاب (كل طالب في سطر)</div></div>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="sm">اسم المجموعة (مثال: مجموعة السبت والثلاثاء الساعة 4):</div>'+
+      '<input id="egName" class="inp" maxlength="40" placeholder="مثال: أبطال تانية إعدادي - سنتر الإسكندرية" value="'+esc(gname)+'" style="font-size:16px">'+
+      '<div class="sm" style="margin-top:4px">المرحلة الدراسية:</div>'+
+      '<div class="row">'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='p'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick=" preserveAndSwitchStg(\'p\',\''+gid+'\')">ابتدائي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='m'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick=" preserveAndSwitchStg(\'m\',\''+gid+'\')">إعدادي</button>'+
+      '</div>'+
+      '<div class="sm" style="margin-top:4px">الصف الدراسي:</div>'+
+      '<div class="row" style="flex-wrap:wrap;gap:6px">'+
+        GList.map(function(n,i){
+          var act=(EDIT_GRP_GRD===i+1);
+          return '<button class="pwb" style="flex:1 1 30%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchGrd('+(i+1)+',\''+gid+'\')">'+n+'</button>';
+        }).join('')+
+      '</div>'+
+      '<div class="sm" style="margin-top:6px">أسماء طلاب المجموعة (اكتب أو الصق كل اسم في سطر مستقل):</div>'+
+      '<textarea id="egStudents" class="inp" rows="8" placeholder="أحمد محمد\nمريم علي\nيوسف حسن\nسارة إبراهيم" style="font-size:16px;text-align:right;line-height:1.6">'+esc(namesTxt)+'</textarea>'+
+    '</div>'+
+    '<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="tSaveGrp(\''+gid+'\')">💾 حفظ المجموعة والأسماء</button>'+
+    (gid?'<button class="btn" style="background:#8B2E2E;font-size:14px;min-height:38px" onclick="tDeleteGrp(\''+gid+'\')">🗑️ حذف المجموعة</button>':'')+
+    '<button class="btn t" onclick="tPanelScr()">رجوع للوحة المستر</button>';
+}
+function preserveAndSwitchStg(st,gid){
+  var nm=$('#egName')?$('#egName').value:'';
+  var tx=$('#egStudents')?$('#egStudents').value:'';
+  EDIT_GRP_STG=st;EDIT_GRP_GRD=1;
+  renderTEditForm(gid,nm,tx);
+}
+function preserveAndSwitchGrd(gr,gid){
+  var nm=$('#egName')?$('#egName').value:'';
+  var tx=$('#egStudents')?$('#egStudents').value:'';
+  EDIT_GRP_GRD=gr;
+  renderTEditForm(gid,nm,tx);
+}
+function tSaveGrp(gid){
+  var nm=($('#egName')&&$('#egName').value.trim())||'';
+  var raw=($('#egStudents')&&$('#egStudents').value)||'';
+  if(nm.length<2){rmsg('اكتب اسم المجموعة الأول يا مستر!');return}
+  var lines=raw.split(/\r?\n/).map(function(x){return x.trim()}).filter(function(x){return x.length>0});
+  if(!lines.length){rmsg('اكتب اسم طالب واحد على الأقل!');return}
+  var oldG=gid?(S.cgrps||[]).filter(function(x){return x.id===gid})[0]:null;
+  var oldMap={};
+  if(oldG&&oldG.students){oldG.students.forEach(function(s){oldMap[s.name]=s})}
+  var stArr=[];
+  var seen={};
+  lines.forEach(function(n){
+    if(seen[n])return;
+    seen[n]=1;
+    var prev=oldMap[n];
+    stArr.push({
+      name:n,
+      pts:prev?(prev.pts||0):0,
+      ok:prev?(prev.ok||0):0,
+      ans:prev?(prev.ans||0):0,
+      lastPts:prev?(prev.lastPts||0):0
+    });
+  });
+  var grp={
+    id:gid||('grp_'+Date.now().toString(36)),
+    name:nm,
+    stage:EDIT_GRP_STG,
+    grade:EDIT_GRP_GRD,
+    students:stArr,
+    lastDate:oldG?(oldG.lastDate||''):''
+  };
+  rmsg('جاري حفظ المجموعة على السحابة...');
+  saveGrpToCloud(grp).then(function(){
+    ding();
+    rmsg('تم حفظ المجموعة ('+stArr.length+' طالب) بنجاح! 🏫✅');
+    tPanelScr();
+  });
+}
+function tDeleteGrp(gid){
+  if(!confirm('هل أنت متأكد من حذف هذه المجموعة بالكامل؟'))return;
+  S.cgrps=(S.cgrps||[]).filter(function(x){return x.id!==gid});
+  save();
+  if(window.FB&&FB.grpDel)FB.grpDel(gid).catch(function(){});
+  tPanelScr();
+}
+function tResetGrpPts(gid){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g)return;
+  if(!confirm('تصفير نقاط جميع طلاب «'+g.name+'» لبدء شهر/أسبوع جديد؟'))return;
+  (g.students||[]).forEach(function(s){s.pts=0;s.ok=0;s.ans=0;s.lastPts=0});
+  g.lastDate=dTxt(cDay());
+  saveGrpToCloud(g).then(function(){
+    rmsg('تم تصفير نقاط المجموعة بنجاح! 🔄');
+    tPanelScr();
+  });
+}
+var CLS_SRC='all',CLS_MODE='turn';
+function clsSetupArena(gid){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g||!g.students||!g.students.length){rmsg('أضف طلاباً للمجموعة أولاً!');return}
+  var stgName=(g.stage==='p'?GP:GM)[(g.grade||1)-1]||'';
+  var srcBtn=function(k,lbl){
+    return '<button class="pwb" style="flex:1 1 30%;font-size:13px;'+(CLS_SRC===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SRC=\''+k+'\';clsSetupArena(\''+gid+'\')">'+lbl+'</button>';
+  };
+  var modeBtn=function(k,lbl,sub){
+    return '<button class="card" style="flex:1;cursor:pointer;text-align:center;border-width:2.5px;'+(CLS_MODE===k?'background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#2F6B4A':'')+'" onclick="CLS_MODE=\''+k+'\';clsSetupArena(\''+gid+'\')">'+
+      '<div style="font-weight:900;font-size:15px;color:#7A3B3B">'+lbl+'</div>'+
+      '<div class="sm" style="font-size:11px;margin-top:3px">'+sub+'</div>'+
+    '</button>';
+  };
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>إعداد بطولة الحصة 🏫⚡</h1><div>'+esc(g.name)+' • الصف '+stgName+' ('+g.students.length+' طالب)</div></div>'+
+    '<div class="card">'+
+      '<div class="tag g" style="margin-bottom:8px">١. اختار مصدر الأسئلة للحصة</div>'+
+      '<div class="row" style="flex-wrap:wrap;gap:6px">'+
+        srcBtn('all','🌟 شامل (بنك الأسئلة)')+
+        srcBtn('u0','📘 Unit 1')+
+        srcBtn('u1','📘 Unit 2')+
+        srcBtn('u2','📘 Unit 3')+
+        srcBtn('u3','📘 Unit 4')+
+        srcBtn('u4','📘 Unit 5')+
+        srcBtn('u5','📘 Unit 6')+
+        srcBtn('s0','📖 Story Ch 1')+
+        srcBtn('s1','📖 Story Ch 2')+
+        srcBtn('s2','📖 Story Ch 3')+
+      '</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="tag" style="margin-bottom:8px">٢. اختار نظام اختيار الطالب في القاعة</div>'+
+      '<div class="row" style="gap:8px">'+
+        modeBtn('turn','🎯 نظام الدور العشوائي','اللعبة تختار اسم الطالب اللي عليه الدور تلقائياً بالتساوي')+
+        modeBtn(' buzz','✋ نظام السرعة (رفع اليد)','يظهر السؤال وتضغط أنت على اسم أول طالب يجاوب صح')+
+      '</div>'+
+    '</div>'+
+    '<div class="sp"></div>'+
+    '<button class="btn" style="font-size:20px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="startClsLive(\''+gid+'\')">🚀 انطلاق بطولة الحصة الآن!</button>'+
+    '<button class="btn t" onclick="tPanelScr()">رجوع للمجموعات</button>';
+}
+function genClsQuestions(g,src,count){
+  count=count||30;
+  var st=g.stage||'m',gr=g.grade||1,pool=[];
+  if(src!=='all'&&typeof CURRICULUM!=='undefined'&&CURRICULUM[st]&&CURRICULUM[st][gr]){
+    var cData=CURRICULUM[st][gr];
+    var raw=src.charAt(0)==='u'?cData.units[+src.slice(1)]:cData.story[+src.slice(1)];
+    if(raw&&raw.length){
+      pool=raw.map(function(q){return [q.q,q.ar||'',q.o,q.a,q.hint||'',src.charAt(0)==='u'?'mc':'st',st]});
+    }
+  }
+  if(!pool.length){
+    var allQ=Q.filter(function(q){return q[6]===st});
+    if(!allQ.length)allQ=Q;
+    pool=allQ.slice();
+  }
+  var out=[];
+  while(out.length<count){
+    out=out.concat(shuffle(pool.slice()));
+  }
+  return out.slice(0,count);
+}
+function startClsLive(gid){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g)return;
+  (g.students||[]).forEach(function(s){s.lastPts=0});
+  var qs=genClsQuestions(g,CLS_SRC,40);
+  var queue=shuffle(g.students.map(function(_,i){return i}));
+  CLS_GAME={
+    grp:g,
+    qs:qs,
+    qi:0,
+    mode:CLS_MODE,
+    queue:queue,
+    curStIdx:queue[0]||0,
+    done:false,
+    ansCount:0
+  };
+  showClsLiveQ();
+}
+function pickNextTurnStudent(){
+  var cg=CLS_GAME;
+  if(!cg.queue.length){
+    cg.queue=shuffle(cg.grp.students.map(function(_,i){return i}));
+  }
+  cg.curStIdx=cg.queue.shift();
+}
+function showClsLiveQ(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var cg=CLS_GAME;if(!cg)return;
+  if(cg.qi>=cg.qs.length){cg.qs=cg.qs.concat(genClsQuestions(cg.grp,CLS_SRC,30))}
+  var q=cg.qs[cg.qi];
+  cg.done=false;
+  cg.ord=shuffle(q[2].map(function(_,k){return k}));
+  cg.ci=cg.ord.indexOf(q[3]);
+
+  var curSt=cg.grp.students[cg.curStIdx]||cg.grp.students[0];
+  var optsHtml=cg.ord.map(function(x,k){
+    var letters=['A','B','C','D'];
+    return '<button class="opt" style="display:flex;align-items:center;justify-content:space-between;font-size:21px;padding:12px 16px" onclick="pickClsLiveOpt('+k+')">'+
+      '<span style="background:#2F5F5A;color:#FFE9B8;border-radius:8px;padding:2px 10px;font-size:15px">'+letters[k]+'</span>'+
+      '<span style="flex:1;text-align:center"'+(/[\u0600-\u06FF]/.test(q[2][x])?' dir="rtl"':'')+'>'+esc(q[2][x])+'</span>'+
+    '</button>';
+  }).join('');
+
+  var studentSelectorHtml='';
+  if(cg.mode==='turn'){
+    studentSelectorHtml='<div class="cls-spotlight">'+
+      '<div style="font-size:13px;color:#FFD700;font-weight:700">🎯 الدور في هذا السؤال على البطل(ة):</div>'+
+      '<div style="font-size:28px;font-weight:900;margin:4px 0;color:#FFF">'+esc(curSt.name)+'</div>'+
+      '<div style="font-size:12px;color:#CFE3D4">نقاطه الإجمالية: <b>'+(curSt.pts||0)+'</b> • نقاط حصة اليوم: <b>+'+(curSt.lastPts||0)+'</b></div>'+
+      '<div class="row" style="justify-content:center;margin-top:8px;gap:8px">'+
+        '<button class="btn t" style="font-size:12px;min-height:32px;padding:4px 10px" onclick="skipClsStudent()">🎲 طالب آخر عشوائي</button>'+
+        '<button class="btn t" style="font-size:12px;min-height:32px;padding:4px 10px" onclick="CLS_GAME.mode=\'buzz\';showClsLiveQ()">✋ تحويل لنظام رفع اليد</button>'+
+      '</div>'+
+    '</div>';
+  }else{
+    studentSelectorHtml='<div class="card" style="border-color:#7A3B3B">'+
+      '<div class="row" style="margin-bottom:6px"><span class="tag" style="background:#7A3B3B;flex:1">✋ اختار الطالب اللي رفع إيده الأول: <b>'+esc(curSt.name)+'</b></span><button class="pwb" style="flex:none;font-size:11px;min-height:28px;padding:2px 8px" onclick="CLS_GAME.mode=\'turn\';showClsLiveQ()">🎯 نظام الدور</button></div>'+
+      '<div class="st-grid">'+cg.grp.students.map(function(s,idx){
+        var isSel=(idx===cg.curStIdx);
+        return '<button class="st-pill'+(isSel?' picked':'')+'" onclick="CLS_GAME.curStIdx='+idx+';showClsLiveQ()"><span>'+esc(s.name)+'</span><span style="font-size:11px;opacity:0.8">'+(s.pts||0)+'</span></button>';
+      }).join('')+'</div>'+
+    '</div>';
+  }
+
+  app.innerHTML='<div class="row">'+
+      '<div class="chip" style="background:#2F5F5A;color:#FFE9B8;border-color:#FFD700">🏫 سؤال '+(cg.qi+1)+'</div>'+
+      '<div class="chip">👥 '+esc(cg.grp.name)+'</div>'+
+      '<div class="sp"></div>'+
+      '<button class="pwb" style="flex:none;min-height:36px;padding:4px 10px" onclick="speak(CLS_GAME.qs[CLS_GAME.qi][0])">🔊 انطق</button>'+
+    '</div>'+
+    studentSelectorHtml+
+    '<div class="cls-qbox">'+
+      '<div class="tag g">'+TT[q[5]]+'</div>'+
+      '<div style="direction:ltr;font-size:25px;font-weight:900;line-height:1.4;margin:10px 0;color:#7A3B3B">'+esc(q[0])+'</div>'+
+      (q[1]?'<div style="font-size:16px;font-weight:700;color:#2F5F5A;border-top:2px dashed #C9973F;padding-top:6px">'+esc(q[1])+'</div>':'')+
+    '</div>'+
+    optsHtml+
+    '<div id="clsFb"></div>'+
+    '<div class="row" style="margin-top:6px;gap:8px">'+
+      '<button class="btn" style="flex:2;font-size:15px;min-height:42px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="finishClsSession()">🏁 إنهاء البطولة وحفظ الترتيب للأهالي ☁️</button>'+
+      '<button class="btn t" style="flex:1;font-size:13px;min-height:42px" onclick="CLS_GAME.qi++;if(CLS_GAME.mode===\'turn\')pickNextTurnStudent();showClsLiveQ()">تخطي السؤال ⬅️</button>'+
+    '</div>';
+}
+function skipClsStudent(){
+  pickNextTurnStudent();
+  ding();
+  showClsLiveQ();
+}
+function pickClsLiveOpt(k){
+  var cg=CLS_GAME;if(!cg||cg.done)return;
+  cg.done=true;
+  var q=cg.qs[cg.qi],good=(k===cg.ci);
+  var st=cg.grp.students[cg.curStIdx];
+  document.querySelectorAll('.opt').forEach(function(b,j){
+    b.disabled=true;
+    if(j===cg.ci)b.classList.add('ok');
+    else if(j===k)b.classList.add('bad');
+  });
+  st.ans=(st.ans||0)+1;
+  var msg='';
+  if(good){
+    st.ok=(st.ok||0)+1;
+    st.pts=(st.pts||0)+100;
+    st.lastPts=(st.lastPts||0)+100;
+    cg.ansCount++;
+    sfxOk(true);
+    msg='🎉 إجابة صحيحة للبطل «'+esc(st.name)+'»! (+100 نقطة في لوحة شرف السنتر)';
+  }else{
+    sfxBad();
+    msg='❌ إجابة غير صحيحة من «'+esc(st.name)+'»! الإجابة الصحيحة موضحة باللون الأخضر.';
+  }
+  cg.grp.lastDate=dTxt(cDay());
+  save();
+  $('#clsFb').innerHTML='<div class="card row" style="border-color:'+(good?'#2F6B4A':'#8B2E2E')+'">'+
+    misterImg(good?'c':'h',48)+
+    '<div class="sp"><div style="font-weight:900;font-size:15px;color:'+(good?'#2F6B4A':'#8B2E2E')+'">'+msg+'</div><div class="sm">'+esc(q[4]||'')+'</div></div>'+
+  '</div>'+
+  '<button class="btn" style="width:100%;margin-top:8px;font-size:19px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="nextClsLiveQ()">السؤال والطالب التالي ⬅️</button>';
+}
+function nextClsLiveQ(){
+  var cg=CLS_GAME;if(!cg)return;
+  cg.qi++;
+  if(cg.mode==='turn')pickNextTurnStudent();
+  showClsLiveQ();
+}
+function finishClsSession(){
+  var cg=CLS_GAME;if(!cg)return;
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var g=cg.grp;
+  g.lastDate=dTxt(cDay());
+  CLS_CUR_GRP=g.id;
+  rmsg('جاري رفع الترتيب النهائي على السحابة ليظهر للطلاب وأولياء الأمور...');
+  saveGrpToCloud(g).then(function(){
+    sfxWin();
+    rmsg('تم رفع نتائج الحصة على المنصة بنجاح! ☁️🏆');
+  });
+  var sorted=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+  var rowsHtml=sorted.map(function(s,i){
+    var rk=i+1,m=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk));
+    return '<div class="row'+(rk===1?' gold':'')+'" style="padding:6px 8px;border-radius:8px;border-bottom:1px dashed rgba(138,106,74,0.25)">'+
+      '<b style="min-width:30px">'+m+'</b>'+
+      '<span class="sp" style="font-weight:900">'+esc(s.name)+' <span class="sm">(اليوم: +'+(s.lastPts||0)+')</span></span>'+
+      '<b>'+(s.pts||0)+' نقطة</b>'+
+    '</div>';
+  }).join('');
+
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700"><h1>تم حفظ ورفع نتائج الحصة! 🏆☁️</h1><div>'+esc(g.name)+' • '+g.lastDate+'</div></div>'+
+    '<div class="card row">'+misterImg('c',54)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">عاش يا أبطال! تم حفظ ورفع الترتيب على المنصة. يقدر كل طالب وولي أمر يفتح <b>«🏆 الترتيب ⬅️ 🏫 أبطال السنتر»</b> أول ما يروح البيت ويشوف مركزه وشهادته!</div>'+
+    '</div>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:6px"><div class="tag">الترتيب النهائي للمجموعة</div>'+rowsHtml+'</div>'+
+    '<button class="btn" style="font-size:18px;background:#1E7E48" onclick="shareClsBoard()">📲 إرسال تقرير أبطال الحصة على جروب واتساب</button>'+
+    '<button class="btn t" onclick="board(\'cls\')">📊 عرض لوحة شرف السنتر العامة</button>'+
+    '<button class="btn t" onclick="tPanelScr()">🔐 العودة للوحة تحكم المستر</button>';
 }
 var ROLES=[
   {id:'police',ic:'👮‍♂️',n:'ضابط شرطة',p:'درع الشرطة: يحمي وقتك من أول خطأ في النجاة ويصد أول ضربة للزعيم!',actName:'🚨 دورية القبض على اللصوص',actDesc:'حل 3 أسئلة سريعة للقبض على عصابة اللصوص وحماية خزينة المدينة!'},
