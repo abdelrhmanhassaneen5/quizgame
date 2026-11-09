@@ -126,16 +126,15 @@ body.dark .c-plot.empty{background:rgba(255,255,255,0.08);border-color:#aaa}
 .role-card{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:10px 8px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 3px 0 rgba(138,106,74,0.35);font-family:'Cairo',sans-serif;color:var(--ink)}
 .role-card.act{background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border:2.5px solid #2F6B4A;box-shadow:0 4px 0 #1B432C}
 body.dark .role-card.act{background:linear-gradient(135deg,#1E3532,#152624);border-color:#FFD700;color:#FFE9B8}
+.wn-ov{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(3px);z-index:9500;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;animation:fadeIn 0.25s ease-out}
+.wn-box{width:100%;max-width:400px;max-height:88vh;overflow-y:auto;background:var(--paper);border:3px solid #FFD700;border-radius:20px;padding:16px 14px;box-shadow:0 12px 32px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:10px}
+.wn-item{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:10px;display:flex;align-items:flex-start;gap:10px;text-align:right}
+.wn-ic{font-size:26px;line-height:1;background:rgba(47,95,90,0.12);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;border:1.5px solid var(--gold)}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -213,7 +212,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -287,9 +286,70 @@ function bnav(active){
     return '<button class="'+(active===t[0]?'act':'')+'" onclick="'+t[3]+'">'+(t[4]?'<span class="bdot"></span>':'')+'<span class="ni">'+t[1]+'</span><span>'+t[2]+'</span></button>';
   }).join('')+'</nav>';
 }
+/* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
+var APP_UPDATE={
+  ver:'v3.5',
+  title:'التحديث الأضخم وصل! 🚀🎉',
+  sub:'إصدار بناء المدينة والأبطال (v3.5)',
+  gift:50,
+  intro:'أهلاً بيك يا بطل في التحديث الجديد من منصة «تحدّي الأصحاب»! شوف إيه المميزات الرهيبة اللي ضفناها ليك:',
+  items:[
+    {ic:'🏙️',t:'نظام بناء المدينة والقصر الملكي',d:'اجمع العملات من حل الأسئلة وابنِ مدينتك خطوة بخطوة (المنزل الكبير، قسم الشرطة، المستشفى، الأكاديمية، والبرج الذهبي) واستلم عوائد يومية!'},
+    {ic:'👮‍♂️',t:'شخصيات ووظائف بقدرات خارقة',d:'اختار شخصيتك (ضابط شرطة، طبيب، ممرضة، لص ذكي، أو مهندس معماري) واستخدم قدرتك الخاصة أثناء حل الأسئلة وفي المهمة اليومية!'},
+    {ic:'🃏',t:'البطاقات الذكية الناطقة (Flashcards)',d:'راجع أهم كلمات وقواعد كل وحدة ببطاقات ثلاثية الأبعاد ناطقة بالصوت قبل دخول معركة الأسئلة واكسب عملات مجانية!'},
+    {ic:'🏅',t:'قاعة الأوسمة والألقاب + شهادات التقدير',d:'افتح ١٢ وساماً جديداً يظهر لقبها جنب اسمك، واستلم شهادة تقدير رسمية باسمك عند ختم الخريطة أو تصدر الأسبوع!'}
+  ]
+};
+function checkWhatsNew(){
+  if(S.ver===APP_UPDATE.ver)return;
+  showWhatsNew(false);
+}
+function showWhatsNew(manual){
+  if(document.getElementById('wnModal'))return;
+  var isNew=(S.ver!==APP_UPDATE.ver);
+  var itemsHtml=APP_UPDATE.items.map(function(it){
+    return '<div class="wn-item">'+
+      '<div class="wn-ic">'+it.ic+'</div>'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:14px;color:#7A3B3B">'+it.t+'</div>'+
+        '<div style="font-size:12px;line-height:1.5;font-weight:700;margin-top:2px">'+it.d+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  var ov=document.createElement('div');
+  ov.id='wnModal';
+  ov.className='wn-ov';
+  ov.innerHTML='<div class="wn-box">'+
+    '<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700;padding:12px">'+
+      '<h1 style="font-size:20px">'+APP_UPDATE.title+'</h1>'+
+      '<div style="color:#FFD700;font-weight:700">'+APP_UPDATE.sub+'</div>'+
+    '</div>'+
+    '<div class="row" style="align-items:center;padding:0 4px">'+
+      misterImg('c',48)+
+      '<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">'+APP_UPDATE.intro+'</div>'+
+    '</div>'+
+    itemsHtml+
+    (isNew&&APP_UPDATE.gift>0?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;font-size:14px;padding:8px">🎁 هدية التحديث الجديد: +'+APP_UPDATE.gift+' عملة ذهبية مجانية!</div>':'')+
+    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="closeWhatsNew(1)">'+(isNew&&APP_UPDATE.gift>0?'🎉 استلم الهدية واستكشف التحديث!':'🚀 تمام، يلا نلعب!')+'</button>'+
+  '</div>';
+  document.body.appendChild(ov);
+}
+function closeWhatsNew(goCity){
+  var isNew=(S.ver!==APP_UPDATE.ver);
+  if(isNew){
+    S.ver=APP_UPDATE.ver;
+    if(APP_UPDATE.gift>0){S.coins+=(APP_UPDATE.gift||0)}
+    save();
+    ding();
+    if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+APP_UPDATE.gift+' عملة هدية التحديث الجديد!');
+  }
+  var el=document.getElementById('wnModal');
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+  if(isNew&&goCity){home()}
+}
 function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var bMsg=bdgCheck();if(bMsg)setTimeout(function(){rmsg(bMsg)},200);
-  setTimeout(function(){ensureReg();claimPrev();askSync()},0);
+  setTimeout(function(){ensureReg();claimPrev();askSync();checkWhatsNew()},50);
   var misCnt=(S.mis||[]).length;
   var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
   app.innerHTML=
@@ -303,8 +363,8 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
         '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+')'+(eqBdgTitle()?' • '+eqBdgTitle():' • 🏙️ '+cityRankName())+'</div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:4px">'+
-        '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:28px;border-width:2px" onclick="accountScr()">⚙️ إعدادات</button>'+
-        '<button class="btn t" style="font-size:11px;padding:3px 8px;min-height:28px;border-width:2px" onclick="stageScr()">الصف</button>'+
+        '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:26px;border-width:2px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="showWhatsNew(true)">✨ الجديد</button>'+
+        '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:26px;border-width:2px" onclick="accountScr()">⚙️ إعدادات</button>'+
       '</div>'+
     '</div>'+
   '</div>'+
@@ -1232,7 +1292,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -1258,7 +1318,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
