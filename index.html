@@ -153,16 +153,15 @@ body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5
 .st-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:240px;overflow-y:auto;padding:4px}
 .st-pill{background:var(--card);border:2px solid #8A6A4A;border-radius:12px;padding:8px 10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 0 #8A6A4A}
 .st-pill.picked{background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border-color:#FFD700}
+.boss-shld{background:linear-gradient(135deg,#1E3C72,#2A5298);color:#FFE9B8;border:2px solid #74B9FF;border-radius:10px;padding:3px 10px;font-size:12px;font-weight:900;display:inline-flex;align-items:center;gap:4px;box-shadow:0 0 10px rgba(116,185,255,0.6);animation:pl 1.4s infinite}
+.boss-rage{background:linear-gradient(135deg,#8B0000,#FF4500);color:#FFF;border:2px solid #FFD700;border-radius:10px;padding:3px 10px;font-size:12px;font-weight:900;display:inline-flex;align-items:center;gap:4px;box-shadow:0 0 12px rgba(255,69,0,0.75);animation:pl 0.8s infinite}
+.w-tab{flex:1;background:var(--card);border:2.5px solid #8A6A4A;border-radius:14px;padding:8px 6px;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;color:var(--ink);cursor:pointer;text-align:center;box-shadow:0 3px 0 #6B4A3A}
+.w-tab.act{background:linear-gradient(135deg,#2F5F5A,#1B3B38);color:#FFE9B8;border-color:#FFD700;box-shadow:0 3px 0 #122826}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -240,12 +239,14 @@ if(window.FIREBASE_CONFIG){
 }
 </script>
 <script>
-var TT={sb:"رتّب الكلمات لتكوين جملة",tf:"صح أم خطأ",v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",lm:"اسمع واختار المعنى",lw:"اسمع واختار الكلمة",lp:"اسمع واختار الإملاء الصح",ck:"اقرا الساعة",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح",mc:"امتحان الوحدة",st:"أسئلة القصة"};
+var TT={sb:"رتّب الكلمات لتكوين جملة",syn:"المرادف والمضاد في السياق 🎭",er:"اكتشف الخطأ وصحّحه 🔍",tf:"صح أم خطأ",v:"اختار الكلمة الصح",g:"اكمل الجملة",w:"أي جملة غلط؟",lm:"اسمع واختار المعنى",lw:"اسمع واختار الكلمة",lp:"اسمع واختار الإملاء الصح",ck:"اقرا الساعة",tr:"اختار المعنى الصح",ar:"اختار الكلمة بالإنجليزي",sp:"اختار الإملاء الصح",mc:"امتحان الوحدة",st:"أسئلة القصة"};
 var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};
+if(S.max===20&&S.stars[20]>0)S.max=21;
+['prog_p','prog_m','prog_s'].forEach(function(pk){if(S[pk]&&S[pk].max===20&&S[pk].stars&&S[pk].stars[20]>0)S[pk].max=21});S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -258,8 +259,11 @@ function dTxt(dn){var t=new Date(dn*864e5);return DN[t.getUTCDay()]+' '+t.getUTC
 function wkRange(k){return'من '+dTxt(7*k+2)+' إلى '+dTxt(7*k+8)}
 function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
 function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
-var GP=['الأول الابتدائي','الثاني الابتدائي','الثالث الابتدائي','الرابع الابتدائي','الخامس الابتدائي','السادس الابتدائي'],GM=['الأول الإعدادي','الثاني الإعدادي','الثالث الإعدادي'];
-function gName(g){g=g||S.grade;return(S.stage==='p'?GP:GM)[g-1]||''}
+var GP=['الأول الابتدائي','الثاني الابتدائي','الثالث الابتدائي','الرابع الابتدائي','الخامس الابتدائي','السادس الابتدائي'],GM=['الأول الإعدادي','الثاني الإعدادي','الثالث الإعدادي'],GS=['الأول الثانوي (بكالوريا)','الثاني الثانوي (بكالوريا)','الثالث الثانوي (بكالوريا)'];
+function stgArr(st){st=st||S.stage;return st==='p'?GP:(st==='s'?GS:GM)}
+function stgLbl(st){st=st||S.stage;return st==='p'?'ابتدائي':(st==='s'?'ثانوي (بكالوريا)':'إعدادي')}
+function stgFullLbl(st){st=st||S.stage;return st==='p'?'المرحلة الابتدائية':(st==='s'?'المرحلة الثانوية (البكالوريا)':'المرحلة الإعدادية')}
+function gName(g,st){g=g||S.grade;return stgArr(st)[g-1]||''}
 function gId(k,g){return wkId(k)+'g'+(g||S.grade)}
 function logDelta(){
   if(!window.FB||!FB.log||!S.uid||!S.nick)return;
@@ -280,7 +284,7 @@ function adjP(){
     save();
   }).catch(function(){});
 }
-function dcId(d){return 'dc_'+(d||cDay())+(S.stage==='p'?'p':'')}
+function dcId(d){return 'dc_'+(d||cDay())+(S.stage==='p'?'p':(S.stage==='s'?'s':''))}
 function svId(k){return 'sv_'+wkId(k||wkKey())}
 function dcPts(){return (S.dc&&S.dc.d===cDay())?(S.dc.pts||0):0}
 function submitP(){
@@ -305,7 +309,8 @@ function coin(){return'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidd
 function stars(n,s){var r='';for(var i=1;i<=3;i++)r+=star(i<=n,s);return r}
 function canChange(){return true;}
 function totStarsCount(){var s=0;Object.keys(S.stars||{}).forEach(function(k){s+=(S.stars[k]||0)});return s}
-function mapDone(){return S.stars&&S.stars[20]>0}
+function mapDone(){return !!(S.stars&&(S.stars[20]>0||S.stars[40]>0))}
+function mapDone40(){return !!(S.stars&&S.stars[40]>0)}
 function bnav(active){
   var hasCert = !!(S.cert || mapDone());
   var canTax = (S.cTax !== cDay()) && (cityDailyInc() > 0);
@@ -322,16 +327,16 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v3.9',
-  title:'تحديث بطولة الحصة وأبطال السنتر! 🏫🏆',
-  sub:'إصدار بطولة المجموعات والمرافق الذكي (v3.9)',
-  gift:80,
-  intro:'أهلاً بيك يا بطل في التحديث الجديد من منصة «تحدّي الأصحاب»! شوف المفاجآت الجديدة:',
+  ver:'v4.0',
+  title:'تحديث البكالوريا والعالم الثاني (٤٠ جولة)! 🎓🐉⚡',
+  sub:'الإصدار الملحمي (v4.0)',
+  gift:100,
+  intro:'أهلاً بيك يا بطل في التحديث الأكبر لمنصة «تحدّي الأصحاب»! شوف المفاجآت الجديدة اللي ضفناها ليك مع الحفاظ الكامل على تقدمك:',
   items:[
-    {ic:'🏫',t:'لوحة شرف أبطال الحصة والسنتر (للطلاب وأولياء الأمور)',d:'دلوقتي كل سؤال بتجاوبه مع مستر عبدالرحمن جوه الحصة بيتسجل باسمك في مجموعتك! لما تروح البيت افتح «🏆 الترتيب ⬅️ 🏫 أبطال السنتر» وشوف ترتيبك وورّيه لولي أمرك!'},
-    {ic:'🦉',t:'المرافق الذكي الناطق (Smart Pets)',d:'تبنَّ مرافقك الذكي (بومة الحكمة 🦉 مجاناً، القط السريع 🐱، ثعلب التلميح 🦊، أو التنين الذهبي 🐉)! مرافقك بيصحى بنشاطك اليومي ويساعدك في كل جولة!'},
-    {ic:'🚨',t:'رادار المطاردات والغارات بين اللاعبين',d:'لو إنت «ضابط شرطة 👮‍♂️» اختار أي لاعب وظيفته «لص 🦹‍♂️» واقبض عليه! ولو إنت «لص» اختار مدينة أي لاعب وادخل غارة على خزنته!'},
-    {ic:'🧩',t:'تحدي تركيب الجمل التفاعلي (Sentence Builder)',d:'اضغط على الكلمات المبعثرة لترتيبها وتكوين جملة إنجليزية صحيحة واسمع نطقها الصحيح!'}
+    {ic:'🎓',t:'إضافة المرحلة الثانوية (نظام البكالوريا - ١ و ٢ و ٣ ثانوي)',d:'ضفنا قسم كامل لطلاب البكالوريا (الأول والثاني والثالث الثانوي) بأسئلة مستويات عليا، وحدات دراسية، ومرادفات ومضادات واكتشاف الأخطاء!'},
+    {ic:'🗺️',t:'توسيع الخريطة إلى ٤٠ جولة (العالم الثاني: أراضي الأساطير)',d:'لو كنت قفلت الجولة ٢٠، هتلاقي الجولة ٢١ اتفتحتلك تلقائياً! ٢٠ جولة جديدة وزعماء أساطير (زعيم الرعد ⚡، الظلام 🌑، الفضاء 🌌، وإمبراطور الزعماء 👑)!'},
+    {ic:'🛡️',t:'قدرات الزعماء الجديدة (درع الزعيم & سؤال الغضب)',d:'الزعماء بقى عندهم درع طاقة 🛡️ لازم تكسره بأول إجابة صح، ولما صحتهم توصل لنقطة أخيرة بيطلقوا «سؤال الغضب 🔥» بمكافأة عملات مضاعفة ×2!'},
+    {ic:'🎭',t:'أنماط أسئلة جديدة (المرادف والمضاد & اكتشف الخطأ)',d:'أسئلة تفاعلية جديدة لقياس الفهم العميق للكلمات في السياق وتصحيح الأخطاء النحوية بدقة!'}
   ]
 };
 function checkWhatsNew(){
@@ -394,7 +399,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
       '<div class="sp">'+
         '<div style="font-family:Lemonada,sans-serif;font-size:15px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
         '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+' <span onclick="cityScr(\'roles\')" style="cursor:pointer;background:rgba(255,215,0,0.22);border:1px solid #FFD700;color:#FFE9B8;padding:1px 6px;border-radius:8px;font-size:11px">'+roleInfo().ic+' '+roleInfo().n+'</span></div>'+
-        '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+')'+(eqBdgTitle()?' • '+eqBdgTitle():' • 🏙️ '+cityRankName())+'</div>'+
+        '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+stgLbl()+' ('+gName()+')'+(eqBdgTitle()?' • '+eqBdgTitle():' • 🏙️ '+cityRankName())+'</div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:4px">'+
         '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:26px;border-width:2px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="showWhatsNew(true)">✨ الجديد</button>'+
@@ -420,7 +425,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
     ? '<button class="hero-play" onclick="map()">'+
         '<div>'+
           '<div style="font-family:Lemonada,sans-serif;font-size:19px;font-weight:900;color:#FFD700">🗺️ خريطة المغامرات</div>'+
-          '<div style="font-size:13px;font-weight:700;margin-top:3px">وصلت للجولة '+S.max+' من 20 • اجمع النجوم واهزم الزعماء!</div>'+
+          '<div style="font-size:13px;font-weight:700;margin-top:3px">وصلت للجولة '+S.max+' من 40 • اجمع النجوم واهزم الزعماء!</div>'+
         '</div>'+
         '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:8px 14px;border-radius:12px;font-size:15px;white-space:nowrap">العب الآن ▶</div>'+
       '</button>'
@@ -507,7 +512,7 @@ function accountScr(){
     misterImg('a',52)+
     '<div class="sp">'+
       '<div style="font-weight:900;font-size:16px">'+esc(S.nick||'بطل التحدي')+'</div>'+
-      '<div class="sm">'+(S.stage==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية')+' • الصف '+gName()+'</div>'+
+      '<div class="sm">'+stgFullLbl()+' • الصف '+gName()+'</div>'+
     '</div>'+
     '<button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="nick()">تعديل الاسم</button>'+
   '</div>'+
@@ -525,8 +530,8 @@ function accountScr(){
 
 function curriculum(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   if(typeof CURRICULUM==='undefined'){app.innerHTML='<div class="hd"><h1>تدريبات المنهج</h1></div><div class="card">جاري تحديث المنهج، يرجى التأكد من رفع ملف curriculum.js</div><button class="btn t" onclick="home()">رجوع</button>';return;}
-  var gData=CURRICULUM[S.stage==='p'?'p':'m']||{};var gUnits=gData[S.grade]||{units:[],story:[]};
-  var html='<div class="hd"><h1>تدريبات المنهج والبطاقات الذكية 📚</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • الصف '+gName()+'</div></div>'+
+  var gData=getStageCurr()||{};var gUnits=gData[S.grade]||{units:[],story:[]};
+  var html='<div class="hd"><h1>تدريبات المنهج والبطاقات الذكية 📚</h1><div>'+stgLbl()+' • الصف '+gName()+'</div></div>'+
     '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="chip">القلوب: '+S.dhp+'/3 ❤️</div></div>'+
     '<div class="card row" style="align-items:center">'+misterImg('c',50)+'<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">اختار أي وحدة أو فصل من القصة عشان تراجع أهم الكلمات والقواعد <b>بالبطاقات الذكية الناطقة 🃏</b> قبل ما تبدأ المعركة!</div></div>';
   html+='<div class="tag g">الوحدات الدراسية (Units)</div><div class="grid" style="grid-template-columns:1fr 1fr 1fr">';
@@ -541,13 +546,13 @@ function curriculum(){app.classList.remove('fade-in');void app.offsetWidth;app.c
 var FC=null;
 function unitPrep(type,idx){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var gData=CURRICULUM[S.stage==='p'?'p':'m'][S.grade];
+  var gData=(getStageCurr()||{})[S.grade]||{units:[],story:[]};
   var rawQs=type==='u'?gData.units[idx]:gData.story[idx];
   if(!rawQs||!rawQs.length)return;
   var title=(type==='u'?'Unit '+(idx+1):'Story Chapter '+(idx+1));
   var fcKey='fc_'+S.stage+'_'+S.grade+'_'+type+'_'+idx;
   var revDone=S.fcDone&&S.fcDone.indexOf(fcKey)>=0;
-  app.innerHTML='<div class="hd"><h1>استعداد '+title+' 🎯</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • الصف '+gName()+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>استعداد '+title+' 🎯</h1><div>'+stgLbl()+' • الصف '+gName()+'</div></div>'+
     '<div class="card row" style="align-items:flex-start">'+misterImg('c',58)+
       '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">نصيحة مستر عبدالرحمن: راجع <b>البطاقات الذكية (Flashcards) 🃏</b> الأول في دقيقة واحدة عشان تثبت الإجابات وتسمع النطق الصح وتكسب <b>+15 عملة هدية</b> قبل المعركة!</div>'+
     '</div>'+
@@ -564,7 +569,7 @@ function unitPrep(type,idx){
     '<button class="btn t" onclick="curriculum()">رجوع لقائمة المنهج</button>';
 }
 function startUnitCards(type,idx){
-  var gData=CURRICULUM[S.stage==='p'?'p':'m'][S.grade];
+  var gData=(getStageCurr()||{})[S.grade]||{units:[],story:[]};
   var rawQs=type==='u'?gData.units[idx]:gData.story[idx];
   if(!rawQs||!rawQs.length)return;
   var pick=shuffle(rawQs.slice()).slice(0,8);
@@ -587,7 +592,7 @@ function startUnitCards(type,idx){
 }
 function startVocabCards(){
   if(typeof WORDS==='undefined'){rmsg('ملف الكلمات غير متاح');return}
-  var L=WORDS[S.stage==='p'?'p':'m']||[];
+  var L=getStageWords();
   if(!L.length)return;
   var pick=shuffle(L.slice()).slice(0,10);
   var cards=pick.map(function(w){
@@ -680,7 +685,7 @@ function finishFlashcards(){
 }
 function startCurriculum(type,idx){
   if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم! راجع بالبطاقات أو اشحن قلوبك');return}
-  var gData=CURRICULUM[S.stage==='p'?'p':'m'][S.grade];
+  var gData=(getStageCurr()||{})[S.grade]||{units:[],story:[]};
   var rawQs=type==='u'?gData.units[idx]:gData.story[idx];
   if(!rawQs||!rawQs.length)return;
   var qs=shuffle(rawQs.slice()).slice(0,10);
@@ -691,13 +696,22 @@ function startCurriculum(type,idx){
   G={lv:(type==='u'?idx+1:idx+1),tier:0,n:n,T:15,qs:formattedQs,i:0,h:S.dhp,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:15,done:false,currType:type};show();
 }
 
-function map(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var g='';for(var i=1;i<=20;i++){var u=i<=S.max,b=i%5===0;
-    g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?'زعيم':'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
+var MAP_W=0;
+function map(w){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(S.max===20&&S.stars&&S.stars[20]>0){S.max=21;save()}
+  if(w)MAP_W=w;
+  else if(!MAP_W)MAP_W=(S.max>20?2:1);
+  var startLv=(MAP_W===2?21:1),endLv=(MAP_W===2?40:20);
+  var g='';for(var i=startLv;i<=endLv;i++){var u=i<=S.max,b=i%5===0;
+    g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?(i>20?'زعيم أسطوري':'زعيم'):'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
   if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم!');return}
-  var mapCertBtn=mapDone()?'<div class="card" style="background:linear-gradient(135deg,#FFE8B5,#E3B03F);text-align:center;font-weight:900">👑 مبروك! ختمت كل جولات الخريطة ('+totStarsCount()+' / 60 نجمة)<br><button class="btn" style="width:100%;margin-top:8px;font-size:16px" onclick="certMap()">🎓 استلم شهادة ختم الخريطة وحمّلها</button></div>':'';
-  app.innerHTML='<div class="hd"><h1>خريطة الجولات</h1><div>اهزم وحش كل جولة علشان تفتح اللي بعدها</div></div>'+
-  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">النجوم: '+totStarsCount()+' / 60</div></div>'+mapCertBtn+'<div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
+  var wTabs='<div class="row" style="gap:8px">'+
+    '<button class="w-tab'+(MAP_W===1?' act':'')+'" onclick="map(1)">🗺️ العالم ١: البداية (1–20)</button>'+
+    '<button class="w-tab'+(MAP_W===2?' act':'')+'" onclick="map(2)">⚡ العالم ٢: الأساطير (21–40) '+(S.max>20?'🔥':'🔒')+'</button>'+
+  '</div>';
+  var mapCertBtn=mapDone()?'<div class="card" style="background:linear-gradient(135deg,#FFE8B5,#E3B03F);text-align:center;font-weight:900">👑 مبروك! '+(mapDone40()?'ختمت الـ ٤٠ جولة كاملة وأراضي الأساطير!':'ختمت العالم الأول (٢٠ جولة) وفتحت العالم الثاني!')+' ('+totStarsCount()+' / 120 نجمة)<br><button class="btn" style="width:100%;margin-top:8px;font-size:15px;min-height:40px" onclick="certMap()">🎓 استلم شهادة ختم الخريطة وحمّلها</button></div>':'';
+  app.innerHTML='<div class="hd" style="'+(MAP_W===2?'background:linear-gradient(135deg,#4A1C1C,#1E1035);border-color:#FFD700':'')+'"><h1>'+(MAP_W===2?'أراضي الأساطير (جولات 21–40) ⚡':'خريطة المغامرات (جولات 1–20) 🗺️')+'</h1><div>'+(MAP_W===2?'زعماء بدرع طاقة وسؤال الغضب الناري ومكافآت مضاعفة!':'اهزم وحش كل جولة علشان تفتح اللي بعدها')+'</div></div>'+
+  '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">النجوم: '+totStarsCount()+' / 120 ⭐</div></div>'+wTabs+mapCertBtn+'<div class="grid">'+g+'</div><div class="sp"></div><button class="btn t" onclick="home()">الرئيسية</button>';
 }
 function others(L,i,k){var a=[];shuffle(L.map(function(_,j){return j})).forEach(function(j){if(a.length<k&&j!==i&&L[j][0]!==L[i][0]&&L[j][1]!==L[i][1])a.push(j)});return a}
 function misspell(w){
@@ -743,7 +757,7 @@ function mkWord(L,i,force){
 }
 function genQs(g){
   if(typeof WORDS==='undefined'||g<=0)return[];
-  var L=WORDS[S.stage==='p'?'p':'m'];if(!L||L.length<8)return[];
+  var L=getStageWords();if(!L||L.length<8)return[];
   S.wrec=S.wrec||[];var out=[],used=[],tries=0;
   while(out.length<g&&tries++<80){
     var i=Math.floor(Math.random()*L.length);
@@ -754,19 +768,37 @@ function genQs(g){
   return out;
 }
 function revTxt(q){return q[0].indexOf('____')>=0?q[0].replace('____',q[2][q[3]]):q[0]+' → '+q[2][q[3]]}
+function getStagePool(){
+  var st=S.stage||'m';
+  var base=Q.map(function(_,i){return i}).filter(function(i){return Q[i][6]===st});
+  return base;
+}
 function pickQs(n){
-  var g=(typeof WORDS==='undefined')?0:Math.max(1,Math.round(n*0.4)),m=n-g;
-  var all=Q.map(function(_,i){return i}).filter(function(i){return Q[i][6]===(S.stage||'m')}),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,m);
+  var g=(typeof WORDS==='undefined'&&S.stage!=='s')?0:Math.max(1,Math.round(n*0.35)),m=n-g;
+  var all=getStagePool(),out=shuffle(all.filter(function(i){return S.seen.indexOf(i)<0})).slice(0,m);
   if(out.length<m){S.seen=[];out=out.concat(shuffle(all.filter(function(i){return out.indexOf(i)<0})).slice(0,m-out.length))}
   S.seen=S.seen.concat(out);save();
-  var ne=evtOn()?(n>=8?2:1):0,nsb=(n>=5?1:0),gen=genQs(Math.max(0,g-ne-nsb));for(var ci=0;ci<ne;ci++)gen.push(mkClock());for(var si=0;si<nsb;si++){var sbq=mkSentQ();if(sbq)gen.push(sbq)}
+  var ne=(evtOn()&&S.stage!=='s')?(n>=8?2:1):0,nsb=(n>=5?1:0),gen=genQs(Math.max(0,g-ne-nsb));for(var ci=0;ci<ne;ci++)gen.push(mkClock());for(var si=0;si<nsb;si++){var sbq=mkSentQ();if(sbq)gen.push(sbq)}
   return shuffle(out.map(function(i){return Q[i]}).concat(gen));
 }
-function start(lv){var b=lv%5===0,t=Math.floor((lv-1)/5),n=b?[7,8,9,10][t]:(lv>10?6:5),base=Math.max(7,13-Math.ceil(lv/2)),T=b?Math.max(6,base-2):base,mx=Math.ceil(n*[.6,.7,.8,.85][t]);
-  G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:S.dhp,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:T,done:false};show()}
+function start(lv){
+  var b=lv%5===0,t=Math.floor((lv-1)/5);
+  var bossNs=[7,8,9,10,10,11,11,12],normNs=lv>30?8:(lv>20?7:(lv>10?6:5));
+  var n=b?(bossNs[t]||10):normNs;
+  var base=Math.max(7,14-Math.floor(lv/4));
+  if(S.stage==='s')base+=2;
+  var T=b?Math.max(7,base-2):base;
+  var ratios=[.6,.7,.8,.85,.85,.85,.9,.9];
+  var mx=Math.ceil(n*(ratios[t]||.85));
+  var shld=b?(lv>=25?2:1):0;
+  G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:S.dhp,mx:mx,mhp:mx,shld:shld,maxShld:shld,rage:false,earned:0,combo:0,ok:0,bad:[],left:T,done:false};
+  show();
+}
 function hearts(){var r='';for(var i=1;i<=Math.max(3,G.h);i++)r+=heart(i<=G.h);return r}
 function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var q=G.qs[G.i],isSB=(q[5]==='sb');G.left=G.T+(q[7]?3:(isSB?6:0));G.done=false;G.f50=false;
+  var q=G.qs[G.i],isSB=(q[5]==='sb'),isBoss=(G.lv%5===0&&!G.rev&&!G.currType);
+  if(isBoss&&G.mhp===1&&G.shld<=0)G.rage=true;
+  G.left=G.T+(q[7]?3:(isSB?6:0));G.done=false;G.f50=false;
   var o='';
   if(isSB){
     G.ci=0;
@@ -779,26 +811,58 @@ function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
     G.ord=shuffle(q[2].map(function(x,k){return k}));G.ci=G.ord.indexOf(q[3]);
     o=G.ord.map(function(x,k){return'<button class="opt"'+(/[\u0600-\u06FF]/.test(q[2][x])?' style="direction:rtl"':'')+' onclick="pick('+k+')">'+q[2][x]+'</button>'}).join('');
   }
+  var bossBadge='';
+  if(G.shld>0){
+    bossBadge='<div style="text-align:center;margin-top:4px"><span class="boss-shld">🛡️ درع الزعيم الفعال ('+G.shld+'/'+G.maxShld+') — جاوب صح لكسر الدرع!</span></div>';
+  }else if(G.rage){
+    bossBadge='<div style="text-align:center;margin-top:4px"><span class="boss-rage">🔥 سؤال الغضب الأخير للزعيم! (مكافأة عملات مضاعفة ×2)</span></div>';
+  }
   app.innerHTML='<div class="row"><div id="hr" class="row" style="gap:2px">'+hearts()+'</div><div class="sp"></div><button id="mb" class="pwb" style="flex:none;min-height:36px;padding:4px 10px" aria-label="الصوت" onclick="toggleSnd(1)">'+spk()+'</button><div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div></div>'+
-  '<div class="card" style="padding:8px"><div class="row"><span class="sm">'+(G.rev?'وحش الأخطاء':mName(G.lv)+(G.lv%5===0?' ⚠️ (غاضب ويسحب الوقت أسرع)':''))+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
+  '<div class="card" style="padding:8px;'+(G.rage?'border-color:#FF4500;background:linear-gradient(135deg,#FFF3E0,#FFCCBC)':(G.shld>0?'border-color:#74B9FF':''))+'"><div class="row"><span class="sm">'+(G.rev?'وحش الأخطاء':mName(G.lv)+(isBoss?' ⚠️ (زعيم قوي)':''))+'</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%;background:'+(G.shld>0?'#2A5298':'#B23A3A')+'"></i></div></div>'+
+  bossBadge+
   '<div id="mon" style="text-align:center;filter:hue-rotate('+((S.eq.ch==='ghost'||S.eq.ch==='robot')?hueOf():0)+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(G.lv,S.eq.ch)+'</div></div></div>'+
-  '<div class="row"><span class="sm">'+(G.rev?'جولة تصحيح':'جولة '+G.lv+(G.lv%5===0?' (زعيم)':''))+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+Math.ceil(G.left)+'</div></div>'+
-  '<div class="row" id="pw">'+pwHtml()+'</div>'+'<div class="card"><div class="tag g">'+TT[q[5]]+'</div>'+(isSB?'<div style="font-size:16px;font-weight:900;margin-top:8px;color:#7A3B3B">🧩 رتّب الكلمات لتكوين هذه الجملة بالإنجليزي:</div><div style="font-size:18px;font-weight:900;margin-top:4px;color:#2F5F5A">« '+esc(q[1])+' »</div>':(q[7]?lsBtn():(q[9]?clockSvg(q[9]):'')+'<div class="en">'+q[0]+'</div>')+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':''))+'</div>'+o+'<div id="fb"></div>';
+  '<div class="row"><span class="sm">'+(G.rev?'جولة تصحيح':'جولة '+G.lv+(isBoss?' (زعيم)':''))+' • سؤال '+(G.i+1)+' من '+G.n+'</span><div class="bar"><i id="bf"></i></div><div class="tm" id="tm">'+Math.ceil(G.left)+'</div></div>'+
+  '<div class="row" id="pw">'+pwHtml()+'</div>'+'<div class="card"><div class="tag g">'+(TT[q[5]]||'اختار الإجابة الصح')+'</div>'+(isSB?'<div style="font-size:16px;font-weight:900;margin-top:8px;color:#7A3B3B">🧩 رتّب الكلمات لتكوين هذه الجملة بالإنجليزي:</div><div style="font-size:18px;font-weight:900;margin-top:4px;color:#2F5F5A">« '+esc(q[1])+' »</div>':(q[7]?lsBtn():(q[9]?clockSvg(q[9]):'')+'<div class="en">'+q[0]+'</div>')+(tr&&q[1]?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':''))+'</div>'+o+'<div id="fb"></div>';
   if(q[7]&&!S.mute)setTimeout(speakQ,350);
   clearInterval(G.t);
   var totT=G.left;
-  var isBoss = G.lv % 5 === 0; var drain = isBoss ? 0.15 : 0.1; G.t=setInterval(function(){G.left-=drain;if(G.left<=0){pick(-1);return}$('#bf').style.width=Math.min(100,G.left/totT*100)+'%';$('#tm').textContent=Math.ceil(G.left);$('#ms').style.transform='scale('+(0.85+Math.max(0,1-G.left/totT)*0.4)+')'},100);
+  var drain = isBoss ? (G.rage?0.16:0.14) : 0.1; G.t=setInterval(function(){G.left-=drain;if(G.left<=0){pick(-1);return}$('#bf').style.width=Math.min(100,G.left/totT*100)+'%';$('#tm').textContent=Math.ceil(G.left);$('#ms').style.transform='scale('+(0.85+Math.max(0,1-G.left/totT)*0.4)+')'},100);
 }
 function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c}
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,msg;
-  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=G.rev?2:1;G.combo++;G.ok++;if(S.role==='thief'){var stB=Math.max(2,Math.round(gain*0.3));gain+=stB}if(q[5]==='sb'){S.sbOk=(S.sbOk||0)+1;if(!S.mute)setTimeout(function(){speak(q[2][0])},200)}misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');msg='إجابة صح! +'+(gain*cm)+' عملة'+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');if(G.combo%3===0){gain+=(S.role==='thief'?15:10);dmg=2;msg+=' • كومبو! ضربة قوية';mTick('k')}if((S.role==='doctor'||S.role==='nurse')&&G.ok===4&&!G.medUsed&&G.h<3){G.medUsed=1;G.h++;if(!G.rev&&S.dhp<3)S.dhp++;msg+=' • '+(S.role==='doctor'?'👨‍⚕️ إسعاف الطبيب':'👩‍⚕️ عناية الممرضة')+' رجّعت لك قلب ❤️!'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain);if(cr!==gain)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • صندوق هدف اليوم! +'+DCHEST+' عملة';DCH=0}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}}
-  else{if(S.role==='police'&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}}
+  if(good){
+    var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=(G.rev||G.rage)?2:1;
+    G.combo++;G.ok++;
+    if(S.role==='thief'){var stB=Math.max(2,Math.round(gain*0.3));gain+=stB}
+    if(q[5]==='sb'){S.sbOk=(S.sbOk||0)+1;if(!S.mute)setTimeout(function(){speak(q[2][0])},200)}
+    misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');
+    msg='إجابة صح! +'+(gain*cm)+' عملة'+(G.rage?' (مكافأة سؤال الغضب ×2 🔥)':'')+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');
+    if(G.combo%3===0){gain+=(S.role==='thief'?15:10);dmg=2;msg+=' • كومبو! ضربة مضاعفة';mTick('k')}
+    if((S.role==='doctor'||S.role==='nurse')&&G.ok===4&&!G.medUsed&&G.h<3){G.medUsed=1;G.h++;if(!G.rev&&S.dhp<3)S.dhp++;msg+=' • '+(S.role==='doctor'?'👨‍⚕️ إسعاف الطبيب':'👩‍⚕️ عناية الممرضة')+' رجّعت لك قلب ❤️!'}
+    if(G.shld>0){
+      var shDmg=Math.min(G.shld,dmg);
+      G.shld-=shDmg;
+      var remDmg=dmg-shDmg;
+      if(G.shld<=0){
+        msg+=' • 🛡️ حطّمت درع الزعيم بالكامل!';
+        if(remDmg>0)G.mhp=Math.max(0,G.mhp-remDmg);
+      }else{
+        msg+=' • 🛡️ أصبت درع الزعيم (متبقي '+G.shld+')!';
+      }
+    }else{
+      G.mhp=Math.max(0,G.mhp-dmg);
+    }
+    S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain*cm);if(cr!==gain*cm)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • صندوق هدف اليوم! +'+DCHEST+' عملة';DCH=0}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}
+  }else{
+    if(S.role==='police'&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}
+    else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
+  }
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
-  if(win){msg+=' • الوحش اتهزم!';setTimeout(sfxWin,450)}
+  if(win){msg+=' • الزعيم اتهزم!';setTimeout(sfxWin,450)}
   $('#fb').innerHTML='<div class="card row" style="align-items:flex-start">'+misterImg(good?'c':'h',46)+'<div class="sp"><div style="font-weight:900">'+msg+'</div><div class="sm">'+(good?cheer()+' • '+q[4]:'افتكر: '+q[4])+'</div></div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>';
 }
 function next(){G.i++;show()}
@@ -883,7 +947,7 @@ function drawCertCanvas(){
   // Rank or Map Medal Badge
   var rk=c.rk||1;
   var medalColors=[['#FFD700','#B8860B','المركز الأول 🥇'],['#E0E6ED','#7A8B99','المركز الثاني 🥈'],['#E6A15C','#8C4A27','المركز الثالث 🥉']][rk-1]||['#FFD700','#B8860B','المركز الأول 🥇'];
-  var badgeText = isMap ? 'قاهر الزعماء — اجتياز ٢٠ جولة كاملة 👑' : ('بطل الأسبوع — ' + medalColors[2]);
+  var badgeText = isMap ? (mapDone40()?'إمبراطور الأساطير — ختم ٤٠ جولة كاملة 👑⚡':'قاهر الزعماء — اجتياز ٢٠ جولة كاملة 👑') : ('بطل الأسبوع — ' + medalColors[2]);
   ctx.fillStyle=isMap?'#2F5F5A':medalColors[1];
   ctx.beginPath();
   ctx.roundRect ? ctx.roundRect(W/2-230, 200, 460, 56, 28) : ctx.rect(W/2-230, 200, 460, 56);
@@ -912,8 +976,8 @@ function drawCertCanvas(){
   ctx.fillText(stName, W/2, 386);
 
   // Stage & Score info
-  var stgTxt = (c.st||S.stage)==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية';
-  var grdTxt = gName(c.gr||S.grade);
+  var stgTxt = stgFullLbl(c.st||S.stage);
+  var grdTxt = gName(c.gr||S.grade, c.st||S.stage);
   ctx.fillStyle='#4A2F22';
   ctx.font='700 25px "Cairo", sans-serif';
   if(isMap){
@@ -921,7 +985,7 @@ function drawCertCanvas(){
     ctx.fillStyle='#2F6B4A';
     ctx.font='900 28px "Cairo", sans-serif';
     var stCnt = c.stars || totStarsCount();
-    ctx.fillText('بإجمالي نجوم: ' + stCnt + ' من 60 نجمة ⭐ • والوصول للجولة 20 بنجاح!', W/2, 506);
+    ctx.fillText('بإجمالي نجوم: ' + stCnt + ' من ' + (mapDone40()?120:60) + ' نجمة ⭐ • والوصول للجولة ' + (mapDone40()?40:20) + ' بنجاح!', W/2, 506);
   }else{
     ctx.fillText('وذلك لحصوله على ' + medalColors[2] + ' في منافسات اللغة الإنجليزية (' + stgTxt + (grdTxt?' - الصف '+grdTxt:'') + ')', W/2, 462);
     ctx.fillStyle='#2F6B4A';
@@ -1024,14 +1088,14 @@ function certShareWA(){
 function endRound(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var win=G.mhp<=0,lv=G.lv,bonus=0;S.nr=(S.nr||0)+1;mTick('r');if(G.mhp<=0)mTick('w');
   var isCurr=!!G.currType;
-  if(win){bonus=20+10*G.h;if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){if(S.dhp<3)S.dhp++;STMSG='رجعت قلب لرصيدك اليومي!';}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<20)S.max++}save()}
+  if(win){bonus=20+10*G.h+(lv>20?25:0);if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){if(S.dhp<3)S.dhp++;STMSG='رجعت قلب لرصيدك اليومي!';}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<40)S.max++}save()}
   dayRoundDone();submit();var mmsg=[mCheck(),STMSG].filter(function(x){return x}).join(' • ');STMSG='';
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+(S.mis&&S.mis.length&&!G.rev?'<button class="btn t" style="font-size:14px;min-height:38px" onclick="startReview()">راجع أخطاءك دلوقتي ('+S.mis.length+')</button>':'')+'</div>':'';
   app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
-  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<20?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية</button>':(win&&lv===20&&!isCurr?'<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certMap()">👑 استلم شهادة ختم الخريطة (٢٠ جولة)!</button>':'')))+
-  '<button class="btn'+(win&&lv<20&&!isCurr?' t':'')+'" onclick="'+(isCurr?'startCurriculum(\''+G.currType+'\','+(lv-1)+')':'start('+lv+')')+'">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="'+(isCurr?'curriculum()':'map()')+'">رجوع</button>');
+  '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<40?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية ('+(lv+1)+') ⬅️</button>':'')+(win&&(lv===20||lv===40)&&!isCurr?'<button class="btn" style="font-size:17px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certMap()">👑 استلم شهادة ختم الخريطة ('+lv+' جولة)!</button>':''))+
+  '<button class="btn'+(win&&lv<40&&!isCurr?' t':'')+'" onclick="'+(isCurr?'startCurriculum(\''+G.currType+'\','+(lv-1)+')':'start('+lv+')')+'">العب الجولة تاني</button><div class="row"><button class="btn t sp" onclick="share()">تحدّى صاحبك</button><button class="btn t sp" onclick="board()">الترتيب</button></div><button class="btn t" onclick="'+(isCurr?'curriculum()':'map()')+'">رجوع</button>');
 }
 function nick(){
   app.innerHTML='<div class="hd"><h1>اختار اسمك المستعار</h1><div>هيظهر في الترتيب. ماتكتبش اسمك الحقيقي</div></div><div class="card"><input id="nk" class="inp" maxlength="14" placeholder="مثلًا: نمر الإعدادي" value="'+esc(S.nick||'')+'"></div><div class="sp"></div><button class="btn" onclick="saveNick()">حفظ</button><button class="btn t" onclick="home()">رجوع</button>';
@@ -1069,7 +1133,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
     '<div class="card"><div class="tag">جايزة أبطال الأسبوع (أول 3 مراكز)</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب البطل 🥇 • التاني: 100 🥈 • التالت: 50 🥉<br><b>+ شهادة تقدير رسمية من مستر عبدالرحمن لأول 3 أوائل للتحميل والمشاركة على واتساب!</b></div>'+(S.cert?'<button class="btn" style="width:100%;margin-top:8px;font-size:15px" onclick="certScr()">🎓 عرض وتحميل شهادة التقدير</button>':'')+'</div>'+
     '<div class="card"><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>';
   }
-  app.innerHTML='<div class="hd"><h1>لوحة الشرف والترتيب 🏆</h1><div>'+(S.stage==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية')+' • النهاردة '+dTxt(cDay())+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>لوحة الشرف والترتيب 🏆</h1><div>'+stgFullLbl()+' • النهاردة '+dTxt(cDay())+'</div></div>'+
   '<div class="row" style="flex-wrap:wrap;gap:6px">'+
     tab('all','🏆 العام')+
     tab('cls','🏫 أبطال السنتر')+
@@ -1155,7 +1219,7 @@ var ITEMS=[
 ];
 var DEF={pet:[{k:'pet',id:'owl',ic:'🦉',n:'بومة الحكمة (Wise Owl)',d:'رفيقتك المجانية! تستبعد لك إجابة خاطئة وتنطق السؤال بصوت واضح مرة في كل جولة!'}],ch:[{k:'ch',id:'blob',n:'مستر عبدالرحمن'}],col:[{k:'col',id:'c0',n:'حسب الجولة',h:0}],th:[{k:'th',id:'t0',n:'ورق كلاسيك',c:'#FBE7B5'}]};
 function item(id){return ITEMS.filter(function(x){return x.id===id})[0]}
-function mName(lv){var t=Math.floor((lv-1)/5);return lv%5===0?['زعيم الغابة','زعيم الكهف','زعيم البركان','ملك الوحوش'][t]:['وحش الغابة','وحش الكهف','وحش البركان','وحش الجليد'][t]}
+function mName(lv){var t=Math.floor((lv-1)/5);return lv%5===0?(['زعيم الغابة','زعيم الكهف','زعيم البركان','ملك الوحوش','زعيم الرعد ⚡','زعيم الظلام 🌑','زعيم الفضاء 🌌','إمبراطور الزعماء 👑'][t]||'زعيم أسطوري'):(['وحش الغابة','وحش الكهف','وحش البركان','وحش الجليد','حارس الرعد','محارب الظلام','عملاق المجرة','فارس الأساطير'][t]||'وحش أسطوري')}
 var bossExprTimer=null;
 function monster(lv,ch,w){
   if(ch==='ghost'||ch==='robot')return svgMonster(lv,ch,w);
@@ -1260,14 +1324,14 @@ function doBuy(id){
   save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
 }
 
-function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك</h1><div>الأسئلة والترتيب بيتحددوا حسب المرحلة</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">ابتدائي</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">إعدادي</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'<button class="btn t" style="font-size:14px" onclick="saveScr()">عندي كود استرجاع</button>')}
+function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك الدراسية 🎓</h1><div>الأسئلة والمنهج والترتيب بيتحددوا حسب مرحلتك (تقدمك محفوظ في كل مرحلة)</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">🏫 المرحلة الابتدائية</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">📚 المرحلة الإعدادية</button><button class="btn" style="font-size:20px;background:linear-gradient(135deg,#C9973F,#7A4E12);border-color:#FFD700" onclick="setStage(\'s\')">🎓 الثانوي (نظام البكالوريا) 🔥</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'<button class="btn t" style="font-size:14px" onclick="saveScr()">عندي كود استرجاع</button>')}
 function gradeScr(){
-  var G6=S.stage==='p'?GP:GM;
-  app.innerHTML='<div class="hd"><h1>اختار صفّك</h1><div>'+(S.stage==='p'?'ابتدائي':'إعدادي')+' • هتتنافس مع طلاب صفّك</div></div><div class="sp"></div>'+G6.map(function(n,i){return'<button class="btn'+(S.grade===i+1?'':' t')+'" onclick="setGrade('+(i+1)+')">'+n+'</button>'}).join('')+'<button class="btn t" onclick="stageScr()" style="font-size:14px">رجوع</button>';
+  var G6=stgArr();
+  app.innerHTML='<div class="hd"><h1>اختار صفّك الدراسي</h1><div>'+stgFullLbl()+' • هتتنافس مع أبطال صفّك</div></div><div class="sp"></div>'+G6.map(function(n,i){return'<button class="btn'+(S.grade===i+1?'':' t')+'" onclick="setGrade('+(i+1)+')">'+n+'</button>'}).join('')+'<button class="btn t" onclick="stageScr()" style="font-size:14px">رجوع</button>';
 }
 function setGrade(g){S.grade=g;save();if(!S.nick)nickReq();else{submit();home()}}
 function setStage(x){if(S.stage===x){gradeScr();return;}if(S.stage){S['prog_'+S.stage]={grade:S.grade,max:S.max,stars:S.stars,mis:S.mis,ts:S.ts,seen:S.seen,wk:S.wk,ls:S.ls,adjT:S.adjT,nr:S.nr,survBest:S.survBest||0,dc:S.dc||null};}S.stage=x;var p=S['prog_'+x]||{};S.grade=p.grade||0;S.max=p.max||1;S.stars=p.stars||{};S.mis=p.mis||[];S.ts=p.ts||{};S.seen=p.seen||[];S.wk=p.wk||null;S.ls=p.ls||null;S.adjT=p.adjT||0;S.nr=p.nr||0;S.survBest=p.survBest||0;S.dc=p.dc||null;save();gradeScr();}
-function wkId(k){return String(k)+(S.stage==='p'?'p':'')}
+function wkId(k){return String(k)+(S.stage==='p'?'p':(S.stage==='s'?'s':''))}
 var QM=['جاهز للتحدّي؟','يلا نلعب!','شد حيلك','برافو عليك','جولة حلوة!','هكسبك المرة دي','تحدّي تاني؟'],RT=0,RMD=null,NEXT=null,LSAY=0,RTRY=0;
 var RQ=(function(){try{return new URLSearchParams(location.search).get('room')}catch(e){return null}})();
 var RCAP=10000,RMIN=1000,RDAY=1,PW=1000,PL=100,PT=500;
@@ -1394,7 +1458,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',sbOk:S.sbOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',sbOk:S.sbOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -1420,7 +1484,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',sbOk:n(o.sbOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',sbOk:n(o.sbOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
@@ -1455,7 +1519,7 @@ function speak(t){
 }
 function speakQ(){var q=G&&G.qs[G.i];if(q&&q[7])speak(q[7])}
 function lsBtn(){return'<div style="text-align:center;margin:10px 0"><button class="btn" style="display:inline-flex;gap:10px;align-items:center;font-size:20px" onclick="speakQ()"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFE9B8"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#FFE9B8" stroke-width="2" stroke-linecap="round"/></svg><span>اسمع الكلمة</span></button></div>'}
-var CATS={sb:'gram',tf:'voc',ck:'clock',v:'voc',tr:'voc',ar:'voc',g:'gram',w:'fix',sp:'spell',lm:'listen',lw:'listen',lp:'listen',mc:'gram',st:'voc'};
+var CATS={sb:'gram',syn:'voc',er:'fix',tf:'voc',ck:'clock',v:'voc',tr:'voc',ar:'voc',g:'gram',w:'fix',sp:'spell',lm:'listen',lw:'listen',lp:'listen',mc:'gram',st:'voc'};
 function misRef(q){if(q[8])return q[8];var i=Q.indexOf(q);return i>=0?'q:'+i:null}
 function misAdd(q){var r=misRef(q);if(!r)return;S.mis=(S.mis||[]).filter(function(x){return x!==r});S.mis.unshift(r);if(S.mis.length>40)S.mis.length=40}
 function misDel(q){var r=misRef(q);if(!r||!S.mis)return;S.mis=S.mis.filter(function(x){return x!==r})}
@@ -1464,7 +1528,7 @@ function resolveRef(r){
   var p=String(r).split(':');
   if(p[0]==='sb')return mkSentQ(+p[1]);
   if(p[0]==='q'){var q=Q[+p[1]];return q&&q[6]===(S.stage||'m')?q:null}
-  if(p[0]==='w'&&typeof WORDS!=='undefined'){var L=WORDS[S.stage==='p'?'p':'m'],i=+p[1];if(!L||!L[i])return null;var w=mkWord(L,i,p[2]);w[8]='w:'+i+':'+w[5];return w}
+  if(p[0]==='w'&&typeof WORDS!=='undefined'){var L=getStageWords(),i=+p[1];if(!L||!L[i])return null;var w=mkWord(L,i,p[2]);w[8]='w:'+i+':'+w[5];return w}
   return null;
 }
 function startReview(){
@@ -1524,7 +1588,7 @@ function reportScr(){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
       statBox('دقة الإجابات',ovPct+'%','صح '+totOk+' من '+totAll)+
-      statBox('نجوم الخريطة',totStars+' / 60','وصلت للجولة '+S.max)+
+      statBox('نجوم الخريطة',totStars+' / 120','وصلت للجولة '+S.max+' من 40')+
       statBox('سلسلة الالتزام',skAlive()+' يوم','اللعب اليومي المتواصل')+
       statBox('أخطاء للمراجعة',misCnt+' سؤال',misCnt>0?'ادخل جولة التصحيح':'سجلك خالي من الأخطاء!')+
     '</div>'+
@@ -1548,7 +1612,8 @@ var BADGES=[
   {id:'b_room1',ic:'🤝',n:'المتحدي الشجاع',d:'اكسب تحدي روم (1 ضد 1) أمام صاحبك',r:150,prog:function(){var v=S.rw||0;return [Math.min(1,v),1]}},
   {id:'b_gold',ic:'🛡️',n:'فارس الدوري الذهبي',d:'اوصل لـ 3000 نقطة أسبوعية (الدوري الذهبي)',r:200,prog:function(){var v=wkPts();return [Math.min(3000,v),3000]}},
   {id:'b_sb20',ic:'🧩',n:'مهندس الجمل',d:'ركّب 20 جملة إنجليزية صحيحة في تحدي تركيب الجمل',r:150,prog:function(){var v=S.sbOk||0;return [Math.min(20,v),20]}},
-  {id:'b_king20',ic:'👑',n:'قاهر الزعماء',d:'اختم كل الـ 20 جولة في خريطة المغامرات',r:300,prog:function(){var v=mapDone()?20:Math.min(19,S.max||1);return [v,20]}}
+  {id:'b_king20',ic:'👑',n:'قاهر العالم الأول',d:'اختم أول 20 جولة في خريطة المغامرات',r:300,prog:function(){var v=mapDone()?20:Math.min(19,S.max||1);return [v,20]}},
+  {id:'b_emp40',ic:'⚡',n:'إمبراطور الأساطير',d:'اختم جميع الـ 40 جولة في العالم الثاني وأراضي الأساطير',r:500,prog:function(){var v=mapDone40()?40:Math.min(39,S.max||1);return [v,40]}}
 ];
 function bdgCheck(){
   S.bdg=S.bdg||[];
@@ -2044,10 +2109,150 @@ var SENTENCES={
     ['By the time the police arrived the thief had escaped','بحلول وقت وصول الشرطة كان اللص قد هرب','بعد By the time ماضي بسيط، والحدث الأقدم ماضي تام (had + P.P).'],
     ['We are going to build a new house','نحن ننوي بناء منزل جديد','للتعبير عن النية والتخطيط المسبق نستخدم am/is/are + going to + المصدر.'],
     ['Neither Ahmed nor his friends were late','لا أحمد ولا أصدقاؤه كانوا متأخرين','مع Neither.. nor يتبع الفعل الفاعل الأقرب له (friends جمع فاخترنا were).']
+  ],
+  s:[
+    ['Hardly had he arrived when the train left','بالكاد وصل حتى غادر القطار','مع Hardly في بداية الجملة نستخدم صيغة الإبدال (Inversion): had + فاعل + P.P ثم when.'],
+    ['No sooner had she finished than she slept','لم يكد ينتهي عملها حتى نامت','مع No sooner نستخدم had + الفاعل + التصريف الثالث ثم الرابط than.'],
+    ['Had you studied harder you would have succeeded','لو كنت ذاكرت بجدية أكبر لكنت نجحت','حذف If في الحالة الثالثة: نبدأ بـ Had + الفاعل + التصريف الثالث.'],
+    ['I had my car repaired yesterday','قمت بإصلاح سيارتي أمس (بواسطة فني)','صيغة السببية (Causative): الفاعل + had + المفعول غير العاقل + التصريف الثالث.'],
+    ['She must have forgotten her keys at home','لا بد أنها نسيت مفاتيحها في المنزل','استنتاج مؤكد في الماضي: must have + التصريف الثالث للفعل.'],
+    ['I wish I had listened to my father','أتمنى لو كنت قد استمعت إلى كلام أبي','التمني والندم في الماضي بعد I wish يأخذ زمن الماضي التام (had + P.P).'],
+    ['Not only did he win but he also broke the record','لم يفز فحسب، بل حطم الرقم القياسي أيضاً','عند البدء بـ Not only نقدم الفعل المساعد (did) على الفاعل.'],
+    ['It is high time you started revising for exams','لقد حان الوقت بالفعل لتبدأ المراجعة للامتحانات','بعد It is high time + فاعل نستخدم الفعل في الماضي البسيط للتعبير عن الضرورة.'],
+    ['The project is believed to be very successful','يُعتقد أن المشروع ناجح جداً','المبني للمجهول مع أفعال الاعتقاد: المفعول + is believed + to + المصدر.'],
+    ['Despite being exhausted he continued working','على الرغم من كونه منهكاً، استمر في العمل','بعد Despite يأتي اسم أو فعل مضاف له ing (Gerund).'],
+    ['She suggested that he apply for the job','اقترحت عليه أن يتقدم للوظيفة','بعد suggest that + فاعل يأتي الفعل في المصدر (Subjunctive) مع جميع الضمائر.'],
+    ['The more you read the more knowledge you gain','كلما قرأت أكثر، اكتسبت معرفة أكثر','قاعدة كلما.. كلما: The + صيغة مقارنة + جملة، The + صيغة مقارنة + جملة.']
   ]
 };
+
+/* === بنك الأسئلة المتقدمة (البكالوريا 1 و 2 و 3 ثانوي + أنماط المرادفات وتصحيح الخطأ للإعدادي والابتدائي) === */
+var EXTRA_Q=[
+  /* --- المرحلة الثانوية (البكالوريا - 's') --- */
+  ['Hardly ____ the station when the train departed.','بالكاد وصلنا المحطة حتى غادر القطار.',['had we reached','we had reached','did we reach','have we reached'],0,'مع Hardly في أول الجملة نستخدم Inversion: had + الفاعل + P.P.','g','s'],
+  ['No sooner had he seen the police ____ he ran away.','لم يكد يرى الشرطة حتى هرب.',['than','when','then','that'],0,'No sooner تأخذ الرابط than، بينما Hardly/Scarcely تأخذ when.','g','s'],
+  ['____ she studied well, she would have passed the exam.','لو كانت ذاكرت جيداً لاجتازت الامتحان.',['Had','If','Should','Were'],0,'تحل Had محل If في الحالة الثالثة: Had + فاعل + P.P.','g','s'],
+  ['I ____ my teeth checked by the dentist yesterday.','فحصت أسناني عند طبيب الأسنان أمس.',['had','made','did','let'],0,'صيغة السببية (Causative): had + المفعول + P.P.','g','s'],
+  ['The streets are wet. It ____ rained heavily last night.','الشوارع مبللة، لا بد أنها أمطرت بغزارة الليلة الماضية.',['must have','can\'t have','should have','may'],0,'استنتاج مثبت شبه مؤكد في الماضي: must have + P.P.','g','s'],
+  ['You ____ have shouted at your friend; it was a mistake.','لم يكن ينبغي أن تصرخ في وجه صديقك؛ كان ذلك خطأ.',['shouldn\'t','mustn\'t','can\'t','needn\'t'],0,'اللوم والعتاب في الماضي: shouldn\'t have + P.P.','g','s'],
+  ['I regret wasting my time. I wish I ____ harder last year.','أندم على تضييع وقتي، أتمنى لو كنت عملت بجد العام الماضي.',['had worked','worked','have worked','would work'],0,'التمني في الماضي بعد I wish يأخذ ماضي تام (had + P.P).','g','s'],
+  ['It\'s high time we ____ action to protect the environment.','لقد آن الأوان لنتخذ إجراءً لحماية البيئة.',['took','take','have taken','will take'],0,'بعد It\'s high time + فاعل نستخدم الماضي البسيط.','g','s'],
+  ['She avoids ____ late at night to stay healthy.','هي تتجنب الأكل في وقت متأخر ليلاً للحفاظ على صحتها.',['eating','to eat','eat','eaten'],0,'الفعل avoid يتبعه دائماً Gerund (فعل + ing).','g','s'],
+  [' He stopped ____ a cup of coffee because he was driving for hours.','توقف لكي يشرب فنجان قهوة لأنه كان يقود لساعات.',['to drink','drinking','drink','drank'],0,'stop + to + inf تعني يتوقف عن شيء لكي يفعل شيئاً آخر.','g','s'],
+  ['I remember ____ the door before leaving; I\'m sure it\'s locked.','أتذكر أنني أغلقت الباب قبل المغادرة؛ أنا متأكد أنه مغلق.',['locking','to lock','lock','locked'],0,'remember + v-ing تعني يتذكر حدثاً قام به بالفعل في الماضي.','g','s'],
+  ['Not only ____ the match, but they also scored four goals.','لم يفوزوا بالمباراة فحسب، بل سجلوا أربعة أهداف أيضاً.',['did they win','they won','they did win','had they win'],0,'عند البدء بـ Not only نقدم الفعل المساعد على الفاعل.','g','s'],
+  ['By the end of next year, the government ____ the new bridge.','بحلول نهاية العام القادم، ستكون الحكومة قد بنت الكوبري الجديد.',['will have built','will build','is building','has built'],0,'مع By + زمن في المستقبل نستخدم المستقبل التام (will have + P.P).','g','s'],
+  ['This time tomorrow, I ____ on the beach in Alexandria.','في مثل هذا الوقت غداً، سأكون مسترخياً على الشاطئ في الإسكندرية.',['will be relaxing','will relax','am relaxing','have relaxed'],0,'حدث سيستمر في وقت محدد بالمستقبل: مستقبل مستمر (will be + v-ing).','g','s'],
+  ['She ____ for three hours before her friend finally arrived.','كانت تنتظر لمدة ثلاث ساعات قبل أن تصل صديقتها أخيراً.',['had been waiting','has been waiting','was waiting','waited'],0,'حدث استمر لفترة قبل حدث آخر في الماضي: ماضي تام مستمر (had been + v-ing).','g','s'],
+  ['My manager suggested that Ali ____ the conference.','اقترح مديري أن يحضر علي المؤتمر.',['attend','attends','attended','attending'],0,'بعد suggest that + فاعل نستخدم الفعل في المصدر بدون إضافات (Subjunctive).','g','s'],
+  ['The criminal is reported ____ the country last week.','أُفيد أن المجرم قد غادر البلاد الأسبوع الماضي.',['to have left','to leave','leaving','that left'],0,'عندما يكون الحدث في الماضي مع المبني للمجهول نستخدم to have + P.P.','g','s'],
+  ['____ his illness, he managed to finish the project on time.','على الرغم من مرضه، تمكن من إنهاء المشروع في الموعد.',['Despite','Although','However','Because'],0,'Despite يتبعها اسم أو شبه جملة، بينما Although يتبعها جملة كاملة.','g','s'],
+  ['He worked hard ____ he could support his family.','عمل بجد لكي يتمكن من إعالة أسرته.',['so that','in order to','because','so as to'],0,'so that يتبعها فاعل + can/could + المصدر.','g','s'],
+  ['She is ____ an intelligent student that she solved the puzzle in seconds.','إنها طالبة ذكية لدرجة أنها حلت اللغز في ثوانٍ.',['such','so','too','enough'],0,'نستخدم such قبل (a/an + صفة + اسم مفرد يعد) متبوعة بـ that.','g','s'],
+  ['Artificial Intelligence has made a huge ____ in modern medicine.','حقق الذكاء الاصطناعي طفرة هائلة في الطب الحديث.',['breakthrough','breakdown','breakout','breakup'],0,'كلمة breakthrough تعني طفرة علمية أو إنجاز كبير.','v','s'],
+  ['Successful students always ____ their time эффективно between study and rest.','الطلاب الناجحون يديرون وقتهم دائماً بفعالية بين المذاكرة والراحة.',['manage','waste','ignore','destroy'],0,'manage time تعني يدير أو ينظم الوقت.','v','s'],
+  ['The company decided to ____ 50 new engineers this month.','قررت الشركة توظيف 50 مهندساً جديداً هذا الشهر.',['employ','apply','imply','rely'],0,'employ تعني يوظف.','v','s'],
+  ['Reading literature helps ____ your awareness of different cultures.','قراءة الأدب تساعد في توسيع وعيك بالثقافات المختلفة.',['broaden','shorten','weaken','frighten'],0,'broaden awareness تعني يوسع الوعي والمدارك.','v','s'],
+  /* نمط المرادف والمضاد في السياق (syn) للثانوي */
+  ['The ancient temple is "colossal". The synonym of "colossal" is ____.','المعبد القديم ضخم للغاية. مرادف كلمة colossal هو:',['massive','tiny','ordinary','fragile'],0,'colossal و massive كلاهما بمعنى ضخم أو هائل الحجم.','syn','s'],
+  ['Strict laws are "mandatory" for road safety. The antonym of "mandatory" is ____.','القوانين الصارمة إلزامية لسلامة الطرق. مضاد كلمة mandatory هو:',['optional','compulsory','necessary','vital'],0,'mandatory تعني إلزامي، ومضادها optional (اختياري).','syn','s'],
+  ['His explanation was "ambiguous", so nobody understood. "Ambiguous" means ____.','كان شرحه غامضاً لذلك لم يفهم أحد. معنى ambiguous هو:',['vague','clear','obvious','bright'],0,'ambiguous تعني غامض غير واضح، ومرادفها vague.','syn','s'],
+  ['Water is "indispensable" for all living beings. The synonym of "indispensable" is ____.','الماء لا غنى عنه لكل الكائنات الحية. مرادف indispensable هو:',['essential','useless','minor','secondary'],0,'indispensable تعني ضروري لا غنى عنه = essential.','syn','s'],
+  ['The medicine had an "adverse" effect on the patient. The antonym of "adverse" is ____.','كان للدواء تأثير سلبي على المريض. مضاد كلمة adverse هو:',['beneficial','harmful','negative','dangerous'],0,'adverse تعني سلبي أو ضار، ومضادها beneficial (مفيد/إيجابي).','syn','s'],
+  ['She is very "optimistic" about her exam results. The antonym of "optimistic" is ____.','هي متفائلة جداً بشأن نتائج امتحاناتها. مضاد optimistic هو:',['pessimistic','hopeful','confident','cheerful'],0,'optimistic (متفائل) عكسها pessimistic (متشائم).','syn','s'],
+  /* نمط اكتشف الخطأ وصححه (er) للثانوي */
+  ['Spot the correction: "If he [studied] harder last term, he would have got full marks."','صحح الكلمة بين القوسين في الجملة الشرطية الثالثة:',['had studied','studies','has studied','would study'],0,'في الحالة الثالثة لـ If (وجود would have + P.P) نستخدم الماضي التام: had studied.','er','s'],
+  ['Spot the correction: "I look forward to [see] you at the university conference."','صحح الخطأ بين القوسين:',['seeing','saw','seen','be seen'],0,'التعبير look forward to يتبعه دائماً اسم أو فعل مضاف له ing (seeing).','er','s'],
+  ['Spot the correction: "The luggage [are] too heavy to carry alone."','صحح الخطأ بين القوسين:',['is','were','have been','aren\'t'],0,'كلمة luggage اسم لا يعد (Uncountable) ويعامل معاملة المفرد فنقول is.','er','s'],
+  ['Spot the correction: "Scarcely had I closed my eyes [than] the phone rang."','صحح الرابط الخاطئ بين القوسين:',['when','then','that','so'],0,'مع Scarcely و Hardly نستخدم الرابط when وليس than.','er','s'],
+  ['Spot the correction: "He denied [to steal] the confidential documents."','صحح الخطأ بين القوسين:',['stealing','stole','stolen','to stealing'],0,'الفعل deny يتبعه فعل مضاف له ing (stealing).','er','s'],
+  ['Spot the correction: "She [must] have taken the train; I saw her driving her own car."','صحح فعل الاستنتاج الخاطئ بين القوسين:',['can\'t','mustn\'t','should','may'],0,'في الاستنتاج المنفي المتأكد منه في الماضي نستخدم can\'t have + P.P.','er','s'],
+
+  /* --- أنماط جديدة (syn & er) للمرحلة الإعدادية ('m') --- */
+  ['The exam was very "simple". The antonym of "simple" is ____.','الامتحان كان بسيطاً جداً. مضاد كلمة simple هو:',['complicated','easy','clear','short'],0,'simple (بسيط/سهل) مضادها complicated (معقد/صعب).','syn','m'],
+  ['This museum is "ancient". The synonym of "ancient" is ____.','هذا المتحف قديم وعريق. مرادف كلمة ancient هو:',['very old','modern','new','recent'],0,'ancient تعني قديم جداً = very old.','syn','m'],
+  ['Spot the correction: "While I [walked] to school, it started to rain."','صحح الفعل بين القوسين بعد While:',['was walking','walk','have walked','am walking'],0,'بعد While نستخدم الماضي المستمر (was/were + ing).','er','m'],
+  ['Spot the correction: "He has lived in Alexandria [since] five years."','صحح الكلمة الخاطئة بين القوسين:',['for','ago','yet','just'],0,'قبل المدة الزمنية المحددة بالعدد (five years) نستخدم for وليس since.','er','m'],
+  ['Spot the correction: "Gold is [expensive] than silver."','صحح صيغة المقارنة بين القوسين:',['more expensive','most expensive','as expensive','expensiver'],0,'الصفات الطويلة في المقارنة يسبقها more ثم than.','er','m'],
+
+  /* --- أنماط جديدة (syn & er) للمرحلة الابتدائية ('p') --- */
+  ['The elephant is "huge". The synonym of "huge" is ____.','الفيل ضخم. الكلمة التي تعطي نفس معنى huge هي:',['very big','small','fast','thin'],0,'huge تعني ضخم جداً = very big.','syn','p'],
+  ['The turtle is "slow". The opposite of "slow" is ____.','السلحفاة بطيئة. عكس كلمة slow هو:',['fast','lazy','late','quiet'],0,'عكس slow (بطيء) هو fast (سريع).','syn','p'],
+  ['Spot the correction: "She [play] tennis every Friday."','صحح الفعل بين القوسين:',['plays','playing','played','to play'],0,'مع She في المضارع البسيط نضيف s للفعل: plays.','er','p'],
+  ['Spot the correction: "There [is] four books in my bag."','صحح الكلمة بين القوسين مع الاسم الجمع:',['are','am','was','be'],0,'مع الجمع (four books) نستخدم There are.','er','p']
+];
+if(typeof Q!=='undefined'&&Array.isArray(Q)){Q=Q.concat(EXTRA_Q)}
+
+var SEC_WORDS=[
+  ['sustainable','مستدام'],['innovation','ابتكار'],['consequence','نتيجة / عاقبة'],['inevitable','حتمي / لا مفر منه'],
+  ['prosperity','ازدهار / رخاء'],['perseverance','مثابرة / إصرار'],['ambitious','طموح'],['overcome','يتغلب على'],
+  ['contribute','يساهم'],['productivity','إنتاجية'],['phenomenon','ظاهرة'],['controversial','مثير للجدل'],
+  ['significant','هام / ملحوظ'],['implement','ينفذ / يطبق'],['obstacle','عقبة / عائق'],['accompany','يرافق / يصاحب'],
+  ['enthusiasm','حماس'],['determination','عزيمة / تصميم'],['artificial','اصطناعي'],['confidential','سري للغاية'],
+  ['accurate','دقيق'],['diversity','تنوع'],['heritage','تراث'],['investigate','يحقق في'],['preserve','يحفظ / يصون'],
+  ['elaborate','مفصل / متقن'],['reluctant','متردد / غير راغب'],['prestigious','مرموق / ذو مكانة'],['resilience','مرونة / صمود'],['flourish','يزدهر']
+];
+function getStageWords(){
+  if(S.stage==='s')return SEC_WORDS;
+  if(typeof WORDS!=='undefined'&&WORDS[S.stage==='p'?'p':'m'])return WORDS[S.stage==='p'?'p':'m'];
+  return SEC_WORDS;
+}
+
+var SEC_CURR={
+  1:{
+    units:[
+      [
+        {q:'Eco-tourism aims to ____ the natural environment while supporting local communities.',ar:'تهدف السياحة البيئية إلى الحفاظ على البيئة الطبيعية مع دعم المجتمعات المحلية.',o:['preserve','destroy','pollute','neglect'],a:0,hint:'preserve تعني يحافظ على أو يصون.'},
+        {q:'While I ____ my essay, the electricity suddenly went out.',ar:'بينما كنت أكتب مقالي، انقطعت الكهرباء فجأة.',o:['was writing','wrote','had written','am writing'],a:0,hint:'حدث كان مستمراً في الماضي وقطعه حدث آخر.'},
+        {q:'Blood donors are ____ heroes who save lives every day.',ar:'المتبرعون بالدم أبطال كرماء ينقذون الأرواح كل يوم.',o:['generous','selfish','greedy','cruel'],a:0,hint:'generous تعني كريم ومعطاء.'}
+      ],
+      [
+        {q:'My grandfather ____ walk five kilometers to school when he was young.',ar:'اعتاد جدي أن يمشي 5 كيلومترات للمدرسة عندما كان صغيراً.',o:['used to','is used to','uses to','was used'],a:0,hint:'لعادة في الماضي انتهت نستخدم used to + المصدر.'},
+        {q:' Dr. Magdi Yacoub is a ____ heart surgeon known worldwide.',ar:'د. مجدي يعقوب جراح قلب رائد ومعروف عالمياً.',o:['pioneering','minor','unknown','lazy'],a:0,hint:'pioneering تعني رائد في مجاله.'},
+        {q:'Have you finished ____ the report for the manager yet?',ar:'هل انتهيت من كتابة التقرير للمدير بعد؟',o:['writing','to write','wrote','written'],a:0,hint:'الفعل finish يتبعه دائماً فعل + ing.'}
+      ],
+      [
+        {q:'Never share your password to avoid online ____ and scams.',ar:'لا تشارك كلمة مرورك أبداً لتجنب الاحتيال الإلكتروني.',o:['fraud','honesty','charity','loyalty'],a:0,hint:'fraud تعني احتيال أو نصب.'},
+        {q:'She has been learning English ____ she was six years old.',ar:'هي تتعلم الإنجليزية منذ أن كانت في السادسة من عمرها.',o:['since','for','ago','during'],a:0,hint:'since يأتي بعدها جملة في الماضي البسيط كمرجع لبداية الحدث.'}
+      ],
+      [
+        {q:'Good communication skills help you ____ well with your colleagues.',ar:'مهارات التواصل الجيدة تساعدك على التفاعل بشكل جيد مع زملائك.',o:['interact','isolate','quarrel','ignore'],a:0,hint:'interact with تعني يتفاعل ويتواصل مع.'},
+        {q:'____ advice you gave me yesterday was davvero invaluable!',ar:'النصيحة التي قدمتها لي أمس كانت لا تقدر بثمن!',o:['The','An','A','No article'],a:0,hint:'نستخدم The لأن كلمة advice هنا محددة ومخصصة بالجملة التي بعدها.'}
+      ],
+      [
+        {q:'Smartphones are connected to the internet via wireless ____.',ar:'تتصل الهواتف الذكية بالإنترنت عبر شبكات لاسلكية.',o:['networks','bricks','cables','mirrors'],a:0,hint:'networks تعني شبكات.'},
+        {q:'Look at those dark clouds! It ____ heavily soon.',ar:'انظر إلى تلك السحب المظلمة! سوف تمطر بغزارة قريباً.',o:['is going to rain','rains','rained','will be rained'],a:0,hint:'تنبؤ في المستقبل مبني على دليل مرئي: am/is/are going to + المصدر.'}
+      ],
+      [
+        {q:'Poets use ____ language and metaphors to express deep emotions.',ar:'يستخدم الشعراء لغة تصويرية واستعارات للتعبير عن المشاعر العميقة.',o:['figurative','literal','boring','mechanical'],a:0,hint:'figurative language تعني اللغة المجازية والتصويرية.'},
+        {q:'The coach made the players ____ for two extra hours.',ar:'جعل المدرب اللاعبين يتدربون لساعتين إضافيتين.',o:['train','to train','training','trained'],a:0,hint:'في المبني للمعلوم: make + مفعول + مصدر بدون to.'}
+      ]
+    ],
+    story:[
+      [
+        {q:'In Treasure Island, why did Billy Bones hide at the Admiral Benbow Inn?',ar:'في جزيرة الكنز، لماذا اختبأ القبطان بيلي بونز في نزل أدميرال بينبو؟',o:['To hide his sea chest and treasure map from other pirates','To open a restaurant','To build a new ship','To meet the king'],a:0,hint:'كان يختبئ بصندوقه البحري وخريطة الكنز من القراصنة الآخرين.'},
+        {q:'What did the "Black Spot" mean among pirates?',ar:'ماذا كانت تعني "العلامة السوداء" بين القراصنة؟',o:['A official pirate warning of guilt or death','A ticket to a party','A gold coin','A map of London'],a:0,hint:'العلامة السوداء كانت بمثابة إنذار خطير أو حكم بالإقالة/الموت لدى القراصنة.'}
+      ],
+      [
+        {q:'What role did Long John Silver pretend to have on the Hispaniola ship?',ar:'ما الدور الذي تظاهر به لونج جون سيلفر على متن سفينة هيسبانيولا؟',o:['The ship\'s friendly cook','The ship\'s doctor','The island governor','A British soldier'],a:0,hint:'تظاهر بأنه طباخ السفينة الودود ليخفي خطته للتمرد.'}
+      ],
+      [
+        {q:'Where did Jim Hawkins hide when he overheard Silver\'s mutiny plan?',ar:'أين اختبأ جيم هوكينز عندما سمع خطة تمرد سيلفر بالصدفة؟',o:['Inside the apple barrel','Under the captain\'s bed','On top of the mast','In a small boat'],a:0,hint:'كان جيم داخل برميل التفاح وسمع المؤامرة كاملة.'}
+      ]
+    ]
+  }
+};
+SEC_CURR[2]=SEC_CURR[1];
+SEC_CURR[3]=SEC_CURR[1];
+
+function getStageCurr(){
+  if(S.stage==='s')return SEC_CURR;
+  if(typeof CURRICULUM!=='undefined')return CURRICULUM[S.stage==='p'?'p':'m']||{};
+  return {};
+}
+
 function mkSentQ(forceIdx){
-  var L=SENTENCES[S.stage==='p'?'p':'m']||SENTENCES.m;
+  var L=SENTENCES[S.stage||'m']||SENTENCES.m;
   var i=(forceIdx!==undefined)?forceIdx:Math.floor(Math.random()*L.length);
   var item=L[i];if(!item)return null;
   var en=item[0],ar=item[1],hint=item[2];
@@ -2136,7 +2341,7 @@ function sbIntro(){
     '</div>'+
     '<div class="card" style="line-height:1.9;font-size:14px">'+
       '<div class="tag g" style="margin-bottom:8px">مميزات وقواعد تحدي تركيب الجمل</div>'+
-      '🧩 <b>5 جمل في كل جولة:</b> مناسبة لمرحلتك الدراسية ('+(S.stage==='p'?'المرحلة الابتدائية':'المرحلة الإعدادية')+').<br>'+
+      '🧩 <b>5 جمل في كل جولة:</b> مناسبة لمرحلتك الدراسية ('+stgFullLbl()+').<br>'+
       '🔊 <b>نطق صوتي تلقائي:</b> بمجرد تركيب الجملة صح، هتسمع نطقها الإنجليزي الصحيح فوراً!<br>'+
       '💡 <b>مساعدة أول كلمتين:</b> تقدر تستخدم زر <b>«💡 تلميح أول كلمتين»</b> مرة مجاناً في كل جولة لو جملة وقفت معاك!<br>'+
       '❤️ <b>بدون خصم قلوب:</b> التحدي ده مخصص لتقوية التأسيس والكتابة ومش بيخصم من قلوبك اليومية!<br>'+
@@ -2152,7 +2357,7 @@ function sbIntro(){
 }
 function startSBMode(){
   clearInterval(G&&G.t);
-  var L=SENTENCES[S.stage==='p'?'p':'m']||SENTENCES.m;
+  var L=SENTENCES[S.stage||'m']||SENTENCES.m;
   var idxs=shuffle(L.map(function(_,i){return i})).slice(0,5);
   var qs=idxs.map(function(i){return mkSentQ(i)});
   G={sbOnly:true,lv:6,tier:1,n:qs.length,T:22,left:22,qs:qs,i:0,ok:0,combo:0,earned:0,bad:[],done:false,freeHint:1};
@@ -2408,7 +2613,7 @@ function renderClsPublicBoard(lbEl){
       '</div>';
     }).join('');
 
-    var stgName=(curG.stage==='p'?GP:GM)[(curG.grade||1)-1]||'';
+    var stgName=gName(curG.grade||1,curG.stage);
     lbEl.innerHTML=grpTabs+
       '<div style="background:rgba(47,95,90,0.1);padding:8px 10px;border-radius:10px;text-align:center;margin-bottom:6px">'+
         '<div style="font-weight:900;font-size:16px;color:#2F5F5A">🏫 '+esc(curG.name)+' ('+stgName+')</div>'+
@@ -2461,14 +2666,14 @@ function tPanelScr(){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var grps=S.cgrps||[];
   var grpCards=grps.map(function(g){
-    var stgName=(g.stage==='p'?GP:GM)[(g.grade||1)-1]||'';
+    var stgName=gName(g.grade||1,g.stage);
     var cnt=(g.students||[]).length;
     return '<div class="card" style="border-color:#2F5F5A">'+
       '<div class="row">'+
         '<div style="font-size:28px">🏫</div>'+
         '<div class="sp">'+
           '<div style="font-weight:900;font-size:16px;color:#7A3B3B">'+esc(g.name)+'</div>'+
-          '<div class="sm">'+(g.stage==='p'?'ابتدائي':'إعدادي')+' • الصف '+stgName+' • <b>'+cnt+' طالب</b></div>'+
+          '<div class="sm">'+stgLbl(g.stage)+' • الصف '+stgName+' • <b>'+cnt+' طالب</b></div>'+
           '<div class="sm" style="font-size:11px">آخر حصة: '+(g.lastDate||'لم تبدأ بعد')+'</div>'+
         '</div>'+
       '</div>'+
@@ -2497,7 +2702,7 @@ function tEditGrpScr(gid){
   renderTEditForm(gid||'',g?g.name:'',namesTxt);
 }
 function renderTEditForm(gid,gname,namesTxt){
-  var GList=EDIT_GRP_STG==='p'?GP:GM;
+  var GList=stgArr(EDIT_GRP_STG);
   if(EDIT_GRP_GRD>GList.length)EDIT_GRP_GRD=1;
   app.innerHTML='<div class="hd"><h1>'+(gid?'تعديل المجموعة ✏️':'مجموعة سنتر جديدة ➕')+'</h1><div>اكتب اسم المجموعة وأسماء الطلاب (كل طالب في سطر)</div></div>'+
     '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
@@ -2505,8 +2710,9 @@ function renderTEditForm(gid,gname,namesTxt){
       '<input id="egName" class="inp" maxlength="40" placeholder="مثال: أبطال تانية إعدادي - سنتر الإسكندرية" value="'+esc(gname)+'" style="font-size:16px">'+
       '<div class="sm" style="margin-top:4px">المرحلة الدراسية:</div>'+
       '<div class="row">'+
-        '<button class="pwb" style="'+(EDIT_GRP_STG==='p'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick=" preserveAndSwitchStg(\'p\',\''+gid+'\')">ابتدائي</button>'+
-        '<button class="pwb" style="'+(EDIT_GRP_STG==='m'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick=" preserveAndSwitchStg(\'m\',\''+gid+'\')">إعدادي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='p'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'p\',\''+gid+'\')">ابتدائي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='m'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'m\',\''+gid+'\')">إعدادي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='s'?'background:#C9973F;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'s\',\''+gid+'\')">ثانوي (بكالوريا)</button>'+
       '</div>'+
       '<div class="sm" style="margin-top:4px">الصف الدراسي:</div>'+
       '<div class="row" style="flex-wrap:wrap;gap:6px">'+
@@ -2594,7 +2800,7 @@ var CLS_SRC='all',CLS_MODE='turn';
 function clsSetupArena(gid){
   var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
   if(!g||!g.students||!g.students.length){rmsg('أضف طلاباً للمجموعة أولاً!');return}
-  var stgName=(g.stage==='p'?GP:GM)[(g.grade||1)-1]||'';
+  var stgName=gName(g.grade||1,g.stage);
   var srcBtn=function(k,lbl){
     return '<button class="pwb" style="flex:1 1 30%;font-size:13px;'+(CLS_SRC===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SRC=\''+k+'\';clsSetupArena(\''+gid+'\')">'+lbl+'</button>';
   };
@@ -2634,8 +2840,9 @@ function clsSetupArena(gid){
 function genClsQuestions(g,src,count){
   count=count||30;
   var st=g.stage||'m',gr=g.grade||1,pool=[];
-  if(src!=='all'&&typeof CURRICULUM!=='undefined'&&CURRICULUM[st]&&CURRICULUM[st][gr]){
-    var cData=CURRICULUM[st][gr];
+  var stgC=(st==='s'?SEC_CURR:(typeof CURRICULUM!=='undefined'?CURRICULUM[st]:null));
+  if(src!=='all'&&stgC&&stgC[gr]){
+    var cData=stgC[gr];
     var raw=src.charAt(0)==='u'?cData.units[+src.slice(1)]:cData.story[+src.slice(1)];
     if(raw&&raw.length){
       pool=raw.map(function(q){return [q.q,q.ar||'',q.o,q.a,q.hint||'',src.charAt(0)==='u'?'mc':'st',st]});
@@ -3294,7 +3501,7 @@ function refreshLb(f){
 function fillLb(){
   var e=$('#lbh');if(!e)return;
   if(!window.FB){e.style.display='none';return}
-  var head='<div class="tag">ترتيب الأسبوع ('+(S.stage==='p'?'ابتدائي':'إعدادي')+')</div><div class="sm" style="text-align:center;margin-top:6px">'+leftTxt()+'</div>';
+  var head='<div class="tag">ترتيب الأسبوع ('+stgLbl()+')</div><div class="sm" style="text-align:center;margin-top:6px">'+leftTxt()+'</div>';
   e.style.display='';
   if(!LBD){e.innerHTML=head+'<div class="sm" style="text-align:center;margin-top:8px">بنحمّل الترتيب...</div>';return}
   var pt=wkPts(),list=LBD.map(function(x){return{id:x.id,name:x.name,pts:x.pts||0}}),mi=-1,i;
