@@ -111,16 +111,26 @@ body.dark .bdg-card.unlocked{background:linear-gradient(135deg,#332A18,#261E10);
 .fc-front{background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border:3px solid #C9973F;color:#4A2F22}
 .fc-back{background:linear-gradient(135deg,#2F5F5A,#1B3B38);border:3px solid #FFD700;color:#FFE9B8;transform:rotateY(180deg)}
 body.dark .fc-front{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5F5F5;border-color:#C9973F}
+.city-view{background:linear-gradient(180deg,#5CA4D6 0%,#A6D5F5 55%,#76B065 55%,#4E8742 100%);border:3px solid #C9973F;border-radius:18px;padding:12px 10px;position:relative;overflow:hidden;box-shadow:inset 0 4px 14px rgba(0,0,0,0.2)}
+body.dark .city-view{background:linear-gradient(180deg,#101B33 0%,#1E325C 55%,#244728 55%,#18331B 100%)}
+.city-plots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.c-plot{background:rgba(255,255,255,0.88);border:2px solid #6B4A3A;border-radius:14px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;position:relative;transition:transform 0.15s;min-height:84px;justify-content:center}
+body.dark .c-plot{background:rgba(30,30,30,0.88);color:#FFE9B8;border-color:#C9973F}
+.c-plot:active{transform:scale(0.96)}
+.c-plot.empty{background:rgba(255,248,225,0.55);border:2px dashed #6B4A3A}
+body.dark .c-plot.empty{background:rgba(255,255,255,0.08);border-color:#aaa}
+.c-plot .b-ic{font-size:30px;line-height:1.1;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.25))}
+.c-plot .b-nm{font-size:11px;font-weight:900;line-height:1.2}
+.c-plot .b-lv{font-size:10px;font-weight:900;background:#2F5F5A;color:#FFE9B8;padding:1px 6px;border-radius:8px}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.role-card{background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:10px 8px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 3px 0 rgba(138,106,74,0.35);font-family:'Cairo',sans-serif;color:var(--ink)}
+.role-card.act{background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border:2.5px solid #2F6B4A;box-shadow:0 4px 0 #1B432C}
+body.dark .role-card.act{background:linear-gradient(135deg,#1E3532,#152624);border-color:#FFD700;color:#FFE9B8}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -198,7 +208,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.max=S.max||1;S.stars=S.stars||{};S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0']};S.eq=S.eq||{ch:'blob',col:'c0',th:'t0'};S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -260,12 +270,13 @@ function totStarsCount(){var s=0;Object.keys(S.stars||{}).forEach(function(k){s+
 function mapDone(){return S.stars&&S.stars[20]>0}
 function bnav(active){
   var hasCert = !!(S.cert || mapDone());
+  var canTax = (S.cTax !== cDay()) && (cityDailyInc() > 0);
   var tabs=[
     ['home','🏠','الرئيسية','home()',0],
+    ['city','🏙️','مدينتي','cityScr()',canTax],
     ['rep','📊','مستوايا','reportScr()',hasCert],
     ['lb','🏆','الترتيب','board()',0],
-    ['shop','🛒','المتجر','store()',0],
-    ['acc','⚙️','حسابي','accountScr()',S.rcOk&&!S.rcSeen]
+    ['shop','🛒','المتجر','store()',0]
   ];
   return '<div class="bnav-spacer"></div><nav class="bnav" aria-label="التنقل الرئيسي">'+tabs.map(function(t){
     return '<button class="'+(active===t[0]?'act':'')+'" onclick="'+t[3]+'">'+(t[4]?'<span class="bdot"></span>':'')+'<span class="ni">'+t[1]+'</span><span>'+t[2]+'</span></button>';
@@ -282,11 +293,14 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
     '<div class="row">'+
       misterImg('c',48)+
       '<div class="sp">'+
-        '<div style="font-family:Lemonada,sans-serif;font-size:16px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
-        '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+(eqBdgTitle()?' <span style="background:#FFD700;color:#4A2F22;padding:1px 6px;border-radius:8px;font-size:11px">'+eqBdgTitle()+'</span>':'')+'</div>'+
-        '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+') • الأوسمة: '+(S.bdg||[]).length+'/'+BADGES.length+' 🏅</div>'+
+        '<div style="font-family:Lemonada,sans-serif;font-size:15px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
+        '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+' <span onclick="cityScr(\'roles\')" style="cursor:pointer;background:rgba(255,215,0,0.22);border:1px solid #FFD700;color:#FFE9B8;padding:1px 6px;border-radius:8px;font-size:11px">'+roleInfo().ic+' '+roleInfo().n+'</span></div>'+
+        '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+(S.stage==='p'?'ابتدائي':'إعدادي')+' ('+gName()+')'+(eqBdgTitle()?' • '+eqBdgTitle():' • 🏙️ '+cityRankName())+'</div>'+
       '</div>'+
-      '<button class="btn" style="font-size:12px;padding:4px 10px;min-height:32px;border-width:2px" onclick="stageScr()">تغيير الصف</button>'+
+      '<div style="display:flex;flex-direction:column;gap:4px">'+
+        '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:28px;border-width:2px" onclick="accountScr()">⚙️ إعدادات</button>'+
+        '<button class="btn t" style="font-size:11px;padding:3px 8px;min-height:28px;border-width:2px" onclick="stageScr()">الصف</button>'+
+      '</div>'+
     '</div>'+
   '</div>'+
 
@@ -336,6 +350,9 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
       '<span class="m-sb">'+(misCnt>0?'صحّح '+misCnt+' سؤال واسترجع قلب':'افتح أكواد مستر عبدالرحمن')+'</span>'+
     '</button>'+
   '</div>'+
+
+  /* Interactive City & Roleplay Banner */
+  homeCityCard()+
 
   /* Daily Arena Banner */
   dailyArenaCard()+
@@ -635,8 +652,8 @@ function anim(c){var m=$('#mon');m.className='';void m.offsetWidth;m.className=c
 function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,msg;
-  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=G.rev?2:1;G.combo++;G.ok++;misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');msg='إجابة صح! +'+(gain*cm)+' عملة'+(G.rev?' (مراجعة ×2)':'');if(G.combo%3===0){gain+=10;dmg=2;msg+=' • كومبو! ضربة قوية';mTick('k')}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain);if(cr!==gain)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • صندوق هدف اليوم! +'+DCHEST+' عملة';DCH=0}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}}
-  else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
+  if(good){var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=G.rev?2:1;G.combo++;G.ok++;if(S.role==='thief'){var stB=Math.max(2,Math.round(gain*0.3));gain+=stB}misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');msg='إجابة صح! +'+(gain*cm)+' عملة'+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');if(G.combo%3===0){gain+=(S.role==='thief'?15:10);dmg=2;msg+=' • كومبو! ضربة قوية';mTick('k')}if((S.role==='doctor'||S.role==='nurse')&&G.ok===4&&!G.medUsed&&G.h<3){G.medUsed=1;G.h++;if(!G.rev&&S.dhp<3)S.dhp++;msg+=' • '+(S.role==='doctor'?'👨‍⚕️ إسعاف الطبيب':'👩‍⚕️ عناية الممرضة')+' رجّعت لك قلب ❤️!'}G.mhp=Math.max(0,G.mhp-dmg);S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain);if(cr!==gain)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • صندوق هدف اليوم! +'+DCHEST+' عملة';DCH=0}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}}
+  else{if(S.role==='police'&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}}
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
@@ -1210,7 +1227,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -1236,7 +1253,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(20,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?o.own:{ch:['blob'],col:['c0'],th:['t0']},eq:o.eq&&o.eq.ch?o.eq:{ch:'blob',col:'c0',th:'t0'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='m'?'m':undefined),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
@@ -1512,9 +1529,9 @@ function pickSurv(k){
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   if(good){
     G.ok++;G.combo++;if(G.combo>G.maxCombo)G.maxCombo=G.combo;
-    var addT=G.combo%3===0?5:3;
+    var addT=G.combo%3===0?5:((S.role==='nurse'||S.role==='doctor')?4:3);
     G.left=Math.min(90,G.left+addT);
-    var gain=4+(G.combo%3===0?8:0);
+    var gain=4+(S.role==='thief'?2:0)+(G.combo%3===0?8:0);
     S.coins+=gain;G.earned+=gain;
     var cr=creditPts(gain);G.ptsEarned+=cr;roomAdd(gain);
     misDel(q);tsAdd(q,1);mTick('a');if(G.combo%3===0)mTick('k');
@@ -1525,10 +1542,11 @@ function pickSurv(k){
     anim('hit');sfxOk(G.combo%3===0);changeBossExpression('hit');
   }else{
     G.wrong++;G.combo=0;
-    G.left=Math.max(0,G.left-5);
+    var pen=(S.role==='police'&&G.wrong===1)?0:5;
+    G.left=Math.max(0,G.left-pen);
     if(G.bad.length<8)G.bad.push(q);
     misAdd(q);tsAdd(q,0);
-    if(dl){dl.textContent='-5 ثواني ⚠️';dl.style.color='#B23A3A'}
+    if(dl){dl.textContent=(pen===0?'👮‍♂️ درع الشرطة حمى وقتك!':'-5 ثواني ⚠️');dl.style.color=pen===0?'#2F5F5A':'#B23A3A'}
     anim('atk');sfxBad();changeBossExpression('angry');
   }
   if($('#sok'))$('#sok').textContent=G.ok;
@@ -1819,6 +1837,258 @@ function redeemGift(){
   }else{
     sfxBad();rmsg('الكود ده غلط! تأكد من حروف الكود من مستر عبدالرحمن');
   }
+}
+var ROLES=[
+  {id:'police',ic:'👮‍♂️',n:'ضابط شرطة',p:'درع الشرطة: يحمي وقتك من أول خطأ في النجاة ويصد أول ضربة للزعيم!',actName:'🚨 دورية القبض على اللصوص',actDesc:'حل 3 أسئلة سريعة للقبض على عصابة اللصوص وحماية خزينة المدينة!'},
+  {id:'doctor',ic:'👨‍⚕️',n:'طبيب ماهر',p:'الإسعاف الفوري: يرجّع لك قلب تلقائياً بعد 4 إجابات صحيحة في أي جولة + ثانية إضافية في النجاة!',actName:'🚑 مهمة إسعاف طارئة',actDesc:'حل 3 أسئلة طبية سريعة لإنقاذ المصابين وشحن قلوبك اليومية وعملاتك!'},
+  {id:'nurse',ic:'👩‍⚕️',n:'ممرضة البطولة',p:'العناية المركزة: تزيد الوقت المكتسب +4 ثواني في النجاة وترجع لك قلب بعد 4 إجابات صح!',actName:'💉 جولة الرعاية الصحية',actDesc:'حل 3 أسئلة سريعة لمساعدة المستشفى وكسب عملات وقلب إضافي!'},
+  {id:'thief',ic:'🦹‍♂️',n:'اللص الذكي',p:'خفة اليد: يسرق +30% عملات ذهب إضافية من الوحش مع كل إجابة صح وفي الكومبو!',actName:'💎 غارة الخزنة السرية',actDesc:'تسلل وحل 3 أسئلة صعبة بدون ولا غلطة لفتح الخزنة الذهبية وخطف الجائزة!'},
+  {id:'eng',ic:'👷‍♂️',n:'المهندس المعماري',p:'عبقري التعمير: يمنحك خصم 25% على تكلفة بناء وتطوير كل مباني ومنشآت مدينتك!',actName:'🏗️ مشروع البناء السريع',actDesc:'حل 3 أسئلة هندسية سريعة للحصول على منحة عملات لتطوير مدينتك!'}
+];
+var BUILDINGS=[
+  {id:'house',ic:'🏠',ic3:'🏰',n:'المنزل الكبير (الفيلا)',n3:'القصر الملكي الفخم',d:'مقر سكنك في المدينة، كل تطوير يكبّره لحد ما يبقى قصر ملكي!',cost:[0,150,350],inc:[10,25,60],pts:[15,35,80]},
+  {id:'police',ic:'🚓',ic3:'🛡️',n:'قسم الشرطة',n3:'مقر قيادة الأمن',d:'يحمي المدينة من السرقات ويزود نقاطك الأمنية كل يوم.',cost:[200,350,600],inc:[20,45,95],pts:[25,55,110]},
+  {id:'hosp',ic:'🏥',ic3:'🏨',n:'المستشفى العام',n3:'المدينة الطبية الكبرى',d:'يرعى صحة الأبطال ويشحن قلوبك اليومية مع عائد عملات.',cost:[250,400,700],inc:[25,55,115],pts:[30,65,130]},
+  {id:'school',ic:'🏫',ic3:'🎓',n:'أكاديمية مستر عبدالرحمن',n3:'جامعة Grammora العالمية',d:'منارة العلم في مدينتك! تمنحك أعلى نقاط ترتيب يومية.',cost:[300,500,850],inc:[35,75,150],pts:[45,95,190]},
+  {id:'bank',ic:'🏦',ic3:'💰',n:'البنك المركزي',n3:'الخزينة الذهبية العظمى',d:'يضاعف أرباحك واستثماراتك من العملات الذهبية كل يوم.',cost:[400,650,1000],inc:[50,105,210],pts:[50,110,220]},
+  {id:'tower',ic:'🗼',ic3:'👑',n:'برج الأبطال الذهبي',n3:'أعجوبة عالم الإنجليزي',d:'أغلى وأفخم معلم في المدينة! يثبت سيطرتك كحاكم للمدينة.',cost:[600,950,1500],inc:[80,160,320],pts:[90,180,360]}
+];
+function roleInfo(id){
+  id=id||S.role||'police';
+  return ROLES.filter(function(r){return r.id===id})[0]||ROLES[0];
+}
+function bldLv(id){return (S.city&&S.city[id])||0}
+function bldCost(b,lv){
+  var raw=b.cost[lv]||0;
+  return S.role==='eng'?Math.round(raw*0.75):raw;
+}
+function cityTotalLv(){
+  var s=0;BUILDINGS.forEach(function(b){s+=bldLv(b.id)});return s;
+}
+function cityDailyInc(){
+  var c=0;BUILDINGS.forEach(function(b){var lv=bldLv(b.id);if(lv>0)c+=b.inc[lv-1]});return c;
+}
+function cityDailyPts(){
+  var p=0;BUILDINGS.forEach(function(b){var lv=bldLv(b.id);if(lv>0)p+=b.pts[lv-1]});return p;
+}
+function cityRankName(){
+  var lv=cityTotalLv();
+  if(lv>=18)return 'إمبراطورية الأبطال العظمى 👑';
+  if(lv>=12)return 'مدينة عالمية كبرى 🌆';
+  if(lv>=7)return 'مدينة متطورة 🏙️';
+  if(lv>=3)return 'بلدة صاعدة 🏘️';
+  return 'بداية التعمير 🏡';
+}
+function homeCityCard(){
+  var r=roleInfo(),lv=cityTotalLv(),inc=cityDailyInc(),canTax=(S.cTax!==cDay());
+  return '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border:2px solid #2F5F5A;box-shadow:0 4px 0 #1B3B38;padding:12px">'+
+    '<div class="row">'+
+      '<div style="font-size:34px;line-height:1">'+r.ic+'</div>'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:15px;color:#1B3B38">🏙️ مدينتي وشخصيتي: <span style="color:#7A3B3B">'+r.n+'</span></div>'+
+        '<div style="font-size:12px;font-weight:700;color:#4A2F22;margin-top:2px">'+cityRankName()+' (مستوى '+lv+'/18) • دخل يومي: <b>+'+inc+' 🪙</b></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="row" style="margin-top:8px;gap:8px">'+
+      '<button class="btn" style="flex:1;font-size:14px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700" onclick="cityScr()">🏗️ ابنِ وطوّر مدينتك'+(canTax?' 🔴':'')+'</button>'+
+      '<button class="btn t" style="flex:1;font-size:14px;min-height:38px;padding:6px;background:#7A3B3B" onclick="startRoleMission()">'+r.actName.split(' ')[0]+' مهمتي الخاصة</button>'+
+    '</div>'+
+  '</div>';
+}
+var CITY_TAB='build';
+function cityScr(tab){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(tab)CITY_TAB=tab;
+  S.city=S.city||{house:1};
+  var r=roleInfo(),totLv=cityTotalLv(),inc=cityDailyInc(),dPts=cityDailyPts(),canTax=(S.cTax!==cDay());
+  var plotsHtml=BUILDINGS.map(function(b){
+    var lv=bldLv(b.id);
+    var ic=lv===0?'🚧':(lv===3?b.ic3:b.ic);
+    var nm=lv===3?b.n3:b.n;
+    return '<div class="c-plot '+(lv===0?'empty':'')+'" onclick="CITY_TAB='build';cityScr();setTimeout(function(){var el=document.getElementById('bld_'+b.id+'');if(el)el.scrollIntoView({behavior:'smooth'})},80)">'+
+      '<div class="b-ic">'+ic+'</div>'+
+      '<div class="b-nm">'+nm+'</div>'+
+      '<div class="b-lv">'+(lv===0?'أرض فاضية':'مستوى '+lv+'/3 '+('⭐'.repeat(lv)))+'</div>'+
+    '</div>';
+  }).join('');
+
+  var tabBtns='<div class="row" style="gap:8px">'+
+    '<button class="pwb" style="'+(CITY_TAB==='build'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr('build')">🏗️ تعمير المباني ('+totLv+'/18)</button>'+
+    '<button class="pwb" style="'+(CITY_TAB==='roles'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="cityScr('roles')">👮‍♂️ اختر شخصيتك ('+r.ic+')</button>'+
+  '</div>';
+
+  var bodyHtml='';
+  if(CITY_TAB==='roles'){
+    bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+'<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">اختار وظيفتك في المدينة! كل شخصية بتديك <b>قدرة خارقة أثناء حل الأسئلة</b> + مهمة خاصة تكسب منها ذهب للمدينة!</div></div>'+
+    '<div class="role-grid">'+ROLES.map(function(ro){
+      var isMe=(S.role===ro.id);
+      return '<div class="role-card '+(isMe?'act':'')+'" onclick="selectRole(''+ro.id+'')">'+
+        '<div style="font-size:36px;line-height:1.1">'+ro.ic+'</div>'+
+        '<div style="font-weight:900;font-size:15px;color:'+(isMe?'#2F6B4A':'#7A3B3B')+'">'+ro.n+'</div>'+
+        '<div style="font-size:11px;line-height:1.4;font-weight:700;min-height:46px">'+ro.p+'</div>'+
+        '<button class="btn'+(isMe?'':' t')+'" style="width:100%;font-size:12px;min-height:32px;padding:4px;margin-top:4px">'+(isMe?'✅ شخصيتك الحالية':'اختار الشخصية')+'</button>'+
+      '</div>';
+    }).join('')+'</div>';
+  }else{
+    bodyHtml=BUILDINGS.map(function(b){
+      var lv=bldLv(b.id),maxed=(lv>=3);
+      var nxtCost=maxed?0:bldCost(b,lv);
+      var curInc=lv>0?b.inc[lv-1]:0,nxtInc=maxed?curInc:b.inc[lv];
+      var ic=lv>=3?b.ic3:b.ic;
+      var nm=lv>=3?b.n3:b.n;
+      return '<div id="bld_'+b.id+'" class="card row" style="align-items:center;'+(lv===3?'border-color:#C9973F;background:linear-gradient(135deg,#FFFDF5,#FCE8B2)':'')+'">'+
+        '<div style="width:54px;height:54px;border-radius:14px;background:rgba(47,95,90,0.12);display:flex;align-items:center;justify-content:center;font-size:32px;flex:none">'+ic+'</div>'+
+        '<div class="sp">'+
+          '<div style="font-weight:900;font-size:15px">'+nm+' <span class="sm">('+(lv===0?'غير مبني':'مستوى '+lv+'/3')+')</span></div>'+
+          '<div style="font-size:11px;line-height:1.4;font-weight:700;margin:2px 0">'+b.d+'</div>'+
+          '<div class="sm" style="color:#2F6B4A">العائد اليومي: '+(lv>0?'+'+curInc+' 🪙':'0')+(maxed?' (الحد الأقصى 🌟)':' ⬅️ بعد التطوير: +'+nxtInc+' 🪙')+'</div>'+
+        '</div>'+
+        (maxed
+          ? '<span class="sm" style="font-weight:900;color:#C9973F">مكتمل 👑</span>'
+          : '<button class="btn" style="font-size:13px;padding:6px 10px;min-height:40px;white-space:nowrap" onclick="buyBld(''+b.id+'')">'+(lv===0?'ابنِ الآن':'طوّر '+(lv+1)+'/3')+'<br><span style="font-size:11px">🪙 '+nxtCost+'</span></button>')+
+      '</div>';
+    }).join('');
+  }
+
+  var actDone=(S.cAct===cDay());
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>مدينتي التفاعلية 🏙️</h1><div>'+cityRankName()+' • اجمع العملات من الأسئلة وابنِ مدينتك!</div></div>'+
+    '<div class="row">'+
+      '<div class="chip">'+coin()+'<span>'+S.coins+'</span></div>'+
+      '<div class="chip">'+r.ic+' <span>'+r.n+'</span></div>'+
+      '<div class="sp"></div>'+
+      '<div class="sm">المستوى: '+totLv+'/18</div>'+
+    '</div>'+
+    '<div class="city-view">'+
+      '<div class="row" style="background:rgba(0,0,0,0.45);color:#FFE9B8;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:900">'+
+        '<span>🏙️ خريطة أراضي المدينة (اضغط على أي مبنى)</span>'+
+        '<span class="sp"></span>'+
+        '<span style="color:#FFD700">+'+inc+' 🪙/يوم</span>'+
+      '</div>'+
+      '<div class="city-plots">'+plotsHtml+'</div>'+
+    '</div>'+
+    '<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid #C9973F">'+
+      '<div class="row">'+
+        '<div class="sp">'+
+          '<div style="font-weight:900;font-size:14px;color:#7A3B3B">💰 خزينة عوائد المدينة اليومية</div>'+
+          '<div class="sm">مبانيك بتنتج كل يوم: <b>+'+inc+' عملة</b> و<b>+'+dPts+' نقطة ترتيب</b>!</div>'+
+        '</div>'+
+        '<button class="btn'+(canTax?'':' t')+'" style="font-size:13px;padding:6px 12px;min-height:38px" '+(canTax?'onclick="claimCityTax()"':'disabled')+'>'+(canTax?'استلم العائد 🪙':'استلمتها اليوم ✅')+'</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card" style="border-color:#7A3B3B">'+
+      '<div class="row">'+
+        '<div style="font-size:28px">'+r.ic+'</div>'+
+        '<div class="sp">'+
+          '<div style="font-weight:900;font-size:14px;color:#7A3B3B">'+r.actName+'</div>'+
+          '<div style="font-size:11px;font-weight:700">'+r.actDesc+'</div>'+
+        '</div>'+
+        '<button class="btn" style="font-size:13px;padding:6px 12px;min-height:38px;background:linear-gradient(135deg,#7A3B3B,#4A1C1C)" onclick="startRoleMission()">'+(actDone?'العب تاني ⚔️':'ابدأ المهمة (+80🪙)')+'</button>'+
+      '</div>'+
+    '</div>'+
+    tabBtns+
+    bodyHtml+
+    '<button class="btn" style="margin-top:4px" onclick="shareCity()">📲 شارك مدينتك وشخصيتك مع صحابك</button>'+
+    bnav('city');
+}
+function selectRole(id){
+  S.role=id;save();
+  var r=roleInfo(id);
+  ding();
+  rmsg('بقيت الآن: '+r.ic+' '+r.n+'!');
+  cityScr('roles');
+}
+function buyBld(id){
+  var b=BUILDINGS.filter(function(x){return x.id===id})[0];
+  if(!b)return;
+  S.city=S.city||{house:1};
+  var lv=bldLv(id);
+  if(lv>=3){rmsg('المبنى ده وصل لأعلى مستوى بالفعل!');return}
+  var cost=bldCost(b,lv);
+  if(S.coins<cost){
+    sfxBad();
+    rmsg('عملاتك مش كفاية! محتاج '+cost+' عملة — العب جولات واجمع ذهب!');
+    return;
+  }
+  S.coins-=cost;
+  S.city[id]=lv+1;
+  var ptBonus=b.pts[lv];
+  addPts(ptBonus);
+  save();submit();sfxWin();
+  var nm=(lv+1===3)?b.n3:b.n;
+  rmsg('🎉 مبروك! بنيت/طورت «'+nm+'» للمستوى '+(lv+1)+' (+'+ptBonus+' نقطة ترتيب)!');
+  cityScr('build');
+}
+function claimCityTax(){
+  if(S.cTax===cDay()){rmsg('استلمت عوائد المدينة النهاردة خلاص!');return}
+  var inc=cityDailyInc(),pts=cityDailyPts();
+  S.cTax=cDay();
+  S.coins+=inc;
+  addPts(pts);
+  save();submit();sfxWin();
+  rmsg('💰 استلمت عوائد مدينتك: +'+inc+' عملة و+'+pts+' نقطة ترتيب!');
+  cityScr();
+}
+function startRoleMission(){
+  clearInterval(G&&G.t);
+  var r=roleInfo();
+  var qs=pickQs(3);
+  G={roleM:true,rObj:r,lv:8,tier:1,n:3,T:12,left:12,qs:qs,i:0,ok:0,earned:0,bad:[],done:false};
+  showRoleMission();
+}
+function showRoleMission(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var q=G.qs[G.i],r=G.rObj;G.left=G.T;G.done=false;
+  G.ord=shuffle(q[2].map(function(x,k){return k}));G.ci=G.ord.indexOf(q[3]);
+  var o=G.ord.map(function(x,k){return'<button class="opt"'+(/[؀-ۿ]/.test(q[2][x])?' style="direction:rtl"':'')+' onclick="pickRoleMission('+k+')">'+q[2][x]+'</button>'}).join('');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>'+r.actName+'</h1><div>خطوة '+(G.i+1)+' من 3 • بشخصية '+r.ic+' '+r.n+'</div></div>'+
+    '<div class="row"><span class="sm">الوقت المتبقي:</span><div class="bar"><i id="bf" style="width:100%"></i></div><div class="tm" id="tm">'+G.T+'</div></div>'+
+    '<div class="card"><div class="tag g">'+TT[q[5]]+'</div><div class="en">'+q[0]+'</div>'+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+
+    o+'<div id="fb"></div>';
+  clearInterval(G.t);
+  G.t=setInterval(function(){
+    G.left-=0.1;
+    if(G.left<=0){G.left=0;pickRoleMission(-1);return}
+    if($('#bf'))$('#bf').style.width=Math.min(100,G.left/G.T*100)+'%';
+    if($('#tm'))$('#tm').textContent=Math.ceil(G.left);
+  },100);
+}
+function pickRoleMission(k){
+  if(G.done)return;G.done=true;clearInterval(G.t);
+  var q=G.qs[G.i],good=k===G.ci,r=G.rObj;
+  document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
+  if(good){G.ok++;sfxOk(true);misDel(q);tsAdd(q,1)}
+  else{G.bad.push(q);sfxBad();misAdd(q);tsAdd(q,0)}
+  var last=(G.i>=2);
+  $('#fb').innerHTML='<div class="card row">'+misterImg(good?'c':'h',44)+'<div class="sp"><b>'+(good?'خطوة ناجحة! '+cheer():'غلطة! ركز في الخطوة الجاية')+'</b><div class="sm">'+q[4]+'</div></div></div>'+
+    '<button class="btn t" style="width:100%;margin-top:8px" onclick="'+(last?'endRoleMission()':'G.i++;showRoleMission()')+'">'+(last?'شوف نتيجة المهمة 🏆':'الخطوة التالية ⬅️')+'</button>';
+}
+function endRoleMission(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var r=G.rObj,win=(G.ok>=2),firstToday=(S.cAct!==cDay());
+  var cReward=0,pReward=0,extraMsg='';
+  if(win){
+    cReward=firstToday?(G.ok===3?80:50):(G.ok*10);
+    pReward=firstToday?60:20;
+    S.cAct=cDay();
+    S.coins+=cReward;addPts(pReward);
+    if((S.role==='doctor'||S.role==='nurse')&&S.dhp<3){S.dhp++;extraMsg='<br>❤️ ومكافأة إضافية لوظيفتك الطبية: <b>+1 قلب يومي</b>!'}
+    if(S.role==='thief'&&G.ok===3){S.coins+=25;cReward+=25;extraMsg='<br>🦹‍♂️ ومكافأة السارق الذكي للعلامة الكاملة: <b>+25 عملة مسروقة من الخزنة</b>!'}
+    save();submit();sfxWin();
+  }
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,'+(win?'#2F6B4A,#1B432C':'#7A3B3B,#4A1C1C')+')"><h1>'+(win?'نجحت المهمة الخاصة! 🎉':'فشلت المهمة هذه المرة!')+'</h1><div>'+r.ic+' '+r.actName+'</div></div>'+
+    '<div class="card" style="text-align:center;line-height:1.8">'+
+      '<div style="font-size:42px">'+r.ic+'</div>'+
+      '<div style="font-weight:900;font-size:18px">جاوبت صح '+G.ok+' من 3 أسئلة</div>'+
+      (win?'<div style="color:#2F6B4A;font-weight:900;font-size:16px;margin-top:6px">كسبت +'+cReward+' عملة لبناء مدينتك و+'+pReward+' نقطة ترتيب!'+extraMsg+'</div>':'<div class="sm" style="margin-top:6px">لازم تجاوب سؤالين صح على الأقل عشان تنجح المهمة.. جرب تاني!</div>')+
+    '</div>'+
+    '<button class="btn" onclick="cityScr()">🏙️ ارجع لمدينتك وابنِ بالعملات</button>'+
+    '<button class="btn t" onclick="startRoleMission()">🔄 العب مهمة جديدة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+}
+function shareCity(){
+  var r=roleInfo(),lv=cityTotalLv();
+  var t='أنا بلعب بشخصية ('+r.ic+' '+r.n+') وبنيت مدينتي لمستوى ('+lv+'/18 - '+cityRankName()+') في لعبة تحدّي الأصحاب مع مستر عبدالرحمن! 🏙️🔥 ادخل اختار شخصيتك وابنِ مدينتك: '+location.href.split('?')[0];
+  window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 }
 var MP={
   a15:{t:'جاوب 15 سؤال صح',k:'a',n:15,r:60},a30:{t:'جاوب 30 سؤال صح',k:'a',n:30,r:90},
