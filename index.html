@@ -159,14 +159,9 @@ body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5
 .w-tab.act{background:linear-gradient(135deg,#2F5F5A,#1B3B38);color:#FFE9B8;border-color:#FFD700;box-shadow:0 3px 0 #122826}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -384,7 +379,7 @@ function closeWhatsNew(goCity){
     S.ver=APP_UPDATE.ver;
     if(APP_UPDATE.gift>0){S.coins+=(APP_UPDATE.gift||0)}
     save();
-    ding();
+    sfxCoins();
     if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+APP_UPDATE.gift+' عملة هدية التحديث الجديد!');
   }
   var el=document.getElementById('wnModal');
@@ -649,7 +644,7 @@ function flipCard(){
   var box=$('#fcBox');
   if(box)box.classList.toggle('flipped',FC.flipped);
   if(FC.flipped){
-    ding();
+    sfxFlip();
     if(!S.mute)setTimeout(fcSpeak,180);
   }
 }
@@ -677,7 +672,7 @@ function finishFlashcards(){
     if(S.fcDone.length>60)S.fcDone=S.fcDone.slice(-60);
     bonus=15;S.coins+=bonus;addPts(15);save();submit();
   }
-  sfxWin();
+  sfxCardsDone();
   app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700"><h1>عاش يا بطل! راجعت كل البطاقات 🃏🎉</h1><div>'+FC.title+'</div></div>'+
     '<div class="card row">'+misterImg('c',56)+
       '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">ممتاز! المراجعة بالبطاقات الذكية قبل اللعب بتثبت المعلومة في ذاكرتك ١٠ أضعاف. دلوقتي إنت جاهز تدخل المعركة وتقفل كل الأسئلة صح!</div>'+
@@ -802,7 +797,7 @@ function start(lv){
 function hearts(){var r='';for(var i=1;i<=Math.max(3,G.h);i++)r+=heart(i<=G.h);return r}
 function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var q=G.qs[G.i],isSB=(q[5]==='sb'),isBoss=(G.lv%5===0&&!G.rev&&!G.currType);
-  if(isBoss&&G.mhp===1&&G.shld<=0)G.rage=true;
+  if(isBoss&&G.mhp===1&&G.shld<=0&&!G.rage){G.rage=true;setTimeout(sfxRage,180)}
   G.left=G.T+(q[7]?3:(isSB?6:0));G.done=false;G.f50=false;
   var o='';
   if(isSB){
@@ -852,6 +847,7 @@ function pick(k){
       var remDmg=dmg-shDmg;
       if(G.shld<=0){
         msg+=' • 🛡️ حطّمت درع الزعيم بالكامل!';
+        setTimeout(sfxShieldBreak,120);
         if(remDmg>0)G.mhp=Math.max(0,G.mhp-remDmg);
       }else{
         msg+=' • 🛡️ أصبت درع الزعيم (متبقي '+G.shld+')!';
@@ -1326,7 +1322,7 @@ function doBuy(id){
   var it=item(id);if(!it||S.coins<it.p)return;
   S.coins-=it.p;var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p=Math.max(0,S.wk.p-it.p);
   if(it.k==='pw')S.inv[id]++;else{S.own[it.k].push(id);S.eq[it.k]=id;applyTheme()}
-  save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
+  sfxCoins();save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
 }
 
 function stageScr(){app.innerHTML='<div class="hd"><h1>اختار مرحلتك الدراسية 🎓</h1><div>الأسئلة والمنهج والترتيب بيتحددوا حسب مرحلتك (تقدمك محفوظ في كل مرحلة)</div></div><div class="sp"></div><button class="btn" style="font-size:20px" onclick="setStage(\'p\')">🏫 المرحلة الابتدائية</button><button class="btn t" style="font-size:20px" onclick="setStage(\'m\')">📚 المرحلة الإعدادية</button><button class="btn" style="font-size:20px;background:linear-gradient(135deg,#C9973F,#7A4E12);border-color:#FFD700" onclick="setStage(\'s\')">🎓 الثانوي (نظام البكالوريا) 🔥</button>'+(S.stage?'<button class="btn t" onclick="home()">رجوع</button>':'<button class="btn t" style="font-size:14px" onclick="saveScr()">عندي كود استرجاع</button>')}
@@ -1418,46 +1414,163 @@ function roomJoinUi(){
 function roomSay(i){if(!S.rm||Date.now()-LSAY<3000)return;LSAY=Date.now();FB.roomMsg(S.rm.code,S.rm.side,i).then(function(){roomSync(drawRoom)}).catch(function(){})}
 function roomShare(){var c=S.rm.code,t='تعالى نتحدّى بعض في تحدّي الأصحاب! كود الروم: '+c+' '+location.href.split('?')[0].split('#')[0]+'?room='+c;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
-var AC=null,VP=0.5,VOS={},VOKS={};
-['ok','bad','win','report','shatouli'].forEach(function(k){
+/* === محرك المؤثرات الصوتية البرمجي + قوالب الملفات الصوتية بصوت مستر عبدالرحمن ===
+   الملفات الصوتية المدعومة تلقائياً (ضع أي ملف منها في فولدر اللعبة وسيعمل فوراً في موضعه):
+   - ok.mp3 / shatouli.mp3 : إجابة صحيحة في المعركة
+   - combo.mp3   : تحقيق كومبو (3 إجابات صح متتالية)
+   - bad.mp3     : إجابة خاطئة في المعركة
+   - win.mp3     : الفوز بالجولة وهزيمة الزعيم
+   - report.mp3  : فتح صفحة تقرير مستوايا
+   - welcome.mp3 : الترحيب عند فتح اللعبة
+   - gift.mp3    : فتح صندوق هدية سري أو وسام جديد
+   - build.mp3   : بناء أو تطوير مبنى في المدينة
+   -tax.mp3      : استلام عوائد الخزينة اليومية
+   - shield.mp3  : تحطيم درع الزعيم
+   - rage.mp3    : دخول الزعيم طور الغضب الأخير
+   - pet.mp3     : تدخل المرافق الذكي لمساعدة الطالب
+   - police.mp3  : بدء مطاردة الشرطة في رادار اللاعبين
+   - cards.mp3   : إنهاء مراجعة البطاقات الذكية (Flashcards)
+   - class.mp3   : حفظ ورفع نتائج بطولة الحصة الحية
+*/
+var AC=null,VP=0.35,VOS={},VOKS={},LAST_VO=0;
+var VOICE_SLOTS=['ok','bad','win','report','shatouli','combo','welcome','gift','build','tax','shield','rage','pet','police','cards','class'];
+VOICE_SLOTS.forEach(function(k){
   try{
-    var a=new Audio(k+'.mp3');a.preload='auto';a.volume=0.85;
-    VOKS[k]=true;a.onerror=function(){VOKS[k]=false};VOS[k]=a;
+    var a=new Audio(k+'.mp3');a.preload='auto';a.volume=0.88;
+    VOKS[k]=false;
+    a.addEventListener('canplaythrough',function(){VOKS[k]=true},{once:true});
+    a.onerror=function(){VOKS[k]=false};
+    VOS[k]=a;
   }catch(e){VOKS[k]=false}
 });
 function ac(){if(S.mute)return null;try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C()}if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
 function tone(f,t0,d,type,v,f2){var c=ac();if(!c)return;var o=c.createOscillator(),g=c.createGain(),t=c.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.05)}
 function noise(t0,d,v,f,q){var c=ac();if(!c)return;var n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0),i;for(i=0;i<n;i++)a[i]=Math.random()*2-1;var s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+t0;s.buffer=b;fl.type='bandpass';fl.frequency.value=f||2000;fl.Q.value=q||0.7;g.gain.setValueAtTime(v||0.2,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);s.connect(fl);fl.connect(g);g.connect(c.destination);s.start(t)}
-function clap(dur){for(var i=0;i<28;i++){var t=Math.random()*dur;noise(t,0.05+Math.random()*0.04,0.16*(1-t/dur*0.7),1400+Math.random()*2200,0.8)}}
+function clap(dur){for(var i=0;i<24;i++){var t=Math.random()*dur;noise(t,0.05+Math.random()*0.04,0.14*(1-t/dur*0.7),1400+Math.random()*2200,0.8)}}
 function roar(){
   var c=ac();if(!c)return;var t=c.currentTime,o=c.createOscillator(),l=c.createOscillator(),lg=c.createGain(),f=c.createBiquadFilter(),g=c.createGain();
-  o.type='sawtooth';o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(55,t+0.8);
+  o.type='sawtooth';o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(55,t+0.65);
   l.frequency.value=22;lg.gain.value=14;l.connect(lg);lg.connect(o.frequency);
-  f.type='lowpass';f.frequency.setValueAtTime(900,t);f.frequency.exponentialRampToValueAtTime(250,t+0.8);
-  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.35,t+0.08);g.gain.exponentialRampToValueAtTime(0.0001,t+0.85);
-  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);l.start(t);o.stop(t+0.9);l.stop(t+0.9);noise(0,0.5,0.12,300,0.6);
+  f.type='lowpass';f.frequency.setValueAtTime(900,t);f.frequency.exponentialRampToValueAtTime(250,t+0.65);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.3,t+0.06);g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
+  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);l.start(t);o.stop(t+0.75);l.stop(t+0.75);noise(0,0.4,0.1,300,0.6);
 }
-function playVoice(k){
+function playVoice(k,force){
   if(S.mute)return false;
-  var key=VOKS[k]?k:(k==='ok'&&VOKS['shatouli']?'shatouli':null);
+  var now=Date.now();
+  if(!force&&now-LAST_VO<2200)return false;
+  var key=null;
+  if(VOS[k]&&VOKS[k]!==false)key=k;
+  else if(k==='combo'&&VOS['shatouli']&&VOKS['shatouli']!==false)key='shatouli';
+  else if(k==='ok'&&VOS['shatouli']&&VOKS['shatouli']!==false&&Math.random()<0.45)key='shatouli';
+  else if(VOS[k])key=k;
   if(!key||!VOS[key])return false;
   try{
     Object.keys(VOS).forEach(function(x){if(VOS[x]&&!VOS[x].paused){VOS[x].pause();VOS[x].currentTime=0}});
     VOS[key].currentTime=0;
-    var p=VOS[key].play();if(p&&p.catch)p.catch(function(){});
+    var p=VOS[key].play();
+    if(p&&p.then){p.then(function(){LAST_VO=Date.now()}).catch(function(){VOKS[key]=false})}
+    else LAST_VO=now;
     return true;
   }catch(e){return false}
 }
-function ding(){tone(880,0,0.14,'triangle',0.18);tone(1320,0.1,0.2,'triangle',0.16)}
+/* 1. رنة خفيفة للأزرار والإجابات السريعة */
+function ding(){tone(880,0,0.12,'triangle',0.16);tone(1320,0.09,0.18,'triangle',0.14)}
+/* 2. صوت إجابة صحيحة في المعركة (أو كومبو) */
 function sfxOk(combo){
   if(S.mute)return;
-  if(combo){clap(1.1);tone(659,0,0.12,'triangle',0.15);tone(988,0.1,0.2,'triangle',0.15);playVoice('ok');return}
+  if(combo){
+    tone(587,0,0.1,'triangle',0.18);tone(880,0.08,0.12,'triangle',0.18);tone(1175,0.16,0.22,'triangle',0.2);
+    if(!playVoice('combo',true))playVoice('ok',true);
+    return;
+  }
   ding();
-  if(Math.random()<VP)playVoice('ok');
+  if(Math.random()<VP)playVoice('ok',false);
 }
-function sfxBad(){if(S.mute)return;roar();playVoice('bad')}
-function sfxWin(){if(S.mute)return;clap(1.8);[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.25,'triangle',0.16)});playVoice('win')}
-function sfxReport(){if(S.mute)return;playVoice('report')}
+/* 3. صوت إجابة خاطئة في المعركة (مع منع تكرار الصوت في الأخطاء السريعة) */
+function sfxBad(quiet){
+  if(S.mute)return;
+  if(quiet){tone(240,0,0.14,'sawtooth',0.14,160);tone(170,0.12,0.2,'sawtooth',0.14,120);return}
+  roar();
+  playVoice('bad',false);
+}
+/* 4. صوت الفوز النهائي بالجولة وهزيمة الزعيم فقط */
+function sfxWin(){
+  if(S.mute)return;
+  clap(1.6);
+  [523,659,784,1047].forEach(function(f,i){tone(f,i*0.11,0.24,'triangle',0.17)});
+  playVoice('win',true);
+}
+/* 5. صوت رنين العملات الذهبية والخزينة (بدون تصفيق أو صوت معركة) */
+function sfxCoins(){
+  if(S.mute)return;
+  [1047,1319,1568,2093].forEach(function(f,i){tone(f,i*0.065,0.16,'sine',0.16)});
+  playVoice('tax',false);
+}
+/* 6. صوت بناء وتطوير المباني في المدينة (طرقات تعمير متصاعدة) */
+function sfxBuild(){
+  if(S.mute)return;
+  noise(0,0.06,0.16,900,1.2);
+  noise(0.12,0.06,0.16,1200,1.2);
+  [330,440,554,659,880].forEach(function(f,i){tone(f,0.18+i*0.07,0.15,'triangle',0.17)});
+  playVoice('build',true);
+}
+/* 7. صوت فتح صندوق هدية سري أو وسام جديد (نغمة الكنز السحري) */
+function sfxChest(){
+  if(S.mute)return;
+  [523,659,784,988,1175,1568].forEach(function(f,i){tone(f,i*0.075,0.22,'triangle',0.16)});
+  playVoice('gift',true);
+}
+/* 8. صوت تحطيم درع الزعيم (انكسار البلور والطاقة) */
+function sfxShieldBreak(){
+  if(S.mute)return;
+  noise(0,0.28,0.25,2600,0.9);
+  tone(920,0,0.15,'sawtooth',0.18,320);
+  tone(1240,0.06,0.2,'triangle',0.16,440);
+  playVoice('shield',true);
+}
+/* 9. صوت إنذار دخول الزعيم طور الغضب الأخير (Rage Mode) */
+function sfxRage(){
+  if(S.mute)return;
+  tone(160,0,0.28,'sawtooth',0.22,290);
+  tone(160,0.3,0.32,'sawtooth',0.22,330);
+  playVoice('rage',true);
+}
+/* 10. صوت المرافق الذكي (زقزقة/قفزة لطيفة) */
+function sfxPet(){
+  if(S.mute)return;
+  tone(740,0,0.09,'sine',0.16,1100);
+  tone(1100,0.09,0.14,'triangle',0.16,1480);
+  playVoice('pet',false);
+}
+/* 11. صوت قلب البطاقة الذكية (حركة ورق خفيفة) */
+function sfxFlip(){
+  if(S.mute)return;
+  noise(0,0.05,0.1,1800,1.4);
+  tone(660,0.02,0.08,'sine',0.1,880);
+}
+/* 12. صوت إنهاء مراجعة البطاقات الذكية */
+function sfxCardsDone(){
+  if(S.mute)return;
+  [587,740,880,1175].forEach(function(f,i){tone(f,i*0.09,0.2,'triangle',0.16)});
+  playVoice('cards',true);
+}
+/* 13. صوت صفارة الشرطة وبدء المطاردة في الرادار */
+function sfxSiren(){
+  if(S.mute)return;
+  tone(650,0,0.18,'sine',0.16,960);
+  tone(960,0.18,0.18,'sine',0.16,650);
+  tone(650,0.36,0.18,'sine',0.16,960);
+  playVoice('police',false);
+}
+/* 14. صوت حفظ ورفع بطولة الحصة الحية */
+function sfxClassEnd(){
+  if(S.mute)return;
+  clap(1.2);
+  [440,554,659,880].forEach(function(f,i){tone(f,i*0.1,0.22,'triangle',0.17)});
+  if(!playVoice('class',true))playVoice('win',true);
+}
+function sfxReport(){if(S.mute)return;tone(523,0,0.12,'triangle',0.14);tone(659,0.1,0.16,'triangle',0.14);playVoice('report',true)}
 function spk(){return S.mute?'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#6B4A3A"/><path d="M16 9l5 6M21 9l-5 6" stroke="#7A3B3B" stroke-width="2" stroke-linecap="round"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#2F5F5A"/><path d="M16 9c1.6 1.6 1.6 4.4 0 6M18.5 6.5c3 3 3 8 0 11" fill="none" stroke="#2F5F5A" stroke-width="2" stroke-linecap="round"/></svg>'}
 function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTML=spk()}else home()}
 var CSAVE_AT=0;
@@ -1634,7 +1747,7 @@ function bdgCheck(){
       unlocked.push('🏅 فتحت وسام «'+b.n+'» (+'+b.r+' عملة!)');
     }
   });
-  if(unlocked.length)save();
+  if(unlocked.length){save();setTimeout(sfxChest,250)}
   return unlocked.join(' • ');
 }
 function eqBdgTitle(){
@@ -1786,7 +1899,7 @@ function pickSurv(k){
     if(G.bad.length<8)G.bad.push(q);
     misAdd(q);tsAdd(q,0);
     if(dl){dl.textContent=(pen===0?'👮‍♂️ درع الشرطة حمى وقتك!':'-5 ثواني ⚠️');dl.style.color=pen===0?'#2F5F5A':'#B23A3A'}
-    anim('atk');sfxBad();changeBossExpression('angry');
+    anim('atk');sfxBad(true);changeBossExpression('angry');
   }
   if($('#sok'))$('#sok').textContent=G.ok;
   if($('#scomb'))$('#scomb').textContent=G.combo;
@@ -1941,7 +2054,7 @@ function pickDaily(k){
     S.coins+=cGain;creditPts(cGain);roomAdd(cGain);
     misDel(q);tsAdd(q,1);mTick('a');
     msg='إجابة صحيحة! +'+pGain+' نقطة حلبة (منها +'+spd+' سرعة ⚡) و+'+cGain+' عملة!';
-    anim('hit');sfxOk(true);changeBossExpression('hit');
+    anim('hit');sfxOk(G.ok>=3);changeBossExpression('hit');
   }else{
     G.bad.push(q);misAdd(q);tsAdd(q,0);
     msg=(k<0?'انتهى الوقت!':'إجابة خاطئة!')+' ضاعت نقاط هذا السؤال.';
@@ -2053,7 +2166,7 @@ function applyGiftObj(code,g){
   if(pw.fifty){S.inv.fifty=(S.inv.fifty||0)+pw.fifty;rewards.push('✂️ مساعدة حذف إجابتين ×'+pw.fifty)}
   if(pw.time){S.inv.time=(S.inv.time||0)+pw.time;rewards.push('⏱️ مساعدة +5 ثواني ×'+pw.time)}
   if(pw.sc){S.inv.sc=(S.inv.sc||0)+pw.sc;rewards.push('🛡️ مساعدة الفرصة التانية ×'+pw.sc)}
-  save();submit();sfxWin();
+  save();submit();sfxChest();
   var boxHtml='<div class="card" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border:3px solid #FFD700;text-align:center;animation:fadeIn 0.4s ease-out">'+
     '<div style="font-size:22px;font-weight:900;color:#FFD700;margin-bottom:6px">🎉 مبروك! فتحت '+esc(g.t||'صندوق الهدية')+'</div>'+
     '<div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:10px;margin:8px 0;font-weight:900;font-size:16px;line-height:1.9">'+rewards.join('<br>')+'</div>'+
@@ -2071,10 +2184,10 @@ function redeemGift(){
     rmsg('بنتأكد من الكود...');
     FB.giftGet(code).then(function(d){
       if(d&&d.active!==false){applyGiftObj(code,d)}
-      else{sfxBad();rmsg('الكود ده غلط أو انتهت صلاحيته! تأكد من حروف الكود')}
-    }).catch(function(){sfxBad();rmsg('الكود ده غلط! تأكد من كتابته صح')});
+      else{sfxBad(true);rmsg('الكود ده غلط أو انتهت صلاحيته! تأكد من حروف الكود')}
+    }).catch(function(){sfxBad(true);rmsg('الكود ده غلط! تأكد من كتابته صح')});
   }else{
-    sfxBad();rmsg('الكود ده غلط! تأكد من حروف الكود من مستر عبدالرحمن');
+    sfxBad(true);rmsg('الكود ده غلط! تأكد من حروف الكود من مستر عبدالرحمن');
   }
 }
 /* === نظام تركيب الجمل التفاعلي (Sentence Builder) === */
@@ -2493,10 +2606,10 @@ function isPetAwake(){
 function feedPet(){
   if(isPetAwake()){rmsg('مرافقك الذكي نشيط وصاحي بالفعل! 🌟');return}
   var cost=30;
-  if(S.coins<cost){sfxBad();rmsg('محتاج 30 عملة لإطعام مرافقك، أو العب جولة واحدة وهيصحى مجاناً!');return}
+  if(S.coins<cost){sfxBad(true);rmsg('محتاج 30 عملة لإطعام مرافقك، أو العب جولة واحدة وهيصحى مجاناً!');return}
   S.coins-=cost;
   S.petFed=cDay();
-  save();ding();
+  save();sfxPet();
   var pt=petInfo();
   rmsg(pt.ic+' صحيت '+pt.n+'! جاهزة لمساعدتك في كل الجولات النهاردة 🌟');
   home();
@@ -2518,7 +2631,7 @@ function usePetSkill(){
   if(!G||G.done||G.petUsed||!isPetAwake())return;
   var pt=petInfo(),q=G.qs[G.i],isSB=(q[5]==='sb');
   G.petUsed=true;
-  ding();
+  sfxPet();
   if(pt.id==='owl'){
     if(!S.mute)speak(q[7]||q[0]);
     if(isSB){
@@ -2662,7 +2775,7 @@ function checkTPin(){
     rmsg('أهلاً بك يا مستر عبدالرحمن! 🎓🌟');
     syncGrpsFromCloud(function(){tPanelScr()});
   }else{
-    sfxBad();
+    sfxBad(true);
     rmsg('الرقم السري غير صحيح! 🔒');
   }
 }
@@ -2997,7 +3110,7 @@ function finishClsSession(){
   CLS_CUR_GRP=g.id;
   rmsg('جاري رفع الترتيب النهائي على السحابة ليظهر للطلاب وأولياء الأمور...');
   saveGrpToCloud(g).then(function(){
-    sfxWin();
+    sfxClassEnd();
     rmsg('تم رفع نتائج الحصة على المنصة بنجاح! ☁️🏆');
   });
   var sorted=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
@@ -3305,7 +3418,7 @@ function buyBld(id){
   if(lv>=3){rmsg('المبنى ده وصل لأعلى مستوى بالفعل!');return}
   var cost=bldCost(b,lv);
   if(S.coins<cost){
-    sfxBad();
+    sfxBad(true);
     rmsg('عملاتك مش كفاية! محتاج '+cost+' عملة — العب جولات أو مطاردات واجمع ذهب!');
     return;
   }
@@ -3313,7 +3426,7 @@ function buyBld(id){
   S.city[id]=lv+1;
   var ptBonus=b.pts[lv];
   addPts(ptBonus);
-  save();submit();sfxWin();
+  save();submit();sfxBuild();
   var nm=(lv+1===3)?b.n3:b.n;
   rmsg('🎉 مبروك! بنيت/طورت «'+nm+'» للمستوى '+(lv+1)+' (+'+ptBonus+' نقطة ترتيب)!');
   cityScr('build');
@@ -3324,7 +3437,7 @@ function claimCityTax(){
   S.cTax=cDay();
   S.coins+=inc;
   addPts(pts);
-  save();submit();sfxWin();
+  save();submit();sfxCoins();
   rmsg('💰 استلمت عوائد مدينتك: +'+inc+' عملة و+'+pts+' نقطة ترتيب!');
   cityScr();
 }
@@ -3346,6 +3459,7 @@ function launchPvpMatch(target){
   var trObj=roleInfo(target.role);
   var act=pvpActionMeta(S.role||'police',target.role);
   var qs=pickQs(3);
+  if(S.role==='police')sfxSiren();else ding();
   G={roleM:true,rObj:r,target:target,trObj:trObj,act:act,lv:8,tier:1,n:3,T:12,left:12,qs:qs,i:0,ok:0,earned:0,bad:[],done:false};
   showRoleMission();
 }
@@ -3374,7 +3488,7 @@ function pickRoleMission(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,r=G.rObj;
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
-  if(good){G.ok++;sfxOk(true);misDel(q);tsAdd(q,1)}
+  if(good){G.ok++;sfxOk(false);misDel(q);tsAdd(q,1)}
   else{G.bad.push(q);sfxBad();misAdd(q);tsAdd(q,0)}
   var last=(G.i>=2);
   $('#fb').innerHTML='<div class="card row">'+misterImg(good?'c':'h',44)+'<div class="sp"><b>'+(good?'ضربة موفقة ضد الهدف! '+cheer():'غلطة! الهدف بيحاول يهرب.. ركز!')+'</b><div class="sm">'+q[4]+'</div></div></div>'+
