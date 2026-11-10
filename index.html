@@ -159,14 +159,9 @@ body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5
 .w-tab.act{background:linear-gradient(135deg,#2F5F5A,#1B3B38);color:#FFE9B8;border-color:#FFD700;box-shadow:0 3px 0 #122826}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -833,7 +828,6 @@ function getGradeCurrQs(st,gr){
   var stgC=(st==='s'?SEC_CURR:(typeof CURRICULUM!=='undefined'?CURRICULUM[st]:null));
   if(!stgC)return [];
   var out=[];
-  /* نجمع أسئلة الصف الحالي بوزن مضاعف + أسئلة الصفوف السابقة في نفس المرحلة كمراجعة مألوفة */
   for(var g=1;g<=gr;g++){
     var cData=stgC[g];
     if(!cData)continue;
@@ -2851,7 +2845,6 @@ function renderClsPublicBoard(lbEl){
       return;
     }
     S.clsCodes=S.clsCodes||[];
-    /* للمستر: يرى كل المجموعات، وللطالب: يرى فقط المجموعات التي أدخل الكود السري الخاص بها! */
     var visibleGrps=T_AUTH?grps:grps.filter(function(g){
       return g.code && S.clsCodes.indexOf(g.code.toUpperCase())>=0;
     });
@@ -2876,7 +2869,7 @@ function renderClsPublicBoard(lbEl){
 
     var grpTabs=visibleGrps.length>1?'<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:8px">'+visibleGrps.map(function(g){
       var act=(g.id===curG.id);
-      return '<button class="pwb" style="flex:1 1 42%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_CUR_GRP=''+g.id+'';renderClsPublicBoard($('#lb'))">🏫 '+esc(g.name)+'</button>';
+      return '<button class="pwb" style="flex:1 1 42%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_CUR_GRP=\''+g.id+'\';renderClsPublicBoard($(\'#lb\'))">🏫 '+esc(g.name)+'</button>';
     }).join('')+'</div>':'';
 
     var stList=(curG.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
@@ -2884,7 +2877,7 @@ function renderClsPublicBoard(lbEl){
       var rk=i+1;
       var medal=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk));
       var isMe=(S.nick&&st.name.trim()===S.nick.trim());
-      var certBtn=(rk<=3&&(st.pts||0)>0)?'<button class="btn" style="font-size:11px;min-height:26px;padding:2px 8px;margin-right:6px" onclick="certScr({rk:'+rk+',pts:'+(st.pts||0)+',wk:wkKey(),name:''+esc(st.name)+'',st:''+(curG.stage||'m')+'',gr:'+(curG.grade||1)+'})">🎓 شهادة</button>':'';
+      var certBtn=(rk<=3&&(st.pts||0)>0)?'<button class="btn" style="font-size:11px;min-height:26px;padding:2px 8px;margin-right:6px" onclick="certScr({rk:'+rk+',pts:'+(st.pts||0)+',wk:wkKey(),name:\''+esc(st.name)+'\',st:\''+(curG.stage||'m')+'\',gr:'+(curG.grade||1)+'})">🎓 شهادة</button>':'';
       return '<div class="row'+(isMe?' me':(rk===1?' gold':''))+'" style="padding:6px 8px;border-radius:10px;border-bottom:1px dashed rgba(138,106,74,0.25)">'+
         '<b style="min-width:32px;font-size:16px">'+medal+'</b>'+
         '<div class="sp"><div style="font-weight:900;font-size:15px">'+esc(st.name)+'</div><div class="sm" style="font-size:11px;color:inherit">إجابات صحيحة: '+(st.ok||0)+' ✅ • مشاركات: '+(st.ans||0)+' '+(st.lastPts?'• آخر حصة: +'+st.lastPts+' نقطة':'')+'</div></div>'+
@@ -2957,13 +2950,13 @@ function tPanelScr(){
         '<div class="sp">'+
           '<div style="font-weight:900;font-size:16px;color:#7A3B3B">'+esc(g.name)+'</div>'+
           '<div class="sm">'+stgLbl(g.stage)+' • الصف '+stgName+' • <b>'+cnt+' طالب</b></div>'+
-          '<div class="sm" style="margin-top:2px">🔑 كود طلاب المجموعة: <b style="direction:ltr;display:inline-block;background:#FFE8B5;padding:1px 8px;border-radius:6px;border:1px solid #C9973F;color:#7A3B3B">'+esc(g.code||'')+'</b> <button class="pwb" style="display:inline-block;min-height:22px;padding:1px 6px;font-size:11px;width:auto" onclick="copyGrpCode(''+esc(g.code||'')+'')">نسخ الكود</button></div>'+
+          '<div class="sm" style="margin-top:2px">🔑 كود طلاب المجموعة: <b style="direction:ltr;display:inline-block;background:#FFE8B5;padding:1px 8px;border-radius:6px;border:1px solid #C9973F;color:#7A3B3B">'+esc(g.code||'')+'</b> <button class="pwb" style="display:inline-block;min-height:22px;padding:1px 6px;font-size:11px;width:auto" onclick="copyGrpCode(\''+esc(g.code||'')+'\')">نسخ الكود</button></div>'+
         '</div>'+
       '</div>'+
       '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">'+
-        '<button class="btn" style="flex:2;font-size:14px;min-height:40px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="clsSetupArena(''+g.id+'')">⚡ ابدأ بطولة الحصة الآن</button>'+
-        '<button class="btn t" style="flex:1;font-size:12px;min-height:40px;padding:6px" onclick="tEditGrpScr(''+g.id+'')">✏️ تعديل / الكود</button>'+
-        '<button class="btn t" style="font-size:12px;min-height:40px;padding:6px;background:#8B2E2E" onclick="tResetGrpPts(''+g.id+'')">🔄 تصفير</button>'+
+        '<button class="btn" style="flex:2;font-size:14px;min-height:40px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="clsSetupArena(\''+g.id+'\')">⚡ ابدأ بطولة الحصة الآن</button>'+
+        '<button class="btn t" style="flex:1;font-size:12px;min-height:40px;padding:6px" onclick="tEditGrpScr(\''+g.id+'\')">✏️ تعديل / الكود</button>'+
+        '<button class="btn t" style="font-size:12px;min-height:40px;padding:6px;background:#8B2E2E" onclick="tResetGrpPts(\''+g.id+'\')">🔄 تصفير</button>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -2972,7 +2965,7 @@ function tPanelScr(){
     '<button class="btn" style="font-size:17px;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="tEditGrpScr()">➕ إضافة مجموعة سنتر جديدة</button>'+
     (grpCards||'<div class="card" style="text-align:center;font-weight:700;padding:18px">مفيش مجموعات لسه يا مستر! اضغط على «➕ إضافة مجموعة سنتر جديدة» فوق واكتب أسماء طلاب المجموعة مرة واحدة.</div>')+
     '<div class="sp"></div>'+
-    '<button class="btn t" onclick="board('cls')">🏆 معاينة لوحة شرف السنتر للطلاب</button>'+
+    '<button class="btn t" onclick="board(\'cls\')">🏆 معاينة لوحة شرف السنتر للطلاب</button>'+
     '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
 }
 var EDIT_GRP_STG='m',EDIT_GRP_GRD=1;
@@ -2997,22 +2990,22 @@ function renderTEditForm(gid,gname,namesTxt,gcode){
       '<input id="egCode" class="inp" maxlength="14" placeholder="مثال: M2-ALEX" value="'+esc(gcode)+'" style="font-size:18px;direction:ltr;text-transform:uppercase;letter-spacing:2px;border-color:#C9973F">'+
       '<div class="sm" style="margin-top:4px">المرحلة الدراسية:</div>'+
       '<div class="row">'+
-        '<button class="pwb" style="'+(EDIT_GRP_STG==='p'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg('p',''+gid+'')">ابتدائي</button>'+
-        '<button class="pwb" style="'+(EDIT_GRP_STG==='m'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg('m',''+gid+'')">إعدادي</button>'+
-        '<button class="pwb" style="'+(EDIT_GRP_STG==='s'?'background:#C9973F;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg('s',''+gid+'')">ثانوي (بكالوريا)</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='p'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'p\',\''+gid+'\')">ابتدائي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='m'?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'m\',\''+gid+'\')">إعدادي</button>'+
+        '<button class="pwb" style="'+(EDIT_GRP_STG==='s'?'background:#C9973F;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchStg(\'s\',\''+gid+'\')">ثانوي (بكالوريا)</button>'+
       '</div>'+
       '<div class="sm" style="margin-top:4px">الصف الدراسي (تتحدد صعوبة الأسئلة تلقائياً حسب هذا الصف):</div>'+
       '<div class="row" style="flex-wrap:wrap;gap:6px">'+
         GList.map(function(n,i){
           var act=(EDIT_GRP_GRD===i+1);
-          return '<button class="pwb" style="flex:1 1 30%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchGrd('+(i+1)+',''+gid+'')">'+n+'</button>';
+          return '<button class="pwb" style="flex:1 1 30%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="preserveAndSwitchGrd('+(i+1)+',\''+gid+'\')">'+n+'</button>';
         }).join('')+
       '</div>'+
       '<div class="sm" style="margin-top:6px">أسماء طلاب المجموعة (اكتب أو الصق كل اسم في سطر مستقل):</div>'+
       '<textarea id="egStudents" class="inp" rows="8" placeholder="أحمد محمد&#10;مريم علي&#10;يوسف حسن&#10;سارة إبراهيم" style="font-size:16px;text-align:right;line-height:1.6">'+esc(namesTxt)+'</textarea>'+
     '</div>'+
-    '<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="tSaveGrp(''+gid+'')">💾 حفظ المجموعة والكود والأسماء</button>'+
-    (gid?'<button class="btn" style="background:#8B2E2E;font-size:14px;min-height:38px" onclick="tDeleteGrp(''+gid+'')">🗑️ حذف المجموعة</button>':'')+
+    '<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="tSaveGrp(\''+gid+'\')">💾 حفظ المجموعة والكود والأسماء</button>'+
+    (gid?'<button class="btn" style="background:#8B2E2E;font-size:14px;min-height:38px" onclick="tDeleteGrp(\''+gid+'\')">🗑️ حذف المجموعة</button>':'')+
     '<button class="btn t" onclick="tPanelScr()">رجوع للوحة المستر</button>';
 }
 function preserveAndSwitchStg(st,gid){
@@ -3032,9 +3025,7 @@ function tSaveGrp(gid){
   var cd=($('#egCode')&&$('#egCode').value.trim().toUpperCase())||makeGrpCode(EDIT_GRP_STG,EDIT_GRP_GRD);
   var raw=($('#egStudents')&&$('#egStudents').value)||'';
   if(nm.length<2){rmsg('اكتب اسم المجموعة الأول يا مستر!');return}
-  var lines=raw.split(/
-?
-/).map(function(x){return x.trim()}).filter(function(x){return x.length>0});
+  var lines=raw.split(/\r?\n/).map(function(x){return x.trim()}).filter(function(x){return x.length>0});
   if(!lines.length){rmsg('اكتب اسم طالب واحد على الأقل!');return}
   var oldG=gid?(S.cgrps||[]).filter(function(x){return x.id===gid})[0]:null;
   var oldMap={};
@@ -3095,16 +3086,16 @@ function clsSetupArena(gid){
   if(!g||!g.students||!g.students.length){rmsg('أضف طلاباً للمجموعة أولاً!');return}
   var stgName=gName(g.grade||1,g.stage);
   var srcBtn=function(k,lbl){
-    return '<button class="pwb" style="flex:1 1 30%;font-size:12px;'+(CLS_SRC===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SRC=''+k+'';clsSetupArena(''+gid+'')">'+lbl+'</button>';
+    return '<button class="pwb" style="flex:1 1 30%;font-size:12px;'+(CLS_SRC===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SRC=\''+k+'\';clsSetupArena(\''+gid+'\')">'+lbl+'</button>';
   };
   var modeBtn=function(k,lbl,sub){
-    return '<button class="card" style="flex:1 1 30%;cursor:pointer;text-align:center;padding:10px 6px;border-width:2.5px;'+(CLS_MODE===k?'background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#2F6B4A':'')+'" onclick="CLS_MODE=''+k+'';clsSetupArena(''+gid+'')">'+
+    return '<button class="card" style="flex:1 1 30%;cursor:pointer;text-align:center;padding:10px 6px;border-width:2.5px;'+(CLS_MODE===k?'background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#2F6B4A':'')+'" onclick="CLS_MODE=\''+k+'\';clsSetupArena(\''+gid+'\')">'+
       '<div style="font-weight:900;font-size:14px;color:#7A3B3B">'+lbl+'</div>'+
       '<div class="sm" style="font-size:11px;margin-top:3px">'+sub+'</div>'+
     '</button>';
   };
   var szBtn=function(num){
-    return '<button class="pwb" style="'+(CLS_SQUAD_SZ===num?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SQUAD_SZ='+num+';clsSetupArena(''+gid+'')">'+num+' طلاب في كل سؤال</button>';
+    return '<button class="pwb" style="'+(CLS_SQUAD_SZ===num?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_SQUAD_SZ='+num+';clsSetupArena(\''+gid+'\')">'+num+' طلاب في كل سؤال</button>';
   };
   app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>إعداد بطولة الحصة 🏫⚡</h1><div>'+esc(g.name)+' • الصف '+stgName+' ('+g.students.length+' طالب)</div></div>'+
     '<div class="card">'+
@@ -3132,7 +3123,7 @@ function clsSetupArena(gid){
       (CLS_MODE==='squad'?'<div style="margin-top:8px"><div class="sm" style="margin-bottom:4px">عدد الطلاب في كل سؤال:</div><div class="row" style="gap:6px">'+szBtn(2)+szBtn(3)+szBtn(4)+'</div></div>':'')+
     '</div>'+
     '<div class="sp"></div>'+
-    '<button class="btn" style="font-size:20px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="startClsLive(''+gid+'')">🚀 انطلاق بطولة الحصة الآن!</button>'+
+    '<button class="btn" style="font-size:20px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="startClsLive(\''+gid+'\')">🚀 انطلاق بطولة الحصة الآن!</button>'+
     '<button class="btn t" onclick="tPanelScr()">رجوع للمجموعات</button>';
 }
 function genClsQuestions(g,src,count){
@@ -3147,7 +3138,6 @@ function genClsQuestions(g,src,count){
     }
   }
   if(!pool.length){
-    /* شامل متدرج حسب الصف الدراسي: يسحب أولاً من وحدات الصف الحالي والصفوف السابقة المألوفة للطالب + الأسئلة المناسبة لمستواه */
     var gradeCurr=getGradeCurrQs(st,gr);
     var genIdx=getStagePool(st,gr);
     var genFiltered=shuffle(genIdx.map(function(i){return Q[i]})).slice(0,Math.max(15,gradeCurr.length));
@@ -3160,7 +3150,6 @@ function genClsQuestions(g,src,count){
   }
   return out.slice(0,count);
 }
-/* اختيار عادل ذكي يرتب الطلاب دائماً حسب الأقل مشاركة في حصة اليوم (roundTurns) فلا ينتظر أحد طويلاً */
 function pickBalancedSquad(g,sz){
   var N=(g.students||[]).length;
   if(!N)return [0];
@@ -3228,7 +3217,7 @@ function showClsLiveQ(){
     var letters=['A','B','C','D'];
     return '<button class="opt" style="display:flex;align-items:center;justify-content:space-between;font-size:21px;padding:12px 16px" onclick="pickClsLiveOpt('+k+')">'+
       '<span style="background:#2F5F5A;color:#FFE9B8;border-radius:8px;padding:2px 10px;font-size:15px">'+letters[k]+'</span>'+
-      '<span style="flex:1;text-align:center"'+(/[؀-ۿ]/.test(q[2][x])?' dir="rtl"':'')+'>'+esc(q[2][x])+'</span>'+
+      '<span style="flex:1;text-align:center"'+(/[\u0600-\u06FF]/.test(q[2][x])?' dir="rtl"':'')+'>'+esc(q[2][x])+'</span>'+
     '</button>';
   }).join('');
 
@@ -3237,7 +3226,7 @@ function showClsLiveQ(){
     var sqCards=cg.squad.map(function(idx){
       var st=cg.grp.students[idx];
       var isOk=!!cg.sqStatus[idx];
-      return '<button onclick="toggleSquadSt('+idx+')" style="flex:1 1 44%;background:'+(isOk?'linear-gradient(135deg,#2F6B4A,#1B432C)':'linear-gradient(135deg,#8B2E2E,#521818)')+';color:#FFE9B8;border:2.5px solid '+(isOk?'#FFD700':'#FF9999')+';border-radius:14px;padding:8px 6px;cursor:pointer;font-family:'Cairo',sans-serif;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,0.3)">'+
+      return '<button onclick="toggleSquadSt('+idx+')" style="flex:1 1 44%;background:'+(isOk?'linear-gradient(135deg,#2F6B4A,#1B432C)':'linear-gradient(135deg,#8B2E2E,#521818)')+';color:#FFE9B8;border:2.5px solid '+(isOk?'#FFD700':'#FF9999')+';border-radius:14px;padding:8px 6px;cursor:pointer;font-family:\'Cairo\',sans-serif;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,0.3)">'+
         '<div style="font-size:17px;font-weight:900;color:#FFF">'+(isOk?'✅ ':'❌ ')+esc(st.name)+'</div>'+
         '<div style="font-size:11px;color:#FFE9B8;margin-top:2px">شارك: '+(st.roundTurns||0)+' مرة • اليوم: +'+(st.lastPts||0)+'</div>'+
       '</button>';
@@ -3247,8 +3236,8 @@ function showClsLiveQ(){
       '<div class="row" style="flex-wrap:wrap;gap:8px;margin:8px 0">'+sqCards+'</div>'+
       '<div class="row" style="justify-content:center;gap:6px">'+
         '<button class="btn t" style="font-size:11px;min-height:30px;padding:3px 10px" onclick="nextClsTurnStudents();ding();showClsLiveQ()">🎲 دفعة أخرى</button>'+
-        '<button class="btn t" style="font-size:11px;min-height:30px;padding:3px 10px" onclick="CLS_GAME.mode='turn';nextClsTurnStudents();showClsLiveQ()">🎯 فردي</button>'+
-        '<button class="btn t" style="font-size:11px;min-height:30px;padding:3px 10px" onclick="CLS_GAME.mode='buzz';showClsLiveQ()">✋ رفع اليد</button>'+
+        '<button class="btn t" style="font-size:11px;min-height:30px;padding:3px 10px" onclick="CLS_GAME.mode=\'turn\';nextClsTurnStudents();showClsLiveQ()">🎯 فردي</button>'+
+        '<button class="btn t" style="font-size:11px;min-height:30px;padding:3px 10px" onclick="CLS_GAME.mode=\'buzz\';showClsLiveQ()">✋ رفع اليد</button>'+
       '</div>'+
     '</div>';
   }else if(cg.mode==='turn'){
@@ -3258,13 +3247,13 @@ function showClsLiveQ(){
       '<div style="font-size:12px;color:#CFE3D4">مشاركاته اليوم: <b>'+(curSt.roundTurns||0)+'</b> • نقاط حصة اليوم: <b>+'+(curSt.lastPts||0)+'</b> • الإجمالي: <b>'+(curSt.pts||0)+'</b></div>'+
       '<div class="row" style="justify-content:center;margin-top:8px;gap:6px;flex-wrap:wrap">'+
         '<button class="btn t" style="font-size:11px;min-height:30px;padding:4px 8px" onclick="skipClsStudent()">🎲 طالب آخر</button>'+
-        '<button class="btn t" style="font-size:11px;min-height:30px;padding:4px 8px" onclick="CLS_GAME.mode='squad';nextClsTurnStudents();showClsLiveQ()">⚡ نظام دفعة ('+cg.squadSz+' طلاب)</button>'+
-        '<button class="btn t" style="font-size:11px;min-height:30px;padding:4px 8px" onclick="CLS_GAME.mode='buzz';showClsLiveQ()">✋ رفع اليد</button>'+
+        '<button class="btn t" style="font-size:11px;min-height:30px;padding:4px 8px" onclick="CLS_GAME.mode=\'squad\';nextClsTurnStudents();showClsLiveQ()">⚡ نظام دفعة ('+cg.squadSz+' طلاب)</button>'+
+        '<button class="btn t" style="font-size:11px;min-height:30px;padding:4px 8px" onclick="CLS_GAME.mode=\'buzz\';showClsLiveQ()">✋ رفع اليد</button>'+
       '</div>'+
     '</div>';
   }else{
     studentSelectorHtml='<div class="card" style="border-color:#7A3B3B">'+
-      '<div class="row" style="margin-bottom:6px"><span class="tag" style="background:#7A3B3B;flex:1">✋ اختار الطالب اللي جاوب: <b>'+esc(curSt.name)+'</b></span><button class="pwb" style="flex:none;font-size:11px;min-height:28px;padding:2px 8px" onclick="CLS_GAME.mode='squad';nextClsTurnStudents();showClsLiveQ()">⚡ نظام الدفعة</button></div>'+
+      '<div class="row" style="margin-bottom:6px"><span class="tag" style="background:#7A3B3B;flex:1">✋ اختار الطالب اللي جاوب: <b>'+esc(curSt.name)+'</b></span><button class="pwb" style="flex:none;font-size:11px;min-height:28px;padding:2px 8px" onclick="CLS_GAME.mode=\'squad\';nextClsTurnStudents();showClsLiveQ()">⚡ نظام الدفعة</button></div>'+
       '<div class="st-grid">'+cg.grp.students.map(function(s,idx){
         var isSel=(idx===cg.curStIdx);
         return '<button class="st-pill'+(isSel?' picked':'')+'" onclick="CLS_GAME.curStIdx='+idx+';showClsLiveQ()"><span>'+esc(s.name)+'</span><span style="font-size:11px;opacity:0.8">('+(s.roundTurns||0)+') '+(s.pts||0)+'</span></button>';
@@ -3361,7 +3350,6 @@ function pickClsLiveOpt(k){
     }else{
       sfxBad();
       if(!cg.stealMode && cg.grp.students.length>1){
-        /* لا نكشف الإجابة الصحيحة فوراً لكي نعطي فرصة لخطف السؤال! */
         var clickedBtn=document.querySelectorAll('.opt')[k];
         if(clickedBtn){clickedBtn.disabled=true;clickedBtn.classList.add('bad')}
         msg='❌ إجابة خاطئة من «'+esc(st.name)+'»! هل تريد تحويل السؤال لطالب آخر لخطف +50 نقطة؟';
@@ -3422,7 +3410,7 @@ function finishClsSession(){
     '</div>'+
     '<div class="card" style="display:flex;flex-direction:column;gap:6px"><div class="tag">الترتيب النهائي للمجموعة</div>'+rowsHtml+'</div>'+
     '<button class="btn" style="font-size:18px;background:#1E7E48" onclick="shareClsBoard()">📲 إرسال التقرير وكود المجموعة على واتساب</button>'+
-    '<button class="btn t" onclick="board('cls')">📊 عرض لوحة شرف السنتر</button>'+
+    '<button class="btn t" onclick="board(\'cls\')">📊 عرض لوحة شرف السنتر</button>'+
     '<button class="btn t" onclick="tPanelScr()">🔐 العودة للوحة تحكم المستر</button>';
 }
 var ROLES=[
