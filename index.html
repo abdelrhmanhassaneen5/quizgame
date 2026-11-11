@@ -4,12 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تحدّي الأصحاب</title>
+<meta name="description" content="تحدّي الأصحاب — منصة ألعاب تعليمية للغة الإنجليزية مع مستر عبدالرحمن حسانين (Grammora &amp; EngliFocus)">
+<meta name="theme-color" id="metaTheme" content="#2F5F5A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="تحدّي الأصحاب">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Lemonada:wght@600;700&display=swap">
 <style>
 :root{--paper:#FBE7B5;--card:#FFE8B5;--ink:#4A2F22;--teal:#2F5F5A;--brown:#6B4A3A;--gold:#C9973F;--red:#7A3B3B;--ok:#2F6B4A;--bad:#8B2E2E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0;height:100%}
 body{background:#2B1B12;font-family:'Cairo',sans-serif;color:var(--ink)}
-#app{max-width:430px;min-height:100%;margin:0 auto;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+#app{flex:1;min-width:0;box-sizing:border-box;background:var(--paper) repeating-linear-gradient(0deg,transparent 0 31px,rgba(150,110,50,.13) 31px 32px);padding:18px 16px;display:flex;flex-direction:column;gap:12px}
 .hd{background:var(--teal);border:2px solid var(--gold);border-radius:16px;color:#FFE9B8;text-align:center;padding:14px}
 .hd h1{font-family:Lemonada,sans-serif;font-size:24px;margin:0}
 .hd div{font-size:13px;margin-top:6px}
@@ -92,7 +100,7 @@ body.dark .mode-tile.surv{background:linear-gradient(135deg,#3A2318,#2A1810);col
 body.dark .mode-tile.curr{background:linear-gradient(135deg,#1E3532,#152624);color:#FFE9B8}
 body.dark .stat-pill .lbl{color:#CDB88A}
 .bnav-spacer{height:72px;flex:none}
-.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--teal);border-top:3px solid var(--gold);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:900;box-shadow:0 -4px 16px rgba(0,0,0,0.35);box-sizing:border-box}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:var(--teal);border-top:3px solid var(--gold);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:900;box-shadow:0 -4px 16px rgba(0,0,0,0.35);box-sizing:border-box}
 .bnav button{background:none;border:none;color:rgba(255,233,184,0.68);font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;cursor:pointer;border-radius:10px;position:relative}
 .bnav button .ni{font-size:20px;line-height:1.1}
 .bnav button.act{color:#FFE9B8;background:rgba(255,255,255,0.14);font-weight:900}
@@ -163,24 +171,313 @@ body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5
 .psg-box{background:linear-gradient(135deg,#FFFDF7,#FFF5DA);border:2.5px solid #2F5F5A;border-radius:16px;padding:14px;direction:ltr;text-align:left;font-size:17px;line-height:1.75;font-weight:700;color:#3A2318;box-shadow:inset 0 2px 8px rgba(0,0,0,0.08)}
 body.dark .psg-box{background:linear-gradient(135deg,#262626,#1C1C1C);color:#F5F5F5;border-color:#C9973F}
 .psg-hl{background:#FFE066;color:#4A2F22;padding:1px 5px;border-radius:6px;border-bottom:2px solid #C9973F;font-weight:900;transition:all 0.3s}
+
+/* ================================================================
+   v6 — Cross-platform shell, dashboard layout, themes, motion
+   ================================================================ */
+#shell{min-height:100%;display:flex;flex-direction:column}
+#layout{flex:1;display:flex;width:100%;max-width:560px;margin:0 auto;box-sizing:border-box}
+#side{display:none}
+.only-m{display:contents}
+
+/* --- Top bar: brand, connection badge, theme pill, install --- */
+#topbar{position:sticky;top:0;z-index:950;display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--teal);color:#FFE9B8;border-bottom:2px solid var(--gold);box-shadow:0 2px 10px rgba(0,0,0,.25);font-family:'Cairo',sans-serif;min-height:44px;box-sizing:border-box}
+.tb-brand{display:flex;align-items:center;gap:6px;font-family:Lemonada,sans-serif;font-weight:700;font-size:15px;white-space:nowrap}
+.tb-brand small{font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;opacity:.8;display:none}
+.net{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:900;padding:3px 10px;border-radius:14px;background:rgba(0,0,0,.22);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;transition:background .3s,color .3s}
+.net.off{background:#E3B03F;color:#3A2318}
+.tb-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.16);color:inherit;border:1.5px solid rgba(255,233,184,.55);border-radius:18px;padding:4px 11px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;cursor:pointer;white-space:nowrap;min-height:32px;transition:transform .15s,background .2s}
+.tb-pill:active{transform:scale(.95)}
+.tb-pill .lg{display:none}
+#insBtn{background:#FFD700;color:#3A2318;border-color:#FFF}
+@media(max-width:430px){.tb-brand b{display:none}}
+
+/* --- Sidebar (tablet / desktop / smartboard) --- */
+.snav{display:flex;flex-direction:column;gap:4px;background:var(--teal);border:2px solid var(--gold);border-radius:16px;padding:8px}
+.snav button{display:flex;align-items:center;gap:10px;background:none;border:none;color:rgba(255,233,184,.78);font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;padding:10px 12px;border-radius:12px;cursor:pointer;text-align:right;position:relative;transition:background .18s,color .18s,transform .18s}
+.snav button .ni{font-size:20px;line-height:1;width:26px;text-align:center}
+.snav button.act{background:rgba(255,255,255,.18);color:#FFE9B8;font-weight:900;box-shadow:inset -3px 0 0 #FFD700}
+.snav .bdot{position:absolute;top:8px;left:12px;width:9px;height:9px;border-radius:50%;background:#FF4D4D;border:1.5px solid #fff}
+.side-hint{font-size:11px;font-weight:700;line-height:1.7;color:#FFE9B8;opacity:.85;text-align:center;padding:2px 6px}
+body.th-modern .side-hint{color:#475569}
+.side-lock{display:none;background:#E3B03F;color:#3A2318;border-radius:12px;padding:8px;font-size:12px;font-weight:900;text-align:center}
+
+/* --- Home hub: hero, summary, category tabs --- */
+.hero-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.sum-card{display:flex;flex-direction:column;gap:8px}
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sum-cell{background:rgba(47,95,90,.1);border-radius:12px;padding:8px 2px;text-align:center}
+.sum-cell b{display:block;font-size:17px;font-weight:900;line-height:1.2}
+.sum-cell span{font-size:10.5px;font-weight:700;color:var(--teal)}
+.parent-btn{width:100%;font-family:'Cairo',sans-serif;font-weight:900;font-size:15px;min-height:46px;background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;box-shadow:0 5px 0 #14274A;display:flex;align-items:center;justify-content:center;gap:8px}
+.parent-btn:active{box-shadow:0 2px 0 #14274A}
+.h-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:rgba(0,0,0,.08);padding:5px;border-radius:16px}
+.h-tab{background:transparent;border:2px solid transparent;border-radius:12px;padding:8px 4px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12.5px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.3;transition:background .2s,color .2s,transform .15s,box-shadow .2s;position:relative}
+.h-tab .ti{font-size:22px;line-height:1}
+.h-tab.act{background:var(--teal);color:#FFE9B8;border-color:var(--gold);box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.h-tab .bdot{position:absolute;top:4px;left:8px;width:9px;height:9px;border-radius:50%;background:#FF4D4D;border:1.5px solid #fff}
+.h-panel{display:flex;flex-direction:column;gap:12px;animation:fadeIn .22s ease-out}
+.h-cols{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+.h-sec{font-weight:900;font-size:13px;color:var(--teal);display:flex;align-items:center;gap:8px}
+.h-sec::after{content:"";flex:1;height:2px;background:currentColor;opacity:.18;border-radius:2px}
+.mode-tile .m-new{position:absolute;top:8px;left:8px;background:#FFD700;color:#4A2F22;font-size:9.5px;font-weight:900;padding:1px 6px;border-radius:6px}
+.mode-tile.t-daily{background:linear-gradient(135deg,#FFF8E7,#F6D788);border-color:#C9973F;box-shadow:0 4px 0 #8A6A4A}
+.mode-tile.t-room{background:linear-gradient(135deg,#FBEDEA,#F6CFC6);border-color:#7A3B3B;box-shadow:0 4px 0 #4A1C1C}
+.mode-tile.t-city{background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38}
+.mode-tile.t-spk{background:linear-gradient(135deg,#FFF8E7,#FFE0B2);border-color:#7A3B3B;box-shadow:0 4px 0 #4A1C1C}
+.mode-tile.t-psg{background:linear-gradient(135deg,#EAF3FA,#D6E8F5);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38}
+.mode-tile.t-sb{background:linear-gradient(135deg,#FFFDF5,#E6F4F1);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38}
+.mode-tile.t-daily,.mode-tile.t-room,.mode-tile.t-city,.mode-tile.t-spk,.mode-tile.t-psg,.mode-tile.t-sb,.mode-tile.surv,.mode-tile.curr{color:#4A2F22}
+.mode-tile.t-daily .m-sb,.mode-tile.t-room .m-sb,.mode-tile.t-spk .m-sb{color:#7A3B3B}
+.mode-tile.t-city .m-sb,.mode-tile.t-psg .m-sb,.mode-tile.t-sb .m-sb,.mode-tile.curr .m-sb{color:#2F5F5A}
+body.dark .mode-tile.t-daily,body.dark .mode-tile.t-room,body.dark .mode-tile.t-spk{background:linear-gradient(135deg,#3A2318,#2A1810);color:#FFE9B8}
+body.dark .mode-tile.t-city,body.dark .mode-tile.t-psg,body.dark .mode-tile.t-sb{background:linear-gradient(135deg,#1E3532,#152624);color:#FFE9B8}
+body.dark .mode-tile .m-sb{color:#CDB88A!important}
+/* readable text on cards that carry their own light inline background while a dark look is active */
+body.dark .card[style*="background"]{color:#3A2318}
+body.dark .card[style*="background"] .sm{color:#2F5F5A}
+
+/* --- Parent portal (formal, printable) --- */
+.pr-ov{align-items:flex-start;overflow-y:auto}
+.pr-box{width:100%;max-width:760px;margin:auto;background:#FFFFFF;color:#1F2937;border:1px solid #D7DEE8;border-top:8px solid #1E3C72;border-radius:16px;padding:22px 20px;box-shadow:0 18px 48px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:14px;font-family:'Cairo',sans-serif;animation:popIn .28s cubic-bezier(.2,.9,.3,1.2)}
+.pr-head{display:flex;align-items:center;gap:12px;border-bottom:2px solid #E5EAF2;padding-bottom:12px}
+.pr-head h2{margin:0;font-size:20px;font-weight:900;color:#1E3C72;line-height:1.4}
+.pr-head p{margin:2px 0 0;font-size:12.5px;font-weight:700;color:#64748B}
+.pr-id{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.pr-id div{background:#F4F7FB;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700;color:#475569}
+.pr-id b{display:block;color:#111827;font-size:15px;font-weight:900}
+.pr-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:600px){.pr-kpis{grid-template-columns:repeat(3,1fr)}}
+.pr-kpi{border:1px solid #E1E7F0;border-radius:12px;padding:10px 6px;text-align:center}
+.pr-kpi b{display:block;font-size:22px;font-weight:900;color:#1E3C72;line-height:1.3}
+.pr-kpi span{font-size:12px;font-weight:700;color:#64748B}
+.pr-sec{font-size:14px;font-weight:900;color:#1E3C72;border-right:4px solid #C9973F;padding-right:8px;margin-top:2px}
+.pr-skill{display:grid;grid-template-columns:minmax(120px,1.2fr) 2fr auto;gap:8px;align-items:center;font-size:13px;font-weight:700}
+.pr-bar{height:10px;border-radius:6px;background:#E8EDF4;overflow:hidden}
+.pr-bar i{display:block;height:100%;border-radius:6px;transition:width .6s ease}
+.pr-note{background:#F8FAFC;border:1px dashed #C7D2E0;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;line-height:1.8;color:#334155}
+.pr-row{display:flex;align-items:center;gap:8px;border:1px solid #E1E7F0;border-radius:12px;padding:8px 10px;font-size:13px;font-weight:700}
+.pr-row .sp{flex:1}
+.pr-act{display:flex;flex-wrap:wrap;gap:8px}
+.pr-btn{flex:1 1 150px;font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;min-height:44px;border-radius:12px;border:0;cursor:pointer;color:#fff;background:#1E3C72;transition:transform .15s,filter .2s}
+.pr-btn.g{background:#1E7E48}.pr-btn.l{background:#E8EDF4;color:#1F2937}
+.pr-btn.s{flex:none;min-height:32px;font-size:12px;padding:2px 12px}
+.pr-btn:active{transform:scale(.97)}
+.pr-foot{font-size:11px;font-weight:700;color:#94A3B8;text-align:center;line-height:1.7}
+
+/* --- Motion & micro-interactions --- */
+@keyframes popIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+.fade-in{animation-duration:.22s}
+.wn-box{animation:popIn .28s cubic-bezier(.2,.9,.3,1.2)}
+.btn,.opt,.lv,.pwb,.mode-tile,.w-chip,.st-pill,.role-card,.bdg-card,.c-plot,.w-tab,.stat-pill,.hero-play,.pet-btn,.h-tab{transition:transform .16s cubic-bezier(.2,.8,.3,1),box-shadow .16s ease,filter .16s ease,background-color .2s ease,border-color .2s ease,opacity .2s ease;-webkit-tap-highlight-color:transparent}
+.btn,.opt,.lv,.pwb,.mode-tile,.hero-play,.tb-pill,.h-tab,.snav button,.pr-btn{position:relative;overflow:hidden}
+.rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rpl .55s ease-out forwards;pointer-events:none}
+@keyframes rpl{to{transform:scale(2.6);opacity:0}}
+.opt.ok{animation:optOk .4s ease}
+.opt.bad{animation:optBad .4s ease}
+@keyframes optOk{40%{transform:scale(1.035)}}
+@keyframes optBad{20%{transform:translateX(-6px)}45%{transform:translateX(6px)}70%{transform:translateX(-3px)}}
+.bar i{transition:width .25s linear}
+#bf{transition:none}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9800}
+@media(hover:hover) and (pointer:fine){
+  .btn:hover:not(:disabled),.opt:hover:not(:disabled),.lv:hover:not(:disabled),.pwb:hover:not(:disabled),.mode-tile:hover,.hero-play:hover,.role-card:hover,.bdg-card:hover,.c-plot:hover,.st-pill:hover,.w-chip:hover,.w-tab:hover,.pet-btn:hover:not(:disabled),.pr-btn:hover{transform:translateY(-3px);filter:brightness(1.05)}
+  .snav button:hover{background:rgba(255,255,255,.12);color:#FFE9B8;transform:translateX(-3px)}
+  .h-tab:hover:not(.act){background:rgba(255,255,255,.4)}
+  .tb-pill:hover{background:rgba(255,255,255,.3)}
+  .btn:active:not(:disabled),.opt:active:not(:disabled),.mode-tile:active,.hero-play:active,.lv:active:not(:disabled){transform:translateY(3px);filter:none}
+  /* keyboard hint badges on answer buttons */
+  #app{counter-reset:optn}
+  #app .opt{counter-increment:optn}
+  #app .opt:not(.cls-o)::before{content:counter(optn);float:left;min-width:22px;height:22px;line-height:22px;border-radius:7px;background:rgba(47,95,90,.14);color:var(--teal);font-size:12px;font-weight:900;text-align:center;margin-inline-end:8px}
+  #app .opt.ok::before,#app .opt.bad::before{background:rgba(255,255,255,.25);color:#fff}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ================= Tablet & up: 2-column dashboard ================= */
+@media(min-width:768px){
+  #topbar{padding:8px 20px}
+  .tb-brand{font-size:17px}
+  .tb-brand small,.tb-pill .lg{display:inline}
+  .net{font-size:12px}
+  #layout{max-width:1180px;gap:16px;padding:16px;align-items:flex-start}
+  #side{display:flex;flex-direction:column;gap:12px;width:268px;flex:none;position:sticky;top:64px;max-height:calc(100vh - 80px);overflow-y:auto;scrollbar-width:thin;padding-bottom:4px}
+  #side .stat-strip{grid-template-columns:repeat(3,1fr)}
+  #side .pet-box{flex-wrap:wrap}
+  #side .pet-box .sp{flex:1 1 150px}
+  #side .pet-box .pet-btn{width:100%;justify-content:center}
+  #side .prof-card .row{flex-wrap:wrap}
+  #side .prof-card .row>div:last-child{flex-direction:row!important;width:100%}
+  #side .prof-card .row>div:last-child .btn{flex:1}
+  #app{min-height:calc(100vh - 92px);border-radius:22px;border:2px solid var(--gold);padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.28);gap:14px}
+  .bnav,.bnav-spacer,.only-m{display:none}
+  .hero-play{padding:20px 22px}
+  .h-tab{flex-direction:row;justify-content:center;gap:8px;font-size:15px;padding:11px 8px}
+  .mode-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .mode-tile{padding:16px 14px;min-height:112px}
+  .mode-tile .m-ic{font-size:30px}.mode-tile .m-tt{font-size:16px}.mode-tile .m-sb{font-size:12px}
+  .h-cols{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .bdg-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+  .role-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+  .city-plots{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+  .st-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));max-height:300px}
+  .wn-box{max-width:560px;padding:20px}
+  .fc-scene{height:300px}
+  #toast{font-size:16px}
+  /* focused screens (intros, games, results): comfortable centred column */
+  body.scr-focus #app>*{width:100%;max-width:760px;margin-inline:auto;box-sizing:border-box}
+  body.scr-play .side-lock{display:block}
+  body.scr-play .snav{opacity:.45;pointer-events:none}
+  body.scr-play .en{font-size:26px}
+  body.scr-play .opt{font-size:21px;min-height:56px}
+}
+@media(min-width:1024px){
+  .hero-grid{grid-template-columns:1.25fr 1fr;align-items:stretch}
+  #side{width:300px}
+  #app{padding:26px}
+  .sum-cell b{font-size:19px}
+}
+
+/* ============ Classroom projector / smartboard (teacher live arena) ============ */
+.cls-opts{display:flex;flex-direction:column;gap:12px;direction:ltr}
+.cls-qtxt{direction:ltr;font-size:24px;font-weight:900;line-height:1.4;margin:10px 0;color:#7A3B3B}
+body.dark .cls-qtxt{color:#FFD98A}
+@media(min-width:768px){
+  body.scr-proj #side{display:none}
+  body.scr-proj #layout{max-width:min(1680px,97vw)}
+  body.scr-proj #app>*{max-width:none}
+  body.scr-proj .cls-opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  body.scr-proj .cls-qbox{padding:clamp(18px,2.4vw,40px)}
+  body.scr-proj .cls-qtxt{font-size:clamp(28px,3.3vw,64px)}
+  body.scr-proj .cls-qbox .cls-ar{font-size:clamp(18px,1.9vw,34px)!important}
+  body.scr-proj .cls-qbox .tag{font-size:clamp(14px,1.3vw,24px)}
+  body.scr-proj .cls-opts .opt{font-size:clamp(22px,2.5vw,46px)!important;padding:clamp(12px,1.6vw,28px) clamp(16px,2vw,32px)!important;border-width:3px;border-radius:20px}
+  body.scr-proj .cls-opts .opt>span:first-child{font-size:clamp(16px,1.7vw,32px)!important;padding:4px clamp(10px,1.2vw,22px)!important}
+  body.scr-proj .cls-spotlight button>div:first-child{font-size:clamp(18px,1.9vw,34px)!important}
+  body.scr-proj .cls-spotlight>div:nth-child(2){font-size:clamp(28px,3vw,54px)!important}
+  body.scr-proj .cls-spotlight .btn.t{font-size:clamp(12px,1vw,19px)!important;min-height:clamp(30px,2.6vw,48px)!important}
+  body.scr-proj #app>.row:last-child .btn,body.scr-proj #clsFb>.btn{font-size:clamp(15px,1.3vw,26px)!important;min-height:clamp(42px,3.4vw,64px)!important}
+  body.scr-proj #clsFb .card{font-size:clamp(15px,1.4vw,26px)}
+  body.scr-proj #clsFb .card div{font-size:inherit!important}
+}
+
+/* ======================= Theme: Modern EdTech Glass ======================= */
+body.th-modern{background:#E6ECF5;--paper:#F4F7FB;--card:#FFFFFF;--ink:#1E293B;--teal:#047857;--brown:#475569;--gold:#6366F1;--red:#4F46E5;--ok:#059669;--bad:#DC2626;color:var(--ink)}
+body.th-modern #app{background:radial-gradient(900px 420px at 100% -10%,rgba(99,102,241,.16),transparent 60%),radial-gradient(760px 400px at 0% 0%,rgba(16,185,129,.13),transparent 60%),#F4F7FB}
+body.th-modern #topbar{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#1E293B;border-bottom:1px solid #DDE4EF;box-shadow:0 4px 18px rgba(30,41,59,.08)}
+body.th-modern .tb-brand{color:#4F46E5}
+body.th-modern .net{background:#E7F8F0;color:#047857}
+body.th-modern .net.off{background:#FEF3C7;color:#92400E}
+body.th-modern .tb-pill{background:#EEF2FF;border-color:#C7D2FE;color:#3730A3}
+body.th-modern .card{background:rgba(255,255,255,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(99,102,241,.2);border-radius:18px;box-shadow:0 8px 24px rgba(30,41,59,.08)}
+body.th-modern .hd{background:linear-gradient(135deg,#4F46E5,#7C3AED);border:0;color:#fff;border-radius:20px;box-shadow:0 10px 26px rgba(79,70,229,.3)}
+body.th-modern .btn{border:0;border-radius:16px;box-shadow:0 6px 16px rgba(79,70,229,.3);color:#fff;font-family:'Cairo',sans-serif;font-weight:900}
+body.th-modern .btn.t{box-shadow:0 6px 16px rgba(4,120,87,.28)}
+body.th-modern .btn:active{box-shadow:0 2px 6px rgba(79,70,229,.3)}
+body.th-modern .opt{background:#fff;border:2px solid #E2E8F0;box-shadow:0 3px 0 #E2E8F0;border-radius:16px}
+body.th-modern .opt.ok{background:var(--ok);border-color:#34D399;box-shadow:0 3px 0 #047857}
+body.th-modern .opt.bad{background:var(--bad);border-color:#F87171;box-shadow:0 3px 0 #991B1B}
+body.th-modern .lv,body.th-modern .pwb,body.th-modern .w-tab,body.th-modern .st-pill,body.th-modern .w-chip,body.th-modern .role-card,body.th-modern .bdg-card{border-color:#E2E8F0;box-shadow:0 3px 0 #E2E8F0}
+body.th-modern .lv.boss{background:linear-gradient(135deg,#4F46E5,#7C3AED);border-color:#C7D2FE;color:#fff}
+body.th-modern .mode-tile{border:1px solid #E2E8F0;box-shadow:0 8px 20px rgba(30,41,59,.08);border-radius:20px}
+body.th-modern .inp{background:#fff;border-color:#CBD5E1}
+body.th-modern .bar{background:#E2E8F0;border:0}
+body.th-modern .chip,body.th-modern .stat-pill{border:1px solid #C7D2FE;box-shadow:0 4px 12px rgba(30,41,59,.06)}
+body.th-modern .stat-pill .lbl{color:#64748B}
+body.th-modern .prof-card{background:linear-gradient(135deg,#4F46E5,#0EA5A4);border:0;box-shadow:0 10px 26px rgba(79,70,229,.28)}
+body.th-modern .hero-play{background:linear-gradient(135deg,#4F46E5,#7C3AED);border:0;box-shadow:0 10px 26px rgba(79,70,229,.35)}
+body.th-modern .bnav{background:rgba(255,255,255,.94);border-top:1px solid #DDE4EF;backdrop-filter:blur(12px)}
+body.th-modern .bnav button{color:#64748B}
+body.th-modern .bnav button.act{color:#4F46E5;background:#EEF2FF}
+body.th-modern .snav{background:rgba(255,255,255,.84);border:1px solid rgba(99,102,241,.2);box-shadow:0 8px 24px rgba(30,41,59,.08)}
+body.th-modern .snav button{color:#475569}
+body.th-modern .snav button.act{background:#EEF2FF;color:#4F46E5;box-shadow:inset -3px 0 0 #4F46E5}
+body.th-modern .h-tabs{background:#E8EDF6}
+body.th-modern .h-tab.act{background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;border-color:transparent}
+body.th-modern .sum-cell{background:#EEF2FF}
+body.th-modern .wn-box{border:1px solid #C7D2FE}
+body.th-modern .pet-box{background:rgba(255,255,255,.84);border:1px solid #C7D2FE;box-shadow:0 8px 20px rgba(30,41,59,.08)}
+@media(min-width:768px){body.th-modern #app{border:1px solid #DDE4EF;box-shadow:0 14px 40px rgba(30,41,59,.1)}}
+
+/* ======================= Theme: Cyber Galaxy Dark ======================= */
+body.dark.th-galaxy{background:#060A1A;--paper:#0F172A;--card:#1E293B;--ink:#E2E8F0;--teal:#0E7490;--brown:#334155;--gold:#FBBF24;--red:#7C3AED;--ok:#15803D;--bad:#B91C1C;color:var(--ink)}
+body.dark.th-galaxy{background-image:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 78% 8%,#C4B5FD,transparent),radial-gradient(1.5px 1.5px at 62% 72%,#67E8F9,transparent),radial-gradient(1px 1px at 30% 88%,#fff,transparent),radial-gradient(1px 1px at 92% 52%,#FDE68A,transparent);background-attachment:fixed}
+body.dark.th-galaxy #app{background:radial-gradient(800px 420px at 100% -10%,rgba(124,58,237,.28),transparent 60%),radial-gradient(700px 400px at 0% 100%,rgba(34,211,238,.14),transparent 60%),#0F172A!important}
+body.dark.th-galaxy #topbar{background:rgba(15,23,42,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(251,191,36,.5);color:#E2E8F0}
+body.dark.th-galaxy .tb-brand{color:#FBBF24;text-shadow:0 0 14px rgba(251,191,36,.5)}
+body.dark.th-galaxy .net{background:rgba(34,211,238,.16);color:#67E8F9}
+body.dark.th-galaxy .net.off{background:#FBBF24;color:#1E1B4B}
+body.dark.th-galaxy .tb-pill{border-color:rgba(103,232,249,.6);color:#67E8F9;background:rgba(34,211,238,.1)}
+body.dark.th-galaxy .card{border-color:#334155;box-shadow:0 0 0 1px rgba(34,211,238,.08),0 10px 26px rgba(0,0,0,.4)}
+body.dark.th-galaxy .sm{color:#67E8F9}
+body.dark.th-galaxy .card[style*="background"] .sm{color:#2F5F5A}
+body.dark.th-galaxy .hd{background:linear-gradient(135deg,#1E1B4B,#0E7490);border-color:#FBBF24;color:#FDE68A;box-shadow:0 0 24px rgba(124,58,237,.35)}
+body.dark.th-galaxy .btn{border-color:#FBBF24;box-shadow:0 5px 0 #3B1D7A,0 0 16px rgba(124,58,237,.45)}
+body.dark.th-galaxy .btn.t{box-shadow:0 5px 0 #083A47,0 0 14px rgba(34,211,238,.25)}
+body.dark.th-galaxy .opt{background:#172036;border-color:#3B4A6B;box-shadow:0 3px 0 #0B1224;color:#E2E8F0}
+body.dark.th-galaxy .opt.ok{background:var(--ok);border-color:#FBBF24}
+body.dark.th-galaxy .opt.bad{background:var(--bad);border-color:#F87171}
+body.dark.th-galaxy .lv,body.dark.th-galaxy .pwb,body.dark.th-galaxy .w-tab,body.dark.th-galaxy .st-pill,body.dark.th-galaxy .w-chip,body.dark.th-galaxy .role-card,body.dark.th-galaxy .bdg-card,body.dark.th-galaxy .mode-tile{border-color:#3B4A6B;box-shadow:0 3px 0 #0B1224}
+body.dark.th-galaxy .mode-tile{background:linear-gradient(135deg,#1E293B,#172036)!important;color:#E2E8F0!important}
+body.dark.th-galaxy .mode-tile .m-sb{color:#67E8F9!important}
+body.dark.th-galaxy .lv.boss{background:linear-gradient(135deg,#7C3AED,#4C1D95);border-color:#FBBF24}
+body.dark.th-galaxy .inp{background:#0B1224;border-color:#3B4A6B;color:#E2E8F0}
+body.dark.th-galaxy .bar{background:#0B1224;border-color:#3B4A6B}
+body.dark.th-galaxy .stat-pill .lbl{color:#94A3B8}
+body.dark.th-galaxy .prof-card{background:linear-gradient(135deg,#1E1B4B,#0E7490);border-color:#FBBF24}
+body.dark.th-galaxy .hero-play{background:linear-gradient(135deg,#7C3AED,#1E1B4B);border-color:#FBBF24;box-shadow:0 6px 0 #150F33,0 0 26px rgba(124,58,237,.5)}
+body.dark.th-galaxy .bnav,body.dark.th-galaxy .snav{background:rgba(15,23,42,.94);border-color:#FBBF24}
+body.dark.th-galaxy .bnav button.act,body.dark.th-galaxy .snav button.act{color:#FBBF24;background:rgba(251,191,36,.12)}
+body.dark.th-galaxy .h-tabs{background:rgba(255,255,255,.06)}
+body.dark.th-galaxy .h-tab.act{background:linear-gradient(135deg,#7C3AED,#0E7490);color:#fff}
+body.dark.th-galaxy .sum-cell{background:rgba(34,211,238,.1)}
+body.dark.th-galaxy .sum-cell span,body.dark.th-galaxy .h-sec{color:#67E8F9}
+body.dark.th-galaxy .me{background:#0E7490}
+@media(hover:hover) and (pointer:fine){body.dark #app .opt:not(.cls-o)::before{background:rgba(255,255,255,.12);color:#FDE68A}}
+
+/* dark looks: inline dark text colours lifted when they sit on dark surfaces */
+body.dark .card:not([style*="background"]) [style*=";color:#7A3B3B"],body.dark .pet-box [style*=";color:#7A3B3B"],body.dark .bdg-card [style*=";color:#7A3B3B"],body.dark .role-card [style*=";color:#7A3B3B"],body.dark .cls-qbox [style*=";color:#7A3B3B"],body.dark .fc-front [style*=";color:#7A3B3B"],body.dark .sb-slot [style*=";color:#7A3B3B"]{color:#FFB59E!important}
+body.dark .card:not([style*="background"]) [style*=";color:#4A2F22"],body.dark .pet-box [style*=";color:#4A2F22"],body.dark .bdg-card [style*=";color:#4A2F22"],body.dark .role-card [style*=";color:#4A2F22"],body.dark .cls-qbox [style*=";color:#4A2F22"],body.dark .fc-front [style*=";color:#4A2F22"],body.dark .sb-slot [style*=";color:#4A2F22"]{color:#E8D9B5!important}
+body.dark .card:not([style*="background"]) [style*=";color:#2F5F5A"],body.dark .pet-box [style*=";color:#2F5F5A"],body.dark .bdg-card [style*=";color:#2F5F5A"],body.dark .role-card [style*=";color:#2F5F5A"],body.dark .cls-qbox [style*=";color:#2F5F5A"],body.dark .fc-front [style*=";color:#2F5F5A"],body.dark .sb-slot [style*=";color:#2F5F5A"]{color:#7FD6C9!important}
+body.dark .card:not([style*="background"]) [style*=";color:#1B3B38"],body.dark .pet-box [style*=";color:#1B3B38"],body.dark .bdg-card [style*=";color:#1B3B38"],body.dark .role-card [style*=";color:#1B3B38"],body.dark .cls-qbox [style*=";color:#1B3B38"],body.dark .fc-front [style*=";color:#1B3B38"],body.dark .sb-slot [style*=";color:#1B3B38"]{color:#7FD6C9!important}
+body.dark .card:not([style*="background"]) [style*=";color:#2F6B4A"],body.dark .pet-box [style*=";color:#2F6B4A"],body.dark .bdg-card [style*=";color:#2F6B4A"],body.dark .role-card [style*=";color:#2F6B4A"],body.dark .cls-qbox [style*=";color:#2F6B4A"],body.dark .fc-front [style*=";color:#2F6B4A"],body.dark .sb-slot [style*=";color:#2F6B4A"]{color:#6EE7A8!important}
+body.dark .card:not([style*="background"]) [style*=";color:#8B2E2E"],body.dark .pet-box [style*=";color:#8B2E2E"],body.dark .bdg-card [style*=";color:#8B2E2E"],body.dark .role-card [style*=";color:#8B2E2E"],body.dark .cls-qbox [style*=";color:#8B2E2E"],body.dark .fc-front [style*=";color:#8B2E2E"],body.dark .sb-slot [style*=";color:#8B2E2E"]{color:#FCA5A5!important}
+body.dark .card:not([style*="background"]) [style*=";color:#6B4A3A"],body.dark .pet-box [style*=";color:#6B4A3A"],body.dark .bdg-card [style*=";color:#6B4A3A"],body.dark .role-card [style*=";color:#6B4A3A"],body.dark .cls-qbox [style*=";color:#6B4A3A"],body.dark .fc-front [style*=";color:#6B4A3A"],body.dark .sb-slot [style*=";color:#6B4A3A"]{color:#CDB88A!important}
+
+/* ============================ Print (parent report) ============================ */
+@media print{
+  html,body{height:auto;background:#fff!important}
+  body.pr-open>*:not(#parentModal){display:none!important}
+  body.pr-open #parentModal{position:static;display:block;background:none;padding:0;backdrop-filter:none}
+  body.pr-open .pr-box{box-shadow:none;max-width:none;border:0;border-top:8px solid #1E3C72;animation:none}
+  .no-print{display:none!important}
+  .pr-bar i,.pr-kpi,.pr-id div{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
 <script src="curriculum.js"></script>
 </head>
 <body>
-<div id="app"></div>
-<div id="toast"></div>
+<div id="shell">
+<header id="topbar">
+  <div class="tb-brand">🏆 <b>تحدّي الأصحاب</b> <small>Grammora &amp; EngliFocus</small></div>
+  <span id="netBadge" class="net" role="status" aria-live="polite">🟢 متصل</span>
+  <span class="sp"></span>
+  <button id="thBtn" class="tb-pill" onclick="cycleUiTheme()" aria-label="تغيير المظهر">🎨 <span>المظهر</span><span class="lg" id="thLbl" style="display:none"></span></button>
+  <button id="insBtn" class="tb-pill" style="display:none" onclick="installApp()" aria-label="تثبيت المنصة على جهازك">📲 <span>تثبيت</span><span class="lg">المنصة على جهازك</span></button>
+</header>
+<div id="layout">
+  <aside id="side" aria-label="لوحة الطالب والتنقل"></aside>
+  <div id="app"></div>
+</div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import * as FS from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -397,14 +694,10 @@ function closeWhatsNew(goCity){
   if(el&&el.parentNode)el.parentNode.removeChild(el);
   if(isNew&&goCity){home()}
 }
-function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var bMsg=bdgCheck();if(bMsg)setTimeout(function(){rmsg(bMsg)},200);
-  setTimeout(function(){ensureReg();claimPrev();askSync();checkWhatsNew()},50);
-  var misCnt=(S.mis||[]).length;
-  var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
-  app.innerHTML=
-  /* 1. Student Profile Header */
-  '<div class="prof-card">'+
+/* === الصفحة الرئيسية (v6): بطاقة ملخص + تبويبات منظمة بدل تكديس كل البطاقات === */
+var HOME_TAB='play';
+function profCardHtml(){
+  return '<div class="prof-card">'+
     '<div class="row">'+
       misterImg('c',48)+
       '<div class="sp">'+
@@ -417,114 +710,134 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
         '<button class="btn" style="font-size:11px;padding:3px 8px;min-height:26px;border-width:2px" onclick="accountScr()">⚙️ إعدادات</button>'+
       '</div>'+
     '</div>'+
-  '</div>'+
-
-  /* 2. Unified Status Strip (Coins, Daily Hearts, Streak) */
-  '<div class="stat-strip">'+
+  '</div>';
+}
+function statStripHtml(){
+  var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
+  return '<div class="stat-strip">'+
     '<div class="stat-pill" onclick="store()" style="cursor:pointer"><span class="lbl">رصيد العملات</span><div class="val">'+coin()+'<span>'+S.coins+'</span></div></div>'+
     '<div class="stat-pill"><span class="lbl">القلوب اليومية</span><div class="val" style="gap:2px">'+dhpStars+'</div></div>'+
     '<div class="stat-pill"><span class="lbl">سلسلة الأيام</span><div class="val">'+flame(18)+'<span>'+skAlive()+' يوم</span></div></div>'+
-  '</div>'+
+  '</div>';
+}
+function accStats(){
+  var ts=S.ts||{},ok=0,all=0;
+  SKILL_META.forEach(function(m){var a=ts[m.k]||[0,0];ok+=(a[0]||0);all+=(a[1]||0)});
+  return {ok:ok,all:all,pct:all>0?Math.round(ok/all*100):0};
+}
+function homeSummaryCard(){
+  var a=accStats();
+  function cell(v,l){return '<div class="sum-cell"><b>'+v+'</b><span>'+l+'</span></div>'}
+  return '<div class="card sum-card">'+
+    '<div class="tag g">ملخص سريع للطالب وولي الأمر</div>'+
+    '<div class="sum-grid">'+
+      cell(a.all>0?a.pct+'%':'—','دقة الإجابات')+
+      cell(totStarsCount()+'/120','نجوم الخريطة')+
+      cell((S.bdg||[]).length+'/'+BADGES.length,'الأوسمة')+
+      cell(wkPts(),'نقاط الأسبوع')+
+    '</div>'+
+    '<button class="btn parent-btn" onclick="parentScr()">👨‍👩‍👧 بوابة ولي الأمر — تقرير المستوى</button>'+
+  '</div>';
+}
+function homeTile(cls,fn,ic,tt,sb,isNew){
+  return '<button class="mode-tile'+(cls?' '+cls:'')+'" onclick="'+fn+'">'+
+    (isNew?'<span class="m-new">جديد</span>':'')+
+    '<span class="m-ic">'+ic+'</span>'+
+    '<span class="m-tt">'+tt+'</span>'+
+    '<span class="m-sb">'+sb+'</span>'+
+  '</button>';
+}
+function homeTabHtml(k){
+  var misCnt=(S.mis||[]).length;
+  if(k==='lab'){
+    return '<div class="mode-grid">'+
+      homeTile('t-sb','sbIntro()','🧩','تحدي تركيب الجمل',(S.sbOk?'ركّبت '+S.sbOk+' جملة صح 🌟':'رتّب الكلمات • بدون خصم قلوب'))+
+      homeTile('t-spk','spkIntro()','🎙️','انطق واضرب الوحش',(S.spkOk?'نطقت '+S.spkOk+' جملة صح 🔥':'تحدي المايك والنطق السليم'))+
+      homeTile('t-psg','psgIntro()','🕵️‍♂️','محقق القطعة الذكية',(S.psgOk?'حلّيت '+S.psgOk+' قطع ذكية 🌟':'استنتج الحل من القصة'))+
+      homeTile('',(misCnt>0?'startReview()':'giftScr()'),(misCnt>0?'🛠️':'🎁'),(misCnt>0?'جولة التصحيح':'صندوق الهدايا'),(misCnt>0?'صحّح '+misCnt+' سؤال واسترجع قلب':'افتح أكواد مستر عبدالرحمن'))+
+      homeTile('curr','startVocabCards()','🃏','بطاقات الكلمات الذكية','راجع أهم كلمات مرحلتك بالنطق')+
+    '</div>';
+  }
+  if(k==='center'){
+    return '<div class="h-cols">'+
+      '<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid #7A3B3B;box-shadow:0 4px 0 #4A1C1C;padding:11px 12px">'+
+        '<div class="row">'+
+          '<div style="font-size:32px;line-height:1">🏫</div>'+
+          '<div class="sp">'+
+            '<div style="font-weight:900;font-size:15px;color:#7A3B3B">بطولة الحصة وأبطال السنتر 🏆</div>'+
+            '<div style="font-size:12px;font-weight:700;color:#4A2F22;margin-top:2px">شوف ترتيبك في حصة السنتر مع مستر عبدالرحمن لولي الأمر!</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="row" style="margin-top:8px;gap:6px">'+
+          '<button class="btn" style="flex:2;font-size:13px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="board(\'cls\')">📊 نتائج وترتيب مجموعات السنتر</button>'+
+          '<button class="btn t" style="flex:1;font-size:12px;min-height:38px;padding:6px;background:#4A2F22" onclick="tPinScr()">🔐 لوحة المستر</button>'+
+        '</div>'+
+      '</div>'+
+      missionCard()+
+      misterCard()+
+      eventCard()+
+    '</div>'+
+    '<div class="row" style="gap:6px">'+
+      '<button class="btn" style="flex:1;background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700;font-size:13px;padding:8px 4px;min-height:42px" onclick="badgesScr()">🏅 الأوسمة ('+(S.bdg||[]).length+'/'+BADGES.length+')</button>'+
+      '<button class="btn" style="flex:1;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;font-size:13px;padding:8px 4px;min-height:42px" onclick="giftScr()">🎁 كود هدية</button>'+
+      '<button class="btn t" style="flex:1;font-size:13px;padding:8px 4px;min-height:42px" onclick="askScr()">💬 اسأل المستر'+(askNew()?' 🔴':'')+'</button>'+
+    '</div>';
+  }
+  var dcDone=S.dc&&S.dc.d===cDay(),canTax=(S.cTax!==cDay())&&(cityDailyInc()>0);
+  return '<div class="mode-grid">'+
+    homeTile('curr','curriculum()','📚','تدريبات المنهج','الوحدات والقصة ('+gName()+')')+
+    homeTile('surv','survIntro()','⏱️','تحدي النجاة (60ث)','<span style="color:#B23A3A">'+(S.survBest?'أعلى رقم: '+S.survBest+' صح 🔥':'بدون خصم قلوب 🔥')+'</span>')+
+    homeTile('t-daily','dailyIntro()','🎯','حلبة التحدي اليومية',(dcDone?'نتيجتك اليوم: '+S.dc.ok+'/5 • '+S.dc.pts+' نقطة':'5 أسئلة موحدة • جوائز ×2'))+
+    homeTile('t-room','roomScr()','⚔️','تحدّي صاحب (1 ضد 1)',(S.rm?'روم شغالة حالياً 🔴':'ابعت كود واتحدى صاحبك'))+
+    homeTile('t-city','cityScr()','🏙️','مدينتي والمطاردات',cityRankName()+(canTax?' • استلم العائد 🔴':''))+
+  '</div>';
+}
+function homeTab(k){
+  HOME_TAB=k;
+  var p=document.getElementById('hPanel');
+  if(!p){home();return}
+  p.innerHTML=homeTabHtml(k);
+  p.style.animation='none';void p.offsetWidth;p.style.animation='';
+  document.querySelectorAll('.h-tab').forEach(function(b){var on=(b.getAttribute('data-k')===k);b.classList.toggle('act',on);b.setAttribute('aria-selected',on?'true':'false')});
+}
+function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var bMsg=bdgCheck();if(bMsg)setTimeout(function(){rmsg(bMsg)},200);
+  setTimeout(function(){ensureReg();claimPrev();askSync();checkWhatsNew()},50);
+  var D=dm(),misLeft=D.list.length-D.done.length;
+  function tabBtn(k,ic,lbl,dot){return '<button class="h-tab'+(HOME_TAB===k?' act':'')+'" role="tab" aria-selected="'+(HOME_TAB===k?'true':'false')+'" data-k="'+k+'" onclick="homeTab(\''+k+'\')">'+(dot?'<span class="bdot"></span>':'')+'<span class="ti">'+ic+'</span><span>'+lbl+'</span></button>'}
+  app.innerHTML=
+  /* 1. Student profile + unified stats (phones only — tablets/desktops show them in the sidebar) */
+  '<div class="only-m">'+profCardHtml()+statStripHtml()+'</div>'+
 
-  /* Alerts & Notifications (if any) */
+  /* Alerts & notifications (if any) */
   (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">'+esc(S.cm)+'<br><div class="row" style="justify-content:center;margin-top:6px">'+(S.cert?'<button class="btn" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="certScr()">🎓 استلم شهادتك</button>':'')+'<button class="btn t" style="font-size:14px;min-height:36px;padding:6px 14px" onclick="S.cm=null;save();home()">تمام</button></div></div>':'')+
   (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.8">💬 مستر عبدالرحمن رد على سؤالك!<br><button class="btn t" style="font-size:14px;margin-top:6px;min-height:36px" onclick="askScr()">شوف الرد دلوقتي</button></div>':'')+
   (DB?'<div class="card" style="text-align:center;font-weight:900;background:#CFE3D4;border-color:#2F6B4A">🎉 مكافأة دخولك النهاردة: +'+DB+' عملة'+(skAlive()?' (سلسلة '+skAlive()+' يوم 🔥)':'')+'</div>':'')+
 
-  /* 3. Primary Adventure Banner */
+  /* 2. Hero: primary adventure CTA + student/parent quick summary */
+  '<div class="hero-grid">'+
   (S.dhp>0
     ? '<button class="hero-play" onclick="map()">'+
         '<div>'+
-          '<div style="font-family:Lemonada,sans-serif;font-size:19px;font-weight:900;color:#FFD700">🗺️ خريطة المغامرات</div>'+
+          '<div style="font-family:Lemonada,sans-serif;font-size:clamp(16px,4.3vw,19px);font-weight:900;color:#FFD700">🗺️ خريطة المغامرات (40 جولة)</div>'+
           '<div style="font-size:13px;font-weight:700;margin-top:3px">وصلت للجولة '+S.max+' من 40 • اجمع النجوم واهزم الزعماء!</div>'+
         '</div>'+
         '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:8px 14px;border-radius:12px;font-size:15px;white-space:nowrap">العب الآن ▶</div>'+
       '</button>'
-    : '<div class="card" style="text-align:center;font-weight:900;background:#E3B03F">قلوبك اليومية خلصت! تقدر تلعب <b>تحدي النجاة</b> أو <b>جولة التصحيح</b> أو تشحن قلوبك بكود هدية 🎁</div>')+
-
-  /* 4. 2x2 Game Modes Grid */
-  '<div class="mode-grid">'+
-    '<button class="mode-tile curr" onclick="curriculum()">'+
-      '<span class="m-ic">📚</span>'+
-      '<span class="m-tt">تدريبات المنهج</span>'+
-      '<span class="m-sb">الوحدات والقصة ('+gName()+')</span>'+
-    '</button>'+
-    '<button class="mode-tile surv" onclick="survIntro()">'+
-      '<span class="m-ic">⏱️</span>'+
-      '<span class="m-tt">تحدي النجاة (60ث)</span>'+
-      '<span class="m-sb" style="color:#B23A3A">'+(S.survBest?'أعلى رقم: '+S.survBest+' صح 🔥':'بدون خصم قلوب • جديد 🔥')+'</span>'+
-    '</button>'+
-    '<button class="mode-tile" onclick="roomScr()">'+
-      '<span class="m-ic">⚔️</span>'+
-      '<span class="m-tt">تحدّي صاحب (1 ضد 1)</span>'+
-      '<span class="m-sb">'+(S.rm?'روم شغالة حالياً 🔴':'ابعت كود واتحدى صاحبك')+'</span>'+
-    '</button>'+
-    '<button class="mode-tile" onclick="'+(misCnt>0?'startReview()':'giftScr()')+'">'+
-      '<span class="m-ic">'+(misCnt>0?'🛠️':'🎁')+'</span>'+
-      '<span class="m-tt">'+(misCnt>0?'جولة التصحيح':'صندوق الهدايا')+'</span>'+
-      '<span class="m-sb">'+(misCnt>0?'صحّح '+misCnt+' سؤال واسترجع قلب':'افتح أكواد مستر عبدالرحمن')+'</span>'+
-    '</button>'+
+    : '<div class="card" style="text-align:center;font-weight:900;background:#E3B03F;display:flex;align-items:center;justify-content:center"><div>قلوبك اليومية خلصت! تقدر تلعب <b>تحدي النجاة</b> أو <b>جولة التصحيح</b> أو تشحن قلوبك بكود هدية 🎁</div></div>')+
+    homeSummaryCard()+
   '</div>'+
 
-  /* Interactive Sentence Builder Banner */
-  '<div class="card" style="background:linear-gradient(135deg,#FFFDF5,#E6F4F1);border:2px solid #2F5F5A;box-shadow:0 4px 0 #1B3B38;padding:11px 12px">'+
-    '<div class="row">'+
-      '<div style="font-size:32px;line-height:1">🧩</div>'+
-      '<div class="sp">'+
-        '<div style="font-weight:900;font-size:15px;color:#1B3B38">تحدي تركيب الجمل التفاعلي <span style="background:#FFD700;color:#4A2F22;font-size:10px;padding:1px 6px;border-radius:6px">جديد 🔥</span></div>'+
-        '<div style="font-size:12px;font-weight:700;color:#4A2F22;margin-top:2px">رتّب الكلمات المبعثرة وكون جملاً صحيحة • '+(S.sbOk?'ركّبت '+S.sbOk+' جملة صح 🌟':'بدون خصم قلوب!')+'</div>'+
-      '</div>'+
-      '<button class="btn" style="font-size:13px;min-height:38px;padding:6px 12px;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);white-space:nowrap" onclick="sbIntro()">العب الآن ▶</button>'+
-    '</div>'+
+  /* Smart pet companion (phones only — sidebar on larger screens) */
+  '<div class="only-m">'+homePetCard()+'</div>'+
+
+  /* 3. Category tabs */
+  '<div class="h-tabs" role="tablist" aria-label="أقسام الرئيسية">'+
+    tabBtn('play','🎮','ساحات اللعب',0)+
+    tabBtn('lab','🧠','مختبر المهارات',(S.mis||[]).length>0)+
+    tabBtn('center','🏫','السنتر والمهام',askNew()||misLeft>0)+
   '</div>'+
-
-  /* Speak to Attack & Mini-Passage Detective Grid */
-  '<div class="mode-grid">'+
-    '<button class="mode-tile" style="background:linear-gradient(135deg,#FFF8E7,#FFE0B2);border-color:#7A3B3B;box-shadow:0 4px 0 #4A1C1C" onclick="spkIntro()">'+
-      '<span class="m-ic">🎙️🗣️</span>'+
-      '<span class="m-tt">انطق واضرب الوحش <span style="background:#7A3B3B;color:#FFE9B8;font-size:9px;padding:1px 5px;border-radius:5px">جديد</span></span>'+
-      '<span class="m-sb" style="color:#7A3B3B">'+(S.spkOk?'نطقت '+S.spkOk+' جملة صح 🔥':'تحدي المايك والنطق السليم')+'</span>'+
-    '</button>'+
-    '<button class="mode-tile" style="background:linear-gradient(135deg,#EAF3FA,#D6E8F5);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38" onclick="psgIntro()">'+
-      '<span class="m-ic">🕵️‍♂️📖</span>'+
-      '<span class="m-tt">محقق القطعة الذكية <span style="background:#2F5F5A;color:#FFE9B8;font-size:9px;padding:1px 5px;border-radius:5px">جديد</span></span>'+
-      '<span class="m-sb" style="color:#2F5F5A">'+(S.psgOk?'حلّيت '+S.psgOk+' قطع ذكية 🌟':'استنتج الحل من القصة')+'</span>'+
-    '</button>'+
-  '</div>'+
-
-  /* Smart Pet Companion Banner */
-  homePetCard()+
-
-  /* Interactive City & Roleplay Banner */
-  homeCityCard()+
-
-  /* Daily Arena Banner */
-  dailyArenaCard()+
-
-  /* Classroom Live Arena & Center Champions Card */
-  '<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid #7A3B3B;box-shadow:0 4px 0 #4A1C1C;padding:11px 12px">'+
-    '<div class="row">'+
-      '<div style="font-size:32px;line-height:1">🏫</div>'+
-      '<div class="sp">'+
-        '<div style="font-weight:900;font-size:15px;color:#7A3B3B">بطولة الحصة وأبطال السنتر 🏆</div>'+
-        '<div style="font-size:12px;font-weight:700;color:#4A2F22;margin-top:2px">شوف ترتيبك في حصة السنتر مع مستر عبدالرحمن لولي الأمر!</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="row" style="margin-top:8px;gap:6px">'+
-      '<button class="btn" style="flex:2;font-size:13px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="board(\'cls\')">📊 نتائج وترتيب مجموعات السنتر</button>'+
-      '<button class="btn t" style="flex:1;font-size:12px;min-height:38px;padding:6px;background:#4A2F22" onclick="tPinScr()">🔐 لوحة المستر</button>'+
-    '</div>'+
-  '</div>'+
-
-  /* Quick Badges, Gift & Ask Teacher Row */
-  '<div class="row" style="gap:6px">'+
-    '<button class="btn" style="flex:1;background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700;font-size:13px;padding:8px 4px;min-height:42px" onclick="badgesScr()">🏅 الأوسمة ('+(S.bdg||[]).length+'/'+BADGES.length+')</button>'+
-    '<button class="btn" style="flex:1;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;font-size:13px;padding:8px 4px;min-height:42px" onclick="giftScr()">🎁 كود هدية</button>'+
-    '<button class="btn t" style="flex:1;font-size:13px;padding:8px 4px;min-height:42px" onclick="askScr()">💬 اسأل المستر'+(askNew()?' 🔴':'')+'</button>'+
-  '</div>'+
-
-  /* 5. Daily Missions & Teacher Tip */
-  eventCard()+missionCard()+misterCard()+
+  '<div id="hPanel" class="h-panel" role="tabpanel">'+homeTabHtml(HOME_TAB)+'</div>'+
   bnav('home');
 }
 
@@ -546,7 +859,9 @@ function accountScr(){
   '<div class="card row"><div class="sp"><div style="font-weight:900">حفظ واسترجاع التقدم ☁️</div><div class="sm">'+(S.rc&&S.rcOk?'كودك: '+fmtRC(S.rc):'احفظ تقدمك عشان لو غيّرت الموبايل')+'</div></div><button class="btn" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="saveScr()">كود الاسترجاع</button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الترجمة بالعربي</div><div class="sm">إظهار ترجمة السؤال تحت الإنجليزي</div></div><button class="sw'+(tr?' on':'')+'" aria-label="الترجمة" onclick="tr=!tr;accountScr()"><i></i></button></div>'+
   '<div class="card row"><div class="sp"><div style="font-weight:900">الأصوات والتشجيع الصوتى</div><div class="sm">صوت مستر عبدالرحمن والمؤثرات الصوتية</div></div><button class="sw'+(S.mute?'':' on')+'" aria-label="الأصوات" onclick="S.mute=!S.mute;save();accountScr()"><i></i></button></div>'+
-  '<div class="card row"><div class="sp"><div style="font-weight:900">الوضع الليلي (Dark Mode) 🌙</div><div class="sm">مريح للعين وقت اللعب بالليل</div></div><button class="sw'+(S.dark?' on':'')+'" aria-label="الوضع الليلي" onclick="S.dark=!S.dark;save();applyTheme();accountScr()"><i></i></button></div>'+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">الوضع الليلي (Dark Mode) 🌙</div><div class="sm">مريح للعين وقت اللعب بالليل (مع الثيم الكلاسيكي — ثيم الفضاء الليلي داكن دائماً)</div></div><button class="sw'+(S.dark?' on':'')+'" aria-label="الوضع الليلي" onclick="S.dark=!S.dark;save();applyTheme();accountScr()"><i></i></button></div>'+
+  uiThemeCard()+installCard()+
+  '<div class="card row"><div class="sp"><div style="font-weight:900">👨‍👩‍👧 بوابة ولي الأمر</div><div class="sm">تقرير رسمي بالمستوى والدقة والمهارات قابل للطباعة والمشاركة</div></div><button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="parentScr()">فتح التقرير</button></div>'+
   dayCard()+
   '<div class="card" id="st" style="display:none"></div>'+
   '<div class="card"><div class="tag">إزاي تلعب وتتصدر؟</div><div style="font-size:13px;margin-top:8px;line-height:1.7">جاوب صح علشان تضرب الزعيم. 3 إجابات صح ورا بعض = كومبو وضربة مضاعفة! اجمع النقاط طوال الأسبوع لحد يوم الجمعة الساعة 12 بالليل عشان تكسب شهادة تقدير رسمية من مستر عبدالرحمن.</div></div>'+
@@ -3733,7 +4048,7 @@ function showClsLiveQ(){
   var curSt=cg.grp.students[cg.curStIdx]||cg.grp.students[0];
   var optsHtml=cg.ord.map(function(x,k){
     var letters=['A','B','C','D'];
-    return '<button class="opt" style="display:flex;align-items:center;justify-content:space-between;font-size:21px;padding:12px 16px" onclick="pickClsLiveOpt('+k+')">'+
+    return '<button class="opt cls-o" style="display:flex;align-items:center;justify-content:space-between;font-size:21px;padding:12px 16px" onclick="pickClsLiveOpt('+k+')">'+
       '<span style="background:#2F5F5A;color:#FFE9B8;border-radius:8px;padding:2px 10px;font-size:15px">'+letters[k]+'</span>'+
       '<span style="flex:1;text-align:center"'+(/[\u0600-\u06FF]/.test(q[2][x])?' dir="rtl"':'')+'>'+esc(q[2][x])+'</span>'+
     '</button>';
@@ -3784,14 +4099,15 @@ function showClsLiveQ(){
       '<div class="chip">👥 '+esc(cg.grp.name)+' ('+gName(cg.grp.grade||1,cg.grp.stage)+')</div>'+
       '<div class="sp"></div>'+
       '<button class="pwb" style="flex:none;min-height:36px;padding:4px 10px" onclick="speak(CLS_GAME.qs[CLS_GAME.qi][0])">🔊 انطق</button>'+
+      '<button class="pwb" style="flex:none;min-height:36px;padding:4px 10px" onclick="toggleFS()" title="عرض على السبورة الذكية / البروجيكتور">⛶ ملء الشاشة</button>'+
     '</div>'+
     studentSelectorHtml+
     '<div class="cls-qbox">'+
       '<div class="tag g">'+(TT[q[5]]||'سؤال البطولة')+'</div>'+
-      '<div style="direction:ltr;font-size:24px;font-weight:900;line-height:1.4;margin:10px 0;color:#7A3B3B">'+esc(q[0])+'</div>'+
-      (q[1]?'<div style="font-size:16px;font-weight:700;color:#2F5F5A;border-top:2px dashed #C9973F;padding-top:6px">'+esc(q[1])+'</div>':'')+
+      '<div class="cls-qtxt">'+esc(q[0])+'</div>'+
+      (q[1]?'<div class="cls-ar" style="font-size:16px;font-weight:700;color:#2F5F5A;border-top:2px dashed #C9973F;padding-top:6px">'+esc(q[1])+'</div>':'')+
     '</div>'+
-    optsHtml+
+    '<div class="cls-opts">'+optsHtml+'</div>'+
     '<div id="clsFb"></div>'+
     '<div class="row" style="margin-top:6px;gap:8px">'+
       '<button class="btn" style="flex:2;font-size:15px;min-height:42px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="finishClsSession()">🏁 إنهاء البطولة وحفظ الترتيب ☁️</button>'+
@@ -4542,7 +4858,397 @@ window.onFB=function(){
   setInterval(function(){if(document.visibilityState==='visible')FB.beat(S.uid).catch(function(){})},60000);
   setInterval(function(){refreshStats(true);refreshLb();ensureReg();claimPrev();askSync()},60000);refreshStats(true);ensureReg();claimPrev();refreshLb(true);
 };
+/* ==========================================================================
+   v6 PLATFORM LAYER — sidebar dashboard, themes, parent portal, keyboard,
+   offline queue, PWA install, confetti & ripple. Everything below is additive:
+   it wraps the original functions (save / submit / applyTheme / bnav / sfx*)
+   without changing their logic.
+   ========================================================================== */
+var NAV_ACT='',SIDE_H='',SIDE_T=0,SIDE_MQ=(window.matchMedia?window.matchMedia('(min-width:768px)'):{matches:false});
+var _bnav0=bnav;
+bnav=function(active){NAV_ACT=active;return _bnav0(active)};
+function sideNavHtml(){
+  var hasCert=!!(S.cert||mapDone()),canTax=(S.cTax!==cDay())&&(cityDailyInc()>0);
+  var tabs=[
+    ['home','🏠','الرئيسية','home()',0],
+    ['city','🏙️','مدينتي والمطاردات','cityScr()',canTax],
+    ['rep','📊','مستوايا وتقريري','reportScr()',hasCert],
+    ['lb','🏆','لوحة الشرف والترتيب','board()',0],
+    ['shop','🛒','المتجر','store()',0],
+    ['acc','⚙️','حسابي والإعدادات','accountScr()',0]
+  ];
+  return '<nav class="snav" aria-label="القائمة الجانبية">'+tabs.map(function(t){
+    return '<button class="'+(NAV_ACT===t[0]?'act':'')+'" onclick="'+t[3]+'">'+(t[4]?'<span class="bdot"></span>':'')+'<span class="ni">'+t[1]+'</span><span>'+t[2]+'</span></button>';
+  }).join('')+'</nav>';
+}
+function renderSide(){
+  var el=document.getElementById('side');if(!el||!SIDE_MQ.matches)return;
+  var h='';
+  try{
+    if(S.stage&&S.grade&&S.nick){
+      h=profCardHtml()+statStripHtml()+
+        '<div class="side-lock">⏳ أنهِ الجولة الحالية أولاً ثم تنقّل بين الأقسام</div>'+
+        sideNavHtml()+homePetCard()+
+        '<button class="btn parent-btn" style="font-size:14px;min-height:42px" onclick="parentScr()">👨‍👩‍👧 بوابة ولي الأمر</button>'+
+        '<div class="side-hint">⌨️ اختصارات اللعب: <b>1–4</b> أو <b>A–D</b> للاختيار • <b>Enter / Space</b> للتالي • <b>S</b> للنطق</div>';
+    }else{
+      h='<div class="prof-card" style="text-align:center"><div style="font-family:Lemonada,sans-serif;font-size:17px;font-weight:700;color:#FFD700">منصة تحدّي الأصحاب</div><div style="font-size:12px;font-weight:700;margin-top:6px;line-height:1.8">مستر عبدالرحمن حسانين<br>Grammora &amp; EngliFocus</div></div>'+
+        '<div class="card" style="font-size:13px;font-weight:700;line-height:1.8;text-align:center">اختر مرحلتك وصفّك واسمك لتبدأ المغامرة 🚀</div>';
+    }
+  }catch(e){h=''}
+  if(h!==SIDE_H){SIDE_H=h;el.innerHTML=h}
+}
+function schedSide(){clearTimeout(SIDE_T);SIDE_T=setTimeout(renderSide,60)}
+function syncMode(){
+  var hasNav=!!app.querySelector('.bnav'),b=document.body;
+  if(!hasNav)NAV_ACT='';
+  var proj=!!app.querySelector('.cls-qbox');
+  var play=!hasNav&&!proj&&!!app.querySelector('.opt,#sbSlot,#spkCtrl');
+  b.classList.toggle('scr-focus',!hasNav);
+  b.classList.toggle('scr-play',play);
+  b.classList.toggle('scr-proj',proj);
+  schedSide();
+}
+try{new MutationObserver(syncMode).observe(app,{childList:true})}catch(e){}
+try{if(SIDE_MQ.addEventListener)SIDE_MQ.addEventListener('change',function(){SIDE_H='';renderSide()});else if(SIDE_MQ.addListener)SIDE_MQ.addListener(function(){SIDE_H='';renderSide()})}catch(e){}
+var _save0=save;
+save=function(){_save0();schedSide()};
+
+/* ---------- Dynamic visual theme engine (S.uiTheme, saved in qd_v2) ---------- */
+var UI_THEMES=[['classic','📜','الكلاسيكي الدافئ','#2F5F5A'],['modern','🚀','العصري المضيء','#4F46E5'],['galaxy','🌌','الفضاء الليلي','#0F172A']];
+function uiThemeInfo(id){return UI_THEMES.filter(function(t){return t[0]===id})[0]||UI_THEMES[0]}
+var _applyTheme0=applyTheme;
+applyTheme=function(){
+  _applyTheme0();
+  if(!S.uiTheme||!UI_THEMES.some(function(t){return t[0]===S.uiTheme})){var m=null;try{m=localStorage.getItem('qd_ui')}catch(e){}S.uiTheme=(m&&UI_THEMES.some(function(t){return t[0]===m}))?m:'classic'}
+  var b=document.body,t=S.uiTheme;
+  UI_THEMES.forEach(function(x){b.classList.remove('th-'+x[0])});
+  b.classList.add('th-'+t);
+  if(t==='galaxy')b.classList.add('dark');
+  if(t==='modern')b.classList.remove('dark');
+  if(t!=='classic')document.documentElement.style.setProperty('--paper','');
+  var info=uiThemeInfo(t),mc=document.getElementById('metaTheme'),lb=document.getElementById('thLbl');
+  if(mc)mc.setAttribute('content',info[3]);
+  if(lb)lb.textContent='المظهر: '+info[2];
+  var tb=document.getElementById('thBtn');if(tb)tb.title='المظهر الحالي: '+info[1]+' '+info[2]+' — اضغط للتبديل';
+};
+function setUiTheme(t,quiet){
+  S.uiTheme=uiThemeInfo(t)[0];
+  try{localStorage.setItem('qd_ui',S.uiTheme)}catch(e){}
+  save();applyTheme();
+  var i=uiThemeInfo(S.uiTheme);
+  if(!quiet){try{tone(660,0,0.08,'triangle',0.12);tone(990,0.07,0.12,'triangle',0.12)}catch(e){}showToast('🎨 تم تفعيل الثيم '+i[2]+' '+i[1])}
+}
+function cycleUiTheme(){
+  var ids=UI_THEMES.map(function(t){return t[0]}),i=ids.indexOf(S.uiTheme||'classic');
+  setUiTheme(ids[(i+1)%ids.length]);
+  if(document.getElementById('uiThemeRow'))accountScr();
+}
+function uiThemeCard(){
+  return '<div class="card" id="uiThemeRow"><div style="font-weight:900">🎨 مظهر المنصة</div><div class="sm">اختر الشكل اللي يريّحك — بيتحفظ على جهازك</div>'+
+    '<div class="row" style="margin-top:8px;gap:6px;flex-wrap:wrap">'+UI_THEMES.map(function(t){
+      var on=(S.uiTheme===t[0]);
+      return '<button class="pwb" style="flex:1 1 30%;'+(on?'background:var(--teal);color:#FFE9B8;border-color:var(--gold)':'')+'" onclick="setUiTheme(\''+t[0]+'\');accountScr()">'+t[1]+' '+t[2]+(on?' ✅':'')+'</button>';
+    }).join('')+'</div></div>';
+}
+
+/* ---------- Parent corner: formal, printable, shareable summary ---------- */
+function parentCenterRank(){
+  var nk=(S.nick||'').trim(),codes=S.clsCodes||[],res=null;
+  if(!nk)return null;
+  (S.cgrps||[]).forEach(function(g){
+    if(res||!g||!g.code||codes.indexOf(String(g.code).toUpperCase())<0)return;
+    var l=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+    for(var i=0;i<l.length;i++){if(String(l[i].name||'').trim()===nk){res={g:g.name,rk:i+1,tot:l.length,pts:l[i].pts||0,ok:l[i].ok||0,ans:l[i].ans||0,date:g.lastDate||''};break}}
+  });
+  return res;
+}
+function parentLevel(a){
+  if(a.all<5)return {t:'في بداية الرحلة',c:'#64748B',n:'عدد الإجابات المسجلة ما زال قليلاً ('+a.all+')؛ يتضح المستوى بدقة بعد عدة جولات إضافية.'};
+  if(a.pct>=85)return {t:'ممتاز',c:'#1E7E48',n:'أداء متميز وثابت. نوصي بالاستمرار على نفس الوتيرة مع زيادة التحديات تدريجياً.'};
+  if(a.pct>=70)return {t:'جيد جداً',c:'#2563EB',n:'مستوى مطمئن مع فرص واضحة للوصول إلى الامتياز عبر مراجعة الأخطاء أولاً بأول.'};
+  if(a.pct>=55)return {t:'جيد',c:'#C9973F',n:'أساس مقبول يحتاج إلى تدريب منتظم (١٠–١٥ دقيقة يومياً) لتثبيت المهارات الأضعف.'};
+  return {t:'يحتاج إلى دعم',c:'#B23A3A',n:'نوصي بمتابعة يومية قصيرة والتركيز على المهارات المظللة بالأحمر، مع التواصل مع المعلم.'};
+}
+function parentData(){
+  var ts=S.ts||{},a=accStats(),best=null,weak=null;
+  var skills=SKILL_META.map(function(m){
+    var x=ts[m.k]||[0,0],ok=x[0]||0,all=x[1]||0,pct=all>0?Math.round(ok/all*100):0;
+    var o={n:m.n,ok:ok,all:all,pct:pct,tip:m.tip};
+    if(all>=3){if(!best||pct>best.pct)best=o;if(!weak||pct<weak.pct)weak=o}
+    return o;
+  });
+  return {a:a,lv:parentLevel(a),skills:skills,best:best,weak:weak,stars:totStarsCount(),max:S.max||1,sk:skAlive(),pts:wkPts(),lg:LG[lgIdx(wkPts())].n,mis:(S.mis||[]).length,bdg:(S.bdg||[]).length,ctr:parentCenterRank()};
+}
+function parentScr(){
+  if(document.getElementById('parentModal'))return;
+  var d=parentData(),today=dTxt(cDay());
+  var skillRows=d.skills.map(function(s){
+    var col=s.all===0?'#94A3B8':(s.pct>=80?'#1E7E48':(s.pct>=55?'#C9973F':'#B23A3A'));
+    return '<div class="pr-skill"><span>'+s.n+'</span><div class="pr-bar"><i style="width:'+(s.all>0?s.pct:0)+'%;background:'+col+'"></i></div><b style="color:'+col+';min-width:92px;text-align:left">'+(s.all>0?s.pct+'% ('+s.ok+'/'+s.all+')':'لم تُقَس بعد')+'</b></div>';
+  }).join('');
+  var note='<b>قراءة المستوى:</b> '+d.lv.n;
+  if(d.best&&d.a.all>=5)note+='<br><b>أقوى مهارة:</b> '+d.best.n+' ('+d.best.pct+'%).';
+  if(d.weak&&d.a.all>=5&&d.weak.pct<75&&(!d.best||d.weak.n!==d.best.n))note+='<br><b>مهارة تحتاج إلى تركيز:</b> '+d.weak.n+' ('+d.weak.pct+'%) — '+d.weak.tip;
+  if(d.mis>0)note+='<br><b>أسئلة في قائمة المراجعة:</b> '+d.mis+' سؤالاً يمكن تصحيحها من «جولة التصحيح».';
+  var ctr=d.ctr
+    ? '<div class="pr-row"><span style="font-size:22px">🏫</span><div class="sp"><b>'+esc(d.ctr.g)+'</b><br><span style="color:#64748B">الترتيب <b style="color:#1E3C72">'+d.ctr.rk+'</b> من '+d.ctr.tot+' طالباً • '+d.ctr.pts+' نقطة • إجابات صحيحة في الحصص: '+d.ctr.ok+' من '+d.ctr.ans+(d.ctr.date?' • آخر تحديث: '+esc(d.ctr.date):'')+'</span></div></div>'
+    : '<div class="pr-row"><span style="font-size:22px">🏫</span><div class="sp">لم يُربط هذا الجهاز بمجموعة السنتر بعد. يظهر الترتيب هنا بعد إدخال كود المجموعة الذي يوزّعه المعلم، وبشرط تطابق اسم الطالب في المنصة مع اسمه في كشف المجموعة.</div><button class="pr-btn s no-print" onclick="closeParent();board(\'cls\')">إدخال الكود</button></div>';
+  var certs='';
+  if(S.cert)certs+='<div class="pr-row"><span style="font-size:22px">🎓</span><div class="sp"><b>شهادة تقدير أوائل الأسبوع</b><br><span style="color:#64748B">المركز '+(['الأول','الثاني','الثالث'][(S.cert.rk||1)-1]||'الأول')+' برصيد '+(S.cert.pts||0)+' نقطة</span></div><button class="pr-btn s no-print" onclick="closeParent();certScr()">عرض</button></div>';
+  if(mapDone())certs+='<div class="pr-row"><span style="font-size:22px">👑</span><div class="sp"><b>شهادة ختم خريطة المغامرات</b><br><span style="color:#64748B">'+(mapDone40()?'إتمام ٤٠ جولة كاملة':'إتمام العالم الأول (٢٠ جولة)')+' • '+d.stars+' نجمة</span></div><button class="pr-btn s no-print" onclick="closeParent();certMap()">عرض</button></div>';
+  var bNames=BADGES.filter(function(b){return (S.bdg||[]).indexOf(b.id)>=0}).map(function(b){return b.ic+' '+b.n});
+  certs+='<div class="pr-row"><span style="font-size:22px">🏅</span><div class="sp"><b>الأوسمة المكتسبة: '+bNames.length+' من '+BADGES.length+'</b>'+(bNames.length?'<br><span style="color:#64748B">'+bNames.join(' • ')+'</span>':'<br><span style="color:#64748B">لم تُفتح أوسمة بعد.</span>')+'</div></div>';
+  if(!S.cert&&!mapDone())certs='<div class="pr-row"><span style="font-size:22px">🎓</span><div class="sp">لا توجد شهادات بعد. تُمنح شهادة لأوائل الأسبوع الثلاثة، وأخرى عند ختم خريطة المغامرات.</div></div>'+certs;
+  function kpi(v,l,c){return '<div class="pr-kpi"><b'+(c?' style="color:'+c+'"':'')+'>'+v+'</b><span>'+l+'</span></div>'}
+  var ov=document.createElement('div');
+  ov.id='parentModal';ov.className='wn-ov pr-ov';
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-label','بوابة ولي الأمر');
+  ov.onclick=function(e){if(e.target===ov)closeParent()};
+  ov.innerHTML='<div class="pr-box">'+
+    '<div class="pr-head">'+misterImg('a',60)+'<div class="sp" style="flex:1"><h2>بوابة ولي الأمر — تقرير متابعة الطالب</h2><p>منصة تحدّي الأصحاب للغة الإنجليزية • مستر عبدالرحمن حسانين (Grammora &amp; EngliFocus)</p></div><button class="pr-btn l s no-print" onclick="closeParent()" aria-label="إغلاق">✕ إغلاق</button></div>'+
+    '<div class="pr-id">'+
+      '<div>اسم الطالب في المنصة<b>'+esc(S.nick||'—')+'</b></div>'+
+      '<div>المرحلة والصف<b>'+stgLbl()+' — '+(gName()||'—')+'</b></div>'+
+      '<div>تاريخ التقرير<b>'+today+'</b></div>'+
+    '</div>'+
+    '<div class="pr-sec">المستوى الحالي</div>'+
+    '<div class="pr-kpis">'+
+      kpi(d.lv.t,'التقدير العام',d.lv.c)+
+      kpi(d.a.all>0?d.a.pct+'%':'—','دقة الإجابات ('+d.a.ok+' من '+d.a.all+')')+
+      kpi(d.max+' / 40','الجولة الحالية في الخريطة')+
+      kpi(d.stars+' / 120','النجوم')+
+      kpi(d.sk+' يوم','سلسلة الالتزام اليومي')+
+      kpi(d.pts,'نقاط الأسبوع • دوري '+d.lg)+
+    '</div>'+
+    '<div class="pr-sec">إتقان المهارات</div>'+
+    skillRows+
+    '<div class="pr-note">'+note+'</div>'+
+    '<div class="pr-sec">ترتيب الطالب في مجموعة السنتر</div>'+ctr+
+    '<div class="pr-sec">الشهادات والأوسمة</div>'+certs+
+    '<div class="pr-act no-print">'+
+      '<button class="pr-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>'+
+      '<button class="pr-btn g" onclick="parentShareWA()">📲 مشاركة عبر واتساب</button>'+
+      '<button class="pr-btn l" onclick="closeParent();reportScr()">📊 التقرير التفصيلي</button>'+
+    '</div>'+
+    '<div class="pr-foot">الأرقام محسوبة من إجابات الطالب المسجلة على هذا الجهاز داخل المنصة، والتقدير العام مؤشر استرشادي لا يغني عن تقييم المعلم.</div>'+
+  '</div>';
+  document.body.appendChild(ov);
+  document.body.classList.add('pr-open');
+}
+function closeParent(){
+  var el=document.getElementById('parentModal');
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+  document.body.classList.remove('pr-open');
+}
+function parentShareWA(){
+  var d=parentData(),L=[];
+  L.push('📋 *تقرير متابعة الطالب — منصة تحدّي الأصحاب*');
+  L.push('👤 الطالب: '+(S.nick||'—')+' ('+stgLbl()+' — '+gName()+')');
+  L.push('📅 التاريخ: '+dTxt(cDay()));
+  L.push('');
+  L.push('⭐ التقدير العام: '+d.lv.t);
+  L.push('🎯 دقة الإجابات: '+(d.a.all>0?d.a.pct+'% ('+d.a.ok+' من '+d.a.all+')':'لم تُقَس بعد'));
+  L.push('🗺️ الخريطة: الجولة '+d.max+' من 40 • '+d.stars+' نجمة');
+  L.push('🔥 سلسلة الالتزام: '+d.sk+' يوم • نقاط الأسبوع: '+d.pts);
+  d.skills.forEach(function(s){if(s.all>0)L.push('• '+s.n+': '+s.pct+'%')});
+  if(d.ctr)L.push('🏫 ترتيب السنتر ('+d.ctr.g+'): '+d.ctr.rk+' من '+d.ctr.tot+' • '+d.ctr.pts+' نقطة');
+  L.push('🏅 الأوسمة: '+d.bdg+' من '+BADGES.length+(S.cert?' • شهادة أوائل الأسبوع ✅':'')+(mapDone()?' • شهادة ختم الخريطة ✅':''));
+  L.push('');
+  L.push('مع تحيات مستر عبدالرحمن حسانين — '+location.href.split('?')[0]);
+  window.open('https://wa.me/?text='+encodeURIComponent(L.join('\n')),'_blank');
+}
+
+/* ---------- Desktop keyboard shortcuts during gameplay ---------- */
+document.addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
+  var t=e.target,tn=(t&&t.tagName)||'',c=e.code||'';
+  if(c==='Escape'){if(document.getElementById('parentModal'))closeParent();else if(document.getElementById('wnModal'))closeWhatsNew(1);return}
+  if(tn==='INPUT'||tn==='TEXTAREA'||tn==='SELECT'||(t&&t.isContentEditable))return;
+  if(document.getElementById('wnModal')||document.getElementById('parentModal'))return;
+  var opts=app.querySelectorAll('.opt'),idx=-1,m=/^(?:Digit|Numpad)([1-4])$/.exec(c);
+  if(m)idx=+m[1]-1;else if(/^Key[A-D]$/.test(c))idx=c.charCodeAt(3)-65;
+  if(idx>=0){if(opts[idx]&&!opts[idx].disabled){e.preventDefault();opts[idx].click()}return}
+  var fc=!!document.getElementById('fcBox');
+  if(c==='KeyS'){
+    if(fc){fcSpeak();return}
+    if(app.querySelector('.cls-qbox')&&CLS_GAME&&CLS_GAME.qs[CLS_GAME.qi]){speak(CLS_GAME.qs[CLS_GAME.qi][0]);return}
+    if(G&&G.psgMode&&app.querySelector('.psg-box')){speakCleanPsg();return}
+    if(G&&(G.spkMode||G.sbOnly)&&G.qs&&G.qs[G.i]&&(document.getElementById('spkCtrl')||document.getElementById('sbSlot'))){speak(G.qs[G.i][0]);return}
+    if(G&&G.qs&&G.qs[G.i]&&opts.length){
+      var q=G.qs[G.i];
+      if(q[7])speak(q[7]);
+      else if(q[5]!=='sb'&&/[A-Za-z]{2}/.test(String(q[0])))speak(String(q[0]).replace(/<[^>]+>/g,' ').replace(/_{2,}/g,' blank '));
+    }
+    return;
+  }
+  if(fc&&c==='ArrowLeft'){e.preventDefault();nextCard();return}
+  if(fc&&c==='ArrowRight'){e.preventDefault();prevCard();return}
+  if(c==='Enter'||c==='NumpadEnter'||c==='Space'){
+    /* a focused button inside the screen handles Enter/Space natively; one in the top bar or sidebar must not swallow the shortcut */
+    if(tn==='BUTTON'&&!t.disabled&&app.contains(t))return;
+    var act=null,sub=document.getElementById('sbSubBtn'),fb=document.getElementById('fb')||document.getElementById('clsFb'),bs=fb?fb.querySelectorAll('button'):[];
+    if(fc)act=(c==='Space')?flipCard:nextCard;
+    else if(sub&&!sub.disabled&&sub.style.display!=='none')act=function(){sub.click()};
+    else if(bs.length)act=function(){bs[bs.length-1].click()};
+    if(act){e.preventDefault();if(t&&t.blur&&tn==='BUTTON')t.blur();act()}
+  }
+});
+function toggleFS(){
+  try{
+    var d=document,el=d.documentElement;
+    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}
+    else{(el.requestFullscreen||el.webkitRequestFullscreen).call(el)}
+  }catch(e){rmsg('وضع ملء الشاشة غير متاح في هذا المتصفح')}
+}
+
+/* ---------- Offline indicator + score sync queue ---------- */
+function isOnline(){return navigator.onLine!==false}
+function updNet(){
+  var el=document.getElementById('netBadge');if(!el)return;
+  var on=isOnline();
+  el.className='net'+(on?'':' off');
+  el.textContent=on?'🟢 متصل':'⚡ وضع بدون إنترنت - تقدمك محفوظ';
+  el.title=on?'متصل بالإنترنت — الترتيب والحفظ السحابي يعملان':'تلعب الآن بدون إنترنت. كل تقدمك محفوظ على الجهاز وسيُرفع تلقائياً عند رجوع الاتصال.';
+}
+var _submit0=submit;
+submit=function(){
+  if(!isOnline()){if(!S.pendSync){S.pendSync=1;save()}return}
+  _submit0();
+};
+function flushSync(){
+  if(!S.pendSync||!isOnline()||!window.FB)return;
+  S.pendSync=0;save();
+  var p;try{p=submitP()}catch(e){p=null}
+  if(p&&p.then)p.then(function(){showToast('☁️ رجع الإنترنت — تمت مزامنة نقاطك وتقدمك!')});
+  try{cloudSave(true)}catch(e){}
+}
+window.addEventListener('online',function(){updNet();showToast('🟢 رجع الاتصال بالإنترنت');setTimeout(flushSync,800)});
+window.addEventListener('offline',function(){updNet();showToast('⚡ وضع بدون إنترنت — كمّل لعب وتقدمك محفوظ')});
+var _onFB0=window.onFB;
+window.onFB=function(){if(_onFB0)_onFB0();setTimeout(flushSync,1500)};
+
+/* ---------- Installable web app: inline manifest + install prompt ---------- */
+var INS_EVT=null;
+function isStandalone(){try{return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true}catch(e){return false}}
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+function pwaIcon(sz,maskable){
+  try{
+    var cv=document.createElement('canvas');cv.width=cv.height=sz;var x=cv.getContext('2d');
+    var g=x.createLinearGradient(0,0,sz,sz);g.addColorStop(0,'#2F5F5A');g.addColorStop(1,'#1B3B38');
+    x.fillStyle=g;
+    if(maskable||!x.roundRect){x.fillRect(0,0,sz,sz)}else{x.beginPath();x.roundRect(0,0,sz,sz,sz*0.2);x.fill()}
+    var pad=maskable?sz*0.2:sz*0.09;
+    x.strokeStyle='#C9973F';x.lineWidth=sz*0.035;
+    x.beginPath();x.arc(sz/2,sz/2,sz/2-pad,0,Math.PI*2);x.stroke();
+    x.fillStyle='#FFD700';x.textAlign='center';x.textBaseline='middle';
+    x.font='900 '+Math.round(sz*(maskable?0.3:0.36))+'px Arial, sans-serif';
+    x.fillText('ABC',sz/2,sz*0.47);
+    x.fillStyle='#FFE9B8';x.font='900 '+Math.round(sz*(maskable?0.1:0.12))+'px Arial, sans-serif';
+    x.fillText('★ ★ ★',sz/2,sz*0.7);
+    return cv.toDataURL('image/png');
+  }catch(e){return ''}
+}
+function setupManifest(){
+  try{
+    if(!/^https?:$/.test(location.protocol))return;
+    var base=location.href.split('#')[0].split('?')[0],scope=base.slice(0,base.lastIndexOf('/')+1);
+    var i192=pwaIcon(192),i512=pwaIcon(512),m512=pwaIcon(512,true),icons=[];
+    if(i192)icons.push({src:i192,sizes:'192x192',type:'image/png',purpose:'any'});
+    if(i512)icons.push({src:i512,sizes:'512x512',type:'image/png',purpose:'any'});
+    if(m512)icons.push({src:m512,sizes:'512x512',type:'image/png',purpose:'maskable'});
+    var man={name:'تحدّي الأصحاب — مستر عبدالرحمن حسانين',short_name:'تحدّي الأصحاب',description:'منصة ألعاب تعليمية للغة الإنجليزية (Grammora & EngliFocus)',lang:'ar',dir:'rtl',id:base,start_url:base,scope:scope,display:'standalone',orientation:'any',background_color:'#2B1B12',theme_color:'#2F5F5A',categories:['education','games'],icons:icons};
+    var link=document.getElementById('manifestLink');
+    if(!link){link=document.createElement('link');link.id='manifestLink';link.rel='manifest';document.head.appendChild(link)}
+    link.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/manifest+json'}));
+    if(i192){var at=document.createElement('link');at.rel='apple-touch-icon';at.href=i192;document.head.appendChild(at);var fv=document.createElement('link');fv.rel='icon';fv.type='image/png';fv.href=i192;document.head.appendChild(fv)}
+  }catch(e){}
+}
+function updInstallBtn(){
+  var b=document.getElementById('insBtn');if(!b)return;
+  b.style.display=(!isStandalone()&&(INS_EVT||isIOS()))?'':'none';
+}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();INS_EVT=e;updInstallBtn()});
+window.addEventListener('appinstalled',function(){INS_EVT=null;updInstallBtn();showToast('📲 تم تثبيت المنصة على جهازك!')});
+function installApp(){
+  if(INS_EVT){
+    var ev=INS_EVT;INS_EVT=null;
+    try{ev.prompt();if(ev.userChoice&&ev.userChoice.then)ev.userChoice.then(function(){updInstallBtn()})}catch(e){}
+    updInstallBtn();return;
+  }
+  if(isIOS()){showToast('على iPhone/iPad: اضغط زر المشاركة ⬆️ ثم «إضافة إلى الشاشة الرئيسية»');return}
+  showToast('افتح قائمة المتصفح ⋮ واختر «تثبيت التطبيق»');
+}
+function installCard(){
+  if(isStandalone())return '<div class="card row"><div class="sp"><div style="font-weight:900">📲 المنصة مثبّتة على جهازك</div><div class="sm">بتشتغل كتطبيق وبدون إنترنت بعد أول زيارة</div></div><span class="sm">✅</span></div>';
+  return '<div class="card row"><div class="sp"><div style="font-weight:900">تثبيت المنصة على جهازك 📲</div><div class="sm">افتحها كتطبيق من الشاشة الرئيسية والعب بدون إنترنت</div></div><button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="installApp()">تثبيت</button></div>';
+}
+function setupSW(){
+  /* Browsers refuse to register a service worker from a Blob/Data URL, so the worker lives in sw.js next to this file. */
+  if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      if(reg&&reg.update)setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5);
+    }).catch(function(){});
+  });
+}
+
+/* ---------- Lightweight canvas confetti + ripple press feedback ---------- */
+var CF=null;
+function confetti(n){
+  try{
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    var cv=document.getElementById('confetti');
+    if(!cv){cv=document.createElement('canvas');cv.id='confetti';document.body.appendChild(cv)}
+    var dpr=Math.min(2,window.devicePixelRatio||1),W=window.innerWidth,H=window.innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;
+    var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    var cols=['#FFD700','#C9973F','#2F6B4A','#7C3AED','#22D3EE','#F87171','#FFFFFF','#4F46E5'];
+    n=Math.min(n||(W<600?70:130),160);
+    var P=(CF&&CF.P)||[];
+    for(var i=0;i<n;i++){
+      var left=i%2===0;
+      P.push({x:left?-10:W+10,y:H*(0.35+Math.random()*0.35),vx:(left?1:-1)*(5+Math.random()*9),vy:-(7+Math.random()*9),w:6+Math.random()*7,h:4+Math.random()*5,r:Math.random()*6.28,vr:(Math.random()-0.5)*0.4,c:cols[i%cols.length],life:0});
+    }
+    if(CF){CF.P=P;return}
+    CF={P:P};
+    var last=performance.now();
+    (function step(now){
+      var dt=Math.min(2.2,(now-last)/16.67);last=now;
+      x.clearRect(0,0,W,H);
+      var alive=0;
+      for(var j=0;j<P.length;j++){
+        var p=P[j];
+        p.life+=dt;p.vy+=0.32*dt;p.vx*=Math.pow(0.99,dt);
+        p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;
+        if(p.y>H+30||p.life>240)continue;
+        alive++;
+        x.save();x.translate(p.x,p.y);x.rotate(p.r);
+        x.globalAlpha=Math.max(0,Math.min(1,(240-p.life)/50));
+        x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h*(0.5+Math.abs(Math.cos(p.life*0.15))*0.5));
+        x.restore();
+      }
+      if(alive>0)requestAnimationFrame(step);
+      else{x.clearRect(0,0,W,H);CF=null;if(cv.parentNode)cv.parentNode.removeChild(cv)}
+    })(last);
+  }catch(e){CF=null}
+}
+var _sfxWin0=sfxWin;sfxWin=function(){_sfxWin0();confetti()};
+var _sfxChest0=sfxChest;sfxChest=function(){_sfxChest0();confetti(80)};
+var _sfxCardsDone0=sfxCardsDone;sfxCardsDone=function(){_sfxCardsDone0();confetti(60)};
+document.addEventListener('pointerdown',function(e){
+  try{
+    var b=e.target&&e.target.closest&&e.target.closest('.btn,.opt,.mode-tile,.hero-play,.lv,.pwb,.h-tab,.tb-pill,.snav button,.pr-btn');
+    if(!b||b.disabled)return;
+    var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height),s=document.createElement('span');
+    s.className='rpl';s.style.width=s.style.height=d+'px';
+    s.style.left=(e.clientX-r.left-d/2)+'px';s.style.top=(e.clientY-r.top-d/2)+'px';
+    b.appendChild(s);setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s)},600);
+  }catch(err){}
+},{passive:true});
+
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():(!S.nick?nickReq():home()));if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
+setupManifest();setupSW();updNet();updInstallBtn();syncMode();renderSide();if(isOnline()&&S.pendSync)setTimeout(flushSync,4000);
 </script>
 </body>
 </html>
