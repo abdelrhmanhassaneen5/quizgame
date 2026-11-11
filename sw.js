@@ -1,7 +1,7 @@
 /* تحدّي الأصحاب — Service Worker (offline-first)
    ارفع هذا الملف في نفس مجلد index.html.
    عند أي تحديث للعبة غيّر رقم الإصدار في السطر التالي ليتم تجديد الكاش عند الطلاب. */
-var VERSION = 'qd-v6.0.0';
+var VERSION = 'qd-v7.0.0';
 var CORE = VERSION + '-core';
 var RUNTIME = VERSION + '-runtime';
 
