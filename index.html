@@ -157,16 +157,17 @@ body.dark .cls-qbox{background:linear-gradient(135deg,#2C2C2C,#1E1E1E);color:#F5
 .boss-rage{background:linear-gradient(135deg,#8B0000,#FF4500);color:#FFF;border:2px solid #FFD700;border-radius:10px;padding:3px 10px;font-size:12px;font-weight:900;display:inline-flex;align-items:center;gap:4px;box-shadow:0 0 12px rgba(255,69,0,0.75);animation:pl 0.8s infinite}
 .w-tab{flex:1;background:var(--card);border:2.5px solid #8A6A4A;border-radius:14px;padding:8px 6px;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;color:var(--ink);cursor:pointer;text-align:center;box-shadow:0 3px 0 #6B4A3A}
 .w-tab.act{background:linear-gradient(135deg,#2F5F5A,#1B3B38);color:#FFE9B8;border-color:#FFD700;box-shadow:0 3px 0 #122826}
+.mic-btn{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border:4px solid #FFD700;font-size:36px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 0 #122826,0 8px 20px rgba(0,0,0,0.3);transition:transform 0.15s}
+.mic-btn.rec{background:linear-gradient(135deg,#B23A3A,#6B1D1D);border-color:#FFF;animation:micPulse 1s infinite}
+@keyframes micPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(178,58,58,0.7)}50%{transform:scale(1.08);box-shadow:0 0 0 14px rgba(178,58,58,0)}}
+.psg-box{background:linear-gradient(135deg,#FFFDF7,#FFF5DA);border:2.5px solid #2F5F5A;border-radius:16px;padding:14px;direction:ltr;text-align:left;font-size:17px;line-height:1.75;font-weight:700;color:#3A2318;box-shadow:inset 0 2px 8px rgba(0,0,0,0.08)}
+body.dark .psg-box{background:linear-gradient(135deg,#262626,#1C1C1C);color:#F5F5F5;border-color:#C9973F}
+.psg-hl{background:#FFE066;color:#4A2F22;padding:1px 5px;border-radius:6px;border-bottom:2px solid #C9973F;font-weight:900;transition:all 0.3s}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -249,7 +250,7 @@ var tr=true,G=null,S={},DB=0,app=document.getElementById('app');
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
-function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};
+function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.spkOk=S.spkOk||0;S.psgOk=S.psgOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};
 if(S.max===20&&S.stars[20]>0)S.max=21;
 ['prog_p','prog_m','prog_s'].forEach(function(pk){if(S[pk]&&S[pk].max===20&&S[pk].stars&&S[pk].stars[20]>0)S[pk].max=21});S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.clsCodes=Array.isArray(S.clsCodes)?S.clsCodes:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
@@ -332,16 +333,16 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v4.0',
-  title:'تحديث البكالوريا والعالم الثاني (٤٠ جولة)! 🎓🐉⚡',
-  sub:'الإصدار الملحمي (v4.0)',
-  gift:100,
-  intro:'أهلاً بيك يا بطل في التحديث الأكبر لمنصة «تحدّي الأصحاب»! شوف المفاجآت الجديدة اللي ضفناها ليك مع الحفاظ الكامل على تقدمك:',
+  ver:'v5.0',
+  title:'تحديث التحدي الصوتي والقطعة الذكية! 🎙️🕵️‍♂️🏫',
+  sub:'الإصدار التفاعلي الخامس (v5.0)',
+  gift:120,
+  intro:'أهلاً بيك يا بطل في التحديث الخامس لمنصة «تحدّي الأصحاب»! ضفنا لك نمطين تفاعليين جداد وتطوير شامل لبطولة السنتر:',
   items:[
-    {ic:'🎓',t:'إضافة المرحلة الثانوية (نظام البكالوريا - ١ و ٢ و ٣ ثانوي)',d:'ضفنا قسم كامل لطلاب البكالوريا (الأول والثاني والثالث الثانوي) بأسئلة مستويات عليا، وحدات دراسية، ومرادفات ومضادات واكتشاف الأخطاء!'},
-    {ic:'🗺️',t:'توسيع الخريطة إلى ٤٠ جولة (العالم الثاني: أراضي الأساطير)',d:'لو كنت قفلت الجولة ٢٠، هتلاقي الجولة ٢١ اتفتحتلك تلقائياً! ٢٠ جولة جديدة وزعماء أساطير (زعيم الرعد ⚡، الظلام 🌑، الفضاء 🌌، وإمبراطور الزعماء 👑)!'},
-    {ic:'🛡️',t:'قدرات الزعماء الجديدة (درع الزعيم & سؤال الغضب)',d:'الزعماء بقى عندهم درع طاقة 🛡️ لازم تكسره بأول إجابة صح، ولما صحتهم توصل لنقطة أخيرة بيطلقوا «سؤال الغضب 🔥» بمكافأة عملات مضاعفة ×2!'},
-    {ic:'🎭',t:'أنماط أسئلة جديدة (المرادف والمضاد & اكتشف الخطأ)',d:'أسئلة تفاعلية جديدة لقياس الفهم العميق للكلمات في السياق وتصحيح الأخطاء النحوية بدقة!'}
+    {ic:'🎙️',t:'نمط «انطق واضرب الوحش» (Speak to Attack)',d:'وداعاً لرهبة التحدث! اسمع الكلمة أو الجملة وانطقها بصوتك في الميكروفون عشان تضرب الوحش وتكسب عملات وأوسمة!'},
+    {ic:'🕵️‍♂️',t:'نمط «محقق القطعة الذكية» (Mini-Passage Detective)',d:'قصص وألغاز قصيرة ممتعة لمستوى صفك الدراسي مع إضاءة الكلمات المفتاحية باللون الأصفر لتتعلم حل سؤال القطعة بسهولة!'},
+    {ic:'🏫',t:'نظام «دفعة الأبطال» وخصوصية كود السنتر',d:'تحديث بطولة الحصة ليلعب ٣ طلاب معاً في كل سؤال مع ميزة خطف السؤال، وكود خاص لكل مجموعة لحفظ خصوصية كل مرحلة!'},
+    {ic:'📈',t:'تدرج ذكي لمستوى الأسئلة حسب صفك الدراسي',d:'الأسئلة بقت متفصلة بدقة على مقاس صفك الدراسي (من أولى ابتدائي لحد تالتة ثانوي) مع مراجعة تراكمية مألوفة ليك!'}
   ]
 };
 function checkWhatsNew(){
@@ -470,6 +471,20 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
       '</div>'+
       '<button class="btn" style="font-size:13px;min-height:38px;padding:6px 12px;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);white-space:nowrap" onclick="sbIntro()">العب الآن ▶</button>'+
     '</div>'+
+  '</div>'+
+
+  /* Speak to Attack & Mini-Passage Detective Grid */
+  '<div class="mode-grid">'+
+    '<button class="mode-tile" style="background:linear-gradient(135deg,#FFF8E7,#FFE0B2);border-color:#7A3B3B;box-shadow:0 4px 0 #4A1C1C" onclick="spkIntro()">'+
+      '<span class="m-ic">🎙️🗣️</span>'+
+      '<span class="m-tt">انطق واضرب الوحش <span style="background:#7A3B3B;color:#FFE9B8;font-size:9px;padding:1px 5px;border-radius:5px">جديد</span></span>'+
+      '<span class="m-sb" style="color:#7A3B3B">'+(S.spkOk?'نطقت '+S.spkOk+' جملة صح 🔥':'تحدي المايك والنطق السليم')+'</span>'+
+    '</button>'+
+    '<button class="mode-tile" style="background:linear-gradient(135deg,#EAF3FA,#D6E8F5);border-color:#2F5F5A;box-shadow:0 4px 0 #1B3B38" onclick="psgIntro()">'+
+      '<span class="m-ic">🕵️‍♂️📖</span>'+
+      '<span class="m-tt">محقق القطعة الذكية <span style="background:#2F5F5A;color:#FFE9B8;font-size:9px;padding:1px 5px;border-radius:5px">جديد</span></span>'+
+      '<span class="m-sb" style="color:#2F5F5A">'+(S.psgOk?'حلّيت '+S.psgOk+' قطع ذكية 🌟':'استنتج الحل من القصة')+'</span>'+
+    '</button>'+
   '</div>'+
 
   /* Smart Pet Companion Banner */
@@ -1676,7 +1691,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,spkOk:S.spkOk||0,psgOk:S.psgOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -1702,7 +1717,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),spkOk:n(o.spkOk),psgOk:n(o.psgOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
@@ -1831,7 +1846,9 @@ var BADGES=[
   {id:'b_gold',ic:'🛡️',n:'فارس الدوري الذهبي',d:'اوصل لـ 3000 نقطة أسبوعية (الدوري الذهبي)',r:200,prog:function(){var v=wkPts();return [Math.min(3000,v),3000]}},
   {id:'b_sb20',ic:'🧩',n:'مهندس الجمل',d:'ركّب 20 جملة إنجليزية صحيحة في تحدي تركيب الجمل',r:150,prog:function(){var v=S.sbOk||0;return [Math.min(20,v),20]}},
   {id:'b_king20',ic:'👑',n:'قاهر العالم الأول',d:'اختم أول 20 جولة في خريطة المغامرات',r:300,prog:function(){var v=mapDone()?20:Math.min(19,S.max||1);return [v,20]}},
-  {id:'b_emp40',ic:'⚡',n:'إمبراطور الأساطير',d:'اختم جميع الـ 40 جولة في العالم الثاني وأراضي الأساطير',r:500,prog:function(){var v=mapDone40()?40:Math.min(39,S.max||1);return [v,40]}}
+  {id:'b_emp40',ic:'⚡',n:'إمبراطور الأساطير',d:'اختم جميع الـ 40 جولة في العالم الثاني وأراضي الأساطير',r:500,prog:function(){var v=mapDone40()?40:Math.min(39,S.max||1);return [v,40]}},
+  {id:'b_spk15',ic:'🎙️',n:'المتحدث الفصيح',d:'انطق 15 كلمة أو جملة إنجليزية نطقاً صحيحاً بالمايك',r:180,prog:function(){var v=S.spkOk||0;return [Math.min(15,v),15]}},
+  {id:'b_psg5',ic:'🕵️‍♂️',n:'محقق القطعة الذكي',d:'اقفل 5 قطع قراءة تفاعلية في نمط محقق القطعة',r:180,prog:function(){var v=S.psgOk||0;return [Math.min(5,v),5]}}
 ];
 function bdgCheck(){
   S.bdg=S.bdg||[];
@@ -2687,6 +2704,497 @@ function endSBMode(){
     '</div>'+
     rv+
     '<button class="btn" style="font-size:19px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="startSBMode()">🔄 العب جولة تركيب جمل جديدة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+}
+/* === ١. نمط التحدي الصوتي والميكروفون: انطق واضرب الوحش (Speak to Attack 🎙️🗣️) === */
+var SPK_BANK={
+  p12:[
+    ['Apple','تفاحة 🍎','انطق كلمة Apple بوضوح.'],
+    ['School','مدرسة 🏫','انطق كلمة School بوضوح.'],
+    ['Happy','سعيد 😊','انطق كلمة Happy بوضوح.'],
+    ['Water','ماء 💧','انطق كلمة Water بوضوح.'],
+    ['I am a clever boy','أنا ولد شاطر 🌟','انطق الجملة كلمة كلمة بهدوء.'],
+    ['She is my mother','هي أمي ❤️','انطق الجملة بوضوح.'],
+    ['I can swim fast','أنا أستطيع السباحة بسرعة 🏊‍♂️','انطق الجملة بوضوح.'],
+    ['This is a big cat','هذه قطة كبيرة 🐱','انطق الجملة بوضوح.'],
+    ['Yellow','أصفر 💛','انطق اللون Yellow بوضوح.'],
+    ['Thank you very much','شكراً جزيلاً لك 🙏','انطق التحية بوضوح.']
+  ],
+  p36:[
+    ['We go to school every day','نحن نذهب إلى المدرسة كل يوم 🎒','انطق الجملة كاملة بوضوح.'],
+    ['She plays tennis on Friday','هي تلعب التنس يوم الجمعة 🎾','لا تنسَ صوت الـ s في plays.'],
+    ['Yesterday I visited the zoo','أمس زرت حديقة الحيوان 🦁','انطق الفعل الماضي visited بوضوح.'],
+    ['Alexandria is a beautiful city','الإسكندرية مدينة جميلة 🌊','انطق اسم الإسكندرية والصفة بوضوح.'],
+    ['My father works in a hospital','أبي يعمل في مستشفى 🏥','انطق الجملة بهدوء ووضوح.'],
+    ['What time do you get up','في أي وقت تستيقظ؟ ⏰','انطق السؤال بنبرة واضحة.'],
+    ['Reading books is very useful','قراءة الكتب مفيدة جداً 📚','انطق الجملة بوضوح.'],
+    ['The giraffe is taller than the horse','الزرافة أطول من الحصان 🦒','انطق صيغة المقارنة taller than بوضوح.']
+  ],
+  m:[
+    ['If you study hard you will succeed','إذا ذاكرت بجد سوف تنجح 🎓','انطق جملة الشرط بوضوح وثقة.'],
+    ['He has lived in Egypt for ten years','هو يعيش في مصر منذ عشر سنوات 🇪🇬','انطق المضارع التام بوضوح.'],
+    ['While I was walking I met my friend','بينما كنت أمشي قابلت صديقي 🤝','انطق الجملة المركبة بهدوء.'],
+    ['English is spoken all over the world','اللغة الإنجليزية يُتحدث بها حول العالم 🌍','انطق الجملة بوضوح.'],
+    ['You should always help your parents','ينبغي دائماً أن تساعد والديك ❤️','انطق الجملة بوضوح.'],
+    ['Have you ever travelled by plane','هل سافرت من قبل بالطائرة؟ ✈️','انطق السؤال بوضوح.'],
+    ['Practice makes perfect','الممارسة تصنع الإتقان 🔥','انطق الحكمة الإنجليزية الشهيرة.'],
+    ['Knowledge is power','المعرفة قوة 💡','انطق العبارة بوضوح.']
+  ],
+  s:[
+    ['Artificial intelligence is changing the future','الذكاء الاصطناعي يغير المستقبل 🤖','انطق المصطلح العلمي بوضوح.'],
+    ['Hard work and perseverance lead to success','العمل الجاد والمثابرة يقودان إلى النجاح 🏆','انطق الكلمات المتقدمة بثقة.'],
+    ['We must protect our natural environment','يجب أن نحمي بيئتنا الطبيعية 🌱','انطق الجملة بوضوح.'],
+    ['Education is the key to prosperity','التعليم هو مفتاح الازدهار والرخاء 🎓','انطق الجملة بطلاقة.'],
+    ['Never give up on your dreams','لا تتخلَّ أبداً عن أحلامك ⭐','انطق الجملة بحماس ووضوح.'],
+    ['Time management is essential for students','إدارة الوقت ضرورية للطلاب ⏱️','انطق الجملة بوضوح.']
+  ]
+};
+var SR_INST=null,SPK_REC=false;
+function hasSpeechRec(){
+  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+function getSpkPool(){
+  var st=S.stage||'m',gr=S.grade||1;
+  if(st==='p')return (gr<=2)?SPK_BANK.p12:SPK_BANK.p36;
+  if(st==='s')return SPK_BANK.s;
+  return SPK_BANK.m;
+}
+function normSpkStr(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+}
+function calcSpkMatch(target,said){
+  var t=normSpkStr(target),s=normSpkStr(said);
+  if(!s)return 0;
+  if(t===s || s.indexOf(t)>=0)return 100;
+  var tw=t.split(' '),sw=s.split(' ');
+  var matched=0;
+  tw.forEach(function(w){
+    if(sw.indexOf(w)>=0)matched++;
+    else{
+      for(var i=0;i<sw.length;i++){
+        if(w.length>=4 && sw[i].length>=4 && (w.slice(0,3)===sw[i].slice(0,3))) {matched+=0.75;break;}
+      }
+    }
+  });
+  return Math.min(100,Math.round((matched/tw.length)*100));
+}
+function spkIntro(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  clearInterval(G&&G.t);
+  var cnt=S.spkOk||0,sup=hasSpeechRec();
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>انطق واضرب الوحش 🎙️🗣️</h1><div>تحدي الميكروفون والنطق الصحيح (Speak to Attack)</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg('c',58)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">أهلاً بيك في تحدي الأبطال الصوتى! هنا سلاحك هو <b>صوتك ونطقك السليم للإنجليزي</b>. اسمع الجملة الأول، وبعدين اضغط على المايك وانطقها بصوت واضح عشان تضرب الوحش!</div>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.9;font-size:14px">'+
+      '<div class="tag g" style="margin-bottom:8px">إزاي تلعب وتكسب في تحدي المايك؟</div>'+
+      '🔊 <b>١. اسمع الأول:</b> اضغط على <b>«اسمع النطق الصحيح»</b> وركّز في مخارج الحروف.<br>'+
+      '🎙️ <b>٢. انطق بثقة:</b> اضغط على زر المايك الدائري وانطق الكلمة أو الجملة بصوت مسموع وواضح.<br>'+
+      '⚔️ <b>٣. اضرب الوحش:</b> لو نطقك سليم بنسبة <b>65% فأكثر</b> هتضرب الوحش وتكسب عملات ونقاط فورية!<br>'+
+      '🤫 <b>وضع المكان الهادئ:</b> لو مفيش مايك متاح في متصفحك أو قاعد في مكان هادئ، تقدر تستخدم <b>«التدريب الصوتي البديل»</b> في نفس الشاشة!<br>'+
+      '🏅 <b>وسام المتحدث الفصيح:</b> انطق 15 جملة صح وافتح وسام ولقب <b>«🎙️ المتحدث الفصيح» (+180 عملة)</b>!'+
+    '</div>'+
+    (!sup?'<div class="card" style="background:#FFF3E0;border-color:#D9742B;font-size:13px;font-weight:700;text-align:center">💡 متصفحك الحالي لا يدعم المايك المباشر (يفضل فتح اللعبة من Google Chrome)، ولكن فعّلنا لك <b>نمط التدريب السمعي والنطقي الذكي</b> لتلعب وتتدرب فوراً!</div>':'')+
+    '<div class="card row" style="justify-content:space-around;background:#FFE8B5">'+
+      '<div style="text-align:center"><div class="sm">جمل نطقتها صح</div><div class="big" style="font-size:28px;color:#2F6B4A">'+cnt+' <span style="font-size:14px">جملة 🎙️</span></div></div>'+
+      '<div style="text-align:center"><div class="sm">رصيد عملاتك</div><div class="big" style="font-size:28px;color:#7A3B3B">'+S.coins+' 🪙</div></div>'+
+    '</div>'+
+    '<div class="sp"></div>'+
+    '<button class="btn" style="font-size:20px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="startSpkMode()">🎙️ ابدأ تحدي النطق الآن!</button>'+
+    '<button class="btn t" onclick="home()">رجوع للرئيسية</button>';
+}
+function startSpkMode(){
+  clearInterval(G&&G.t);
+  var pool=shuffle(getSpkPool().slice()).slice(0,5);
+  G={spkMode:true,lv:10,tier:1,n:pool.length,qs:pool,i:0,ok:0,mhp:pool.length,mx:pool.length,earned:0,done:false,heard:'',score:0};
+  showSpkQ();
+}
+function showSpkQ(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var item=G.qs[G.i];
+  G.done=false;G.heard='';G.score=0;SPK_REC=false;
+  var sup=hasSpeechRec();
+  app.innerHTML='<div class="row">'+
+      '<div class="chip" style="background:#7A3B3B;color:#FFE9B8;border-color:#FFD700">🎙️ تحدي '+(G.i+1)+' / '+G.n+'</div>'+
+      '<div class="chip">✅ صح: '+G.ok+'</div>'+
+      '<div class="sp"></div>'+
+      '<div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div>'+
+    '</div>'+
+    '<div class="card" style="padding:8px">'+
+      '<div class="row"><span class="sm">وحش الصمت • انطق بالإنجليزي لهزيمته!</span><div class="bar m"><i id="mh" style="width:'+(G.mhp/G.mx*100)+'%"></i></div></div>'+
+      '<div id="mon" style="text-align:center"><div id="ms" style="display:inline-block;transform:scale(.82)">'+monster(10,S.eq.ch)+'</div></div>'+
+    '</div>'+
+    '<div class="card" style="text-align:center;background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border:2.5px solid #2F5F5A">'+
+      '<div class="tag g">اسمع الجملة ثم انطقها بصوتك</div>'+
+      '<div style="direction:ltr;font-size:25px;font-weight:900;color:#7A3B3B;margin:10px 0;line-height:1.4">'+esc(item[0])+'</div>'+
+      '<div style="font-size:16px;font-weight:700;color:#2F5F5A;border-top:2px dashed #C9973F;padding-top:6px">'+esc(item[1])+'</div>'+
+      '<button class="btn t" style="margin-top:10px;font-size:15px;min-height:40px;padding:6px 18px;display:inline-flex;align-items:center;gap:8px" onclick="speak(G.qs[G.i][0])">🔊 اسمع النطق الصحيح أولاً</button>'+
+    '</div>'+
+    '<div class="card" style="text-align:center;padding:16px" id="spkCtrl">'+
+      (sup
+        ? '<button id="micBtn" class="mic-btn" onclick="toggleMicRec()">🎙️</button>'+
+          '<div id="micStatus" style="font-weight:900;font-size:15px;margin-top:8px;color:#2F5F5A">اضغط على المايك وانطق الجملة بالإنجليزي 👆</div>'+
+          '<div id="micHeard" class="sm" style="margin-top:4px;min-height:20px;direction:ltr"></div>'+
+          '<div style="margin-top:10px;border-top:1px dashed rgba(138,106,74,0.35);padding-top:8px">'+
+            '<button class="pwb" style="font-size:12px;min-height:34px;padding:4px 10px" onclick="spkFallbackCheck()">🤫 لا يوجد مايك حاليًا؟ تدرب صوتياً واختبر نفسك</button>'+
+          '</div>'
+        : '<div style="font-weight:900;font-size:15px;color:#7A3B3B;margin-bottom:8px">🎧 التدريب النطقي الذكي (متصفحك بدون مايك مباشر)</div>'+
+          '<div class="sm" style="margin-bottom:10px">١. اضغط على «🔊 اسمع النطق الصحيح» فوق.<br>٢. انطق الجملة بصوت عالي ٣ مرات ثم اضغط تحت لتأكيد نطقك:</div>'+
+          '<button class="btn" style="width:100%;background:linear-gradient(135deg,#2F6B4A,#1B432C);font-size:17px" onclick="evalSpkResult(100,G.qs[G.i][0])">✅ سمعتها ونطقتها بصوت واضح!</button>'
+      )+
+    '</div>'+
+    '<div id="fb"></div>'+
+    '<button class="btn t" style="font-size:13px;min-height:38px" onclick="home()">العودة للرئيسية</button>';
+  if(!S.mute)setTimeout(function(){if(G&&G.spkMode)speak(item[0])},350);
+}
+function spkFallbackCheck(){
+  if(!G||G.done)return;
+  speak(G.qs[G.i][0]);
+  var ctrl=$('#spkCtrl');
+  if(ctrl){
+    ctrl.innerHTML='<div style="font-weight:900;font-size:15px;color:#2F5F5A;margin-bottom:8px">🗣️ انطق الجملة بصوتك الآن بعد سماعها:</div>'+
+      '<div style="direction:ltr;font-weight:900;font-size:20px;color:#7A3B3B;margin-bottom:10px">'+esc(G.qs[G.i][0])+'</div>'+
+      '<div class="row" style="gap:8px">'+
+        '<button class="btn" style="flex:2;background:linear-gradient(135deg,#2F6B4A,#1B432C);font-size:15px" onclick="evalSpkResult(95,G.qs[G.i][0])">✅ نطقتها صح وواضح!</button>'+
+        '<button class="btn t" style="flex:1;font-size:14px" onclick="speak(G.qs[G.i][0])">🔊 اسمع تاني</button>'+
+      '</div>';
+  }
+}
+function toggleMicRec(){
+  if(!G||G.done)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){spkFallbackCheck();return}
+  if(SPK_REC && SR_INST){
+    try{SR_INST.stop()}catch(e){}
+    SPK_REC=false;
+    return;
+  }
+  try{
+    if('speechSynthesis' in window)speechSynthesis.cancel();
+    var rec=new SR();
+    SR_INST=rec;
+    rec.lang='en-US';
+    rec.interimResults=false;
+    rec.maxAlternatives=3;
+    SPK_REC=true;
+    var mb=$('#micBtn'),st=$('#micStatus');
+    if(mb)mb.classList.add('rec');
+    if(st){st.textContent='🔴 جاري الاستماع.. انطق الجملة الآن!';st.style.color='#B23A3A'}
+    tone(660,0,0.08,'sine',0.12);
+    rec.onresult=function(ev){
+      SPK_REC=false;
+      if($('#micBtn'))$('#micBtn').classList.remove('rec');
+      var bestPct=0,bestTxt='';
+      var target=G.qs[G.i][0];
+      var resList=ev.results[0];
+      for(var a=0;a<resList.length;a++){
+        var trTxt=resList[a].transcript||'';
+        var p=calcSpkMatch(target,trTxt);
+        if(p>=bestPct){bestPct=p;bestTxt=trTxt}
+      }
+      evalSpkResult(bestPct,bestTxt);
+    };
+    rec.onerror=function(err){
+      SPK_REC=false;
+      if($('#micBtn'))$('#micBtn').classList.remove('rec');
+      var stEl=$('#micStatus');
+      if(stEl){
+        stEl.innerHTML='لم نتمكن من سماع الصوت بوضوح ('+(err.error||'تأكد من إذن المايك')+'). جرّب الضغط مرة أخرى أو استخدم زر التدريب بالأسفل 👇';
+        stEl.style.color='#8B2E2E';
+      }
+    };
+    rec.onend=function(){
+      if(SPK_REC){
+        SPK_REC=false;
+        if($('#micBtn'))$('#micBtn').classList.remove('rec');
+      }
+    };
+    rec.start();
+  }catch(e){
+    spkFallbackCheck();
+  }
+}
+function evalSpkResult(pct,heardTxt){
+  if(!G||G.done)return;
+  var item=G.qs[G.i];
+  var good=(pct>=65);
+  var mh=$('#micHeard'),st=$('#micStatus');
+  if(mh&&heardTxt)mh.innerHTML='ما سمعه المايك: <b>"'+esc(heardTxt)+'"</b> (دقة النطق: <b>'+pct+'%</b>)';
+  if(!good){
+    sfxBad(true);
+    anim('atk');changeBossExpression('angry');
+    if(st){
+      st.innerHTML='⚠️ دقة النطق '+pct+'% — اسمع الجملة مرة تانية وحاول تنطقها بوضوح أكتر!';
+      st.style.color='#8B2E2E';
+    }
+    $('#fb').innerHTML='<div class="card row" style="border-color:#8B2E2E">'+misterImg('h',46)+
+      '<div class="sp"><div style="font-weight:900;color:#8B2E2E">قربت جداً يا بطل! اضغط على المايك وجرّب تنطقها كمان مرة، أو تخطَّ للجملة التالية.</div><div class="sm">'+esc(item[2])+'</div></div>'+
+    '</div>'+
+    '<button class="btn t" style="width:100%;margin-top:8px" onclick="'+(G.i>=G.n-1?'endSpkMode()':'G.i++;showSpkQ()')+'">تخطي للجملة التالية ⬅️</button>';
+    return;
+  }
+  G.done=true;
+  G.ok++;
+  G.mhp=Math.max(0,G.mhp-1);
+  S.spkOk=(S.spkOk||0)+1;
+  var gain=20+(pct>=90?10:0);
+  S.coins+=gain;G.earned+=gain;
+  creditPts(gain);roomAdd(gain);
+  if(S.ts){var a=S.ts.listen||(S.ts.listen=[0,0]);a[0]++;a[1]++}
+  mTick('a');mTick('ls');
+  var bm=bdgCheck();
+  if($('#cn'))$('#cn').textContent=S.coins;
+  if($('#mh'))$('#mh').style.width=(G.mhp/G.mx*100)+'%';
+  var ctrl=$('#spkCtrl');
+  if(ctrl)ctrl.innerHTML='<div style="font-size:32px">🎙️✅</div><div style="font-weight:900;font-size:17px;color:#2F6B4A">نطق ممتاز يا بطل! (دقة النطق: '+pct+'%)</div>'+(heardTxt?'<div class="sm" style="direction:ltr;margin-top:4px">"'+esc(heardTxt)+'"</div>':'');
+  anim('hit');sfxOk(true);changeBossExpression(G.mhp<=0?'win':'hit');
+  save();
+  var last=(G.i>=G.n-1);
+  $('#fb').innerHTML='<div class="card row" style="border-color:#2F6B4A">'+misterImg('c',48)+
+    '<div class="sp"><div style="font-weight:900;color:#2F6B4A">🎉 عاش على نطقك الجميل! +'+gain+' عملة ذهبية'+(bm?' • '+bm:'')+'</div><div class="sm">'+esc(item[2])+'</div></div>'+
+  '</div>'+
+  '<button class="btn" style="width:100%;margin-top:8px;font-size:18px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="'+(last?'endSpkMode()':'G.i++;showSpkQ()')+'">'+(last?'شوف نتيجتك النهائية 🏆':'الجملة التالية ⬅️')+'</button>';
+}
+function endSpkMode(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var bonus=(G.ok===G.n)?40:(G.ok>=3?20:0);
+  if(bonus>0){S.coins+=bonus;G.earned+=bonus;creditPts(bonus);roomAdd(bonus)}
+  if(G.ok>=3){S.nr=(S.nr||0)+1;mTick('r');mTick('w');dayRoundDone()}
+  var bm=bdgCheck();
+  save();submit();
+  if(G.ok>=3)sfxWin();
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700"><h1>أنهيت تحدي النطق الصوتي! 🎙️🏆</h1><div>نطقت '+G.ok+' من '+G.n+' جمل بنجاح</div></div>'+
+    '<div class="card row">'+misterImg(G.ok>=3?'c':'h',56)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">'+(G.ok>=4?'الله عليك يا بطل! نطقك للإنجليزي واضح وممتاز وهزمت الوحش بصوتك! استمر كل يوم عشان لسانك يتعود على الطلاقة.':(G.ok>=2?'بداية رائعة! كل ما تسمع وتكرر بصوتك هتلاقي نطقك بقى أسرع وأوضح.':'ولا يهمك! أهم خطوة هي إنك تحاول تنطق بصوت مسموع، جرب جولة كمان واسمع الجملة الأول!'))+'</div>'+
+    '</div>'+
+    (bm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900">'+bm+'</div>':'')+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="card" style="text-align:center"><div class="sm">جمل صحيحة بالصوت</div><div class="big" style="font-size:28px;color:#2F6B4A">'+G.ok+' / '+G.n+'</div></div>'+
+      '<div class="card" style="text-align:center"><div class="sm">العملات المكتسبة</div><div class="big" style="font-size:28px;color:#7A3B3B">+'+G.earned+' 🪙</div></div>'+
+    '</div>'+
+    '<button class="btn" style="font-size:19px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="startSpkMode()">🎙️ العب جولة نطق جديدة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+}
+
+/* === ٢. نمط محقق القطعة الذكية (Mini-Passage Detective 🕵️‍♂️📖) === */
+var PASSAGES_BANK={
+  p13:[
+    {
+      title:'Omar and the Little Cat 🐱',
+      arTitle:'عمر والقطة الصغيرة',
+      text:'Omar is seven years old. <span id="ev_0">He has a small white cat.</span> Every morning, <span id="ev_1">the cat drinks warm milk.</span> Omar loves his cat very much and <span id="ev_2">plays with it in the garden.</span>',
+      qs:[
+        {q:'What color is Omar\'s cat?',ar:'ما هو لون قطة عمر؟',o:['White','Black','Yellow','Blue'],a:0,ev:0,hint:'مذكور في القطعة: He has a small white cat (قطة بيضاء).'},
+        {q:'What does the cat drink every morning?',ar:'ماذا تشرب القطة كل صباح؟',o:['Warm milk','Orange juice','Tea','Coffee'],a:0,ev:1,hint:'مذكور في القطعة: the cat drinks warm milk (حليب دافئ).'},
+        {q:'Where does Omar play with his cat?',ar:'أين يلعب عمر مع قطته؟',o:['In the garden','At school','In the street','At the zoo'],a:0,ev:2,hint:'مذكور في القطعة: plays with it in the garden (في الحديقة).'}
+      ]
+    },
+    {
+      title:'A Trip to the Zoo 🦁',
+      arTitle:'رحلة إلى حديقة الحيوان',
+      text:'Last Friday, <span id="ev_0">Salma went to the zoo with her family.</span> She saw a big elephant and <span id="ev_1">a tall giraffe eating green leaves.</span> Salma was very <span id="ev_2">happy and took nice photos.</span>',
+      qs:[
+        {q:'Who did Salma go to the zoo with?',ar:'مع من ذهبت سلمى إلى حديقة الحيوان؟',o:['Her family','Her teacher','Alone','Her doctor'],a:0,ev:0,hint:'مذكور في السطر الأول: with her family (مع عائلتها).'},
+        {q:'What was the tall giraffe eating?',ar:'ماذا كانت تأكل الزرافة الطويلة؟',o:['Green leaves','Meat','Fish','Bread'],a:0,ev:1,hint:'مذكور في القطعة: eating green leaves (أوراق الشجر الخضراء).'},
+        {q:'How did Salma feel at the zoo?',ar:'كيف شعرت سلمى في حديقة الحيوان؟',o:['Very happy','Sad','Angry','Tired'],a:0,ev:2,hint:'مذكور في نهاية القطعة: Salma was very happy.'}
+      ]
+    }
+  ],
+  p46:[
+    {
+      title:'The Secret of the Library Map 🗺️',
+      arTitle:'سر خريطة المكتبة',
+      text:'Ali loves reading adventure books in the school library. Yesterday, <span id="ev_0">he found an old paper inside a history book.</span> It was a riddle from Mr. Hassan, the librarian! The note said: "Look behind the globe to find the prize." <span id="ev_1">Ali looked behind the big globe and found a golden bookmark</span> because <span id="ev_2">he was the most active reader of the month.</span>',
+      qs:[
+        {q:'Where did Ali find the old paper?',ar:'أين وجد علي الورقة القديمة؟',o:['Inside a history book','Under the table','In the playground','In his bag'],a:0,ev:0,hint:'الدليل في القطعة: he found an old paper inside a history book.'},
+        {q:'What prize did Ali find behind the globe?',ar:'ما الجائزة التي وجدها علي خلف الكرة الأرضية؟',o:['A golden bookmark','A football','A new bike','A sandwich'],a:0,ev:1,hint:'الدليل في القطعة: found a golden bookmark (فاصل كتب ذهبي).'},
+        {q:'Why did Ali win this prize?',ar:'لماذا فاز علي بهذه الجائزة؟',o:['He was the most active reader','He ran the fastest','He cleaned the room','He drew a picture'],a:0,ev:2,hint:'الدليل في آخر سطر: because he was the most active reader of the month.'}
+      ]
+    },
+    {
+      title:'A Sunny Day in Alexandria 🌊',
+      arTitle:'يوم مشمس في الإسكندرية',
+      text:'Last summer, <span id="ev_0">Youssef travelled to Alexandria by train with his cousins.</span> In the morning, they swam in the sea and built a huge sandcastle. In the evening, <span id="ev_1">they visited Qaitbay Citadel and took amazing photos.</span> Before going home, <span id="ev_2">they ate delicious fresh fish by the beach.</span>',
+      qs:[
+        {q:'How did Youssef travel to Alexandria?',ar:'كيف سافر يوسف إلى الإسكندرية؟',o:['By train','By plane','By boat','On foot'],a:0,ev:0,hint:'الدليل في القطعة: travelled to Alexandria by train (بالقطار).'},
+        {q:'What historical place did they visit in the evening?',ar:'ما المكان التاريخي الذي زاروه في المساء؟',o:['Qaitbay Citadel','The Pyramids','Luxor Temple','Cairo Tower'],a:0,ev:1,hint:'الدليل في القطعة: they visited Qaitbay Citadel (قلعة قايتباي).'},
+        {q:'What did they eat before going home?',ar:'ماذا أكلوا قبل العودة للمنزل؟',o:['Fresh fish','Pizza','Chicken','Pasta'],a:0,ev:2,hint:'الدليل في نهاية القطعة: they ate delicious fresh fish.'}
+      ]
+    }
+  ],
+  m:[
+    {
+      title:'The Missing Lab Key 🕵️‍♂️🔬',
+      arTitle:'لغز مفتاح المعمل المفقود',
+      text:'At 8:00 AM, Mr. Adel noticed that the science lab key was missing from his desk. <span id="ev_0">The window was open, and there were shiny wet footprints leading to the garden.</span> Detective Karim examined the clues carefully. He remembered that <span id="ev_1">the school gardener was watering the plants near the window at 7:45 AM.</span> When Karim asked him, the gardener smiled and said <span id="ev_2">he took the key to lock the door safely after a bird flew inside!</span>',
+      qs:[
+        {q:'What clue did Detective Karim find near the desk?',ar:'ما الدليل الذي وجده المحقق كريم بالقرب من المكتب؟',o:['Wet footprints leading to the garden','A broken glass','A lost notebook','A red hat'],a:0,ev:0,hint:'الدليل المضيء في القطعة: shiny wet footprints leading to the garden.'},
+        {q:'Who was near the window at 7:45 AM?',ar:'مَن كان بالقرب من النافذة الساعة 7:45 صباحاً؟',o:['The school gardener','The bus driver','The math teacher','A new student'],a:0,ev:1,hint:'الدليل في القطعة: the school gardener was watering the plants.'},
+        {q:'Why did the gardener take the key?',ar:'لماذا أخذ الجنايني المفتاح؟',o:['To lock the door safely after a bird flew in','To hide it from students','Because he lost his own key','To clean the desk'],a:0,ev:2,hint:'الدليل في آخر القطعة: to lock the door safely after a bird flew inside.'}
+      ]
+    },
+    {
+      title:'Solar Power in the Desert ☀️⚡',
+      arTitle:'الطاقة الشمسية في الصحراء',
+      text:'Egypt is blessed with sunny weather almost all year round. In Aswan, <span id="ev_0">engineers built Benban Solar Park, one of the largest solar projects in the world.</span> Unlike fossil fuels such as coal and oil, <span id="ev_1">solar energy is "renewable" and does not pollute the air.</span> Thousands of young Egyptians <span id="ev_2">work there to produce clean electricity for millions of homes.</span>',
+      qs:[
+        {q:'Where is Benban Solar Park located?',ar:'أين يقع مجمع بنبان للطاقة الشمسية؟',o:['In Aswan','In Sinai','In Matrouh','In Port Said'],a:0,ev:0,hint:'الدليل في السطر الثاني: In Aswan, engineers built Benban Solar Park.'},
+        {q:'What does the word "renewable" mean in the passage?',ar:'ما معنى أن الطاقة الشمسية "متجددة" ونظيفة حسب القطعة؟',o:['Natural energy that never runs out or pollutes','Expensive fuel that burns fast','Energy that works only in winter','Dangerous chemical power'],a:0,ev:1,hint:'الدليل في القطعة: solar energy is renewable and does not pollute the air.'},
+        {q:'What is the main purpose of this project?',ar:'ما الهدف الرئيسي من هذا المشروع العملاق؟',o:['Producing clean electricity for millions of homes','Building a tourist hotel','Growing desert trees','Mining gold'],a:0,ev:2,hint:'الدليل في نهاية القطعة: to produce clean electricity for millions of homes.'}
+      ]
+    }
+  ],
+  s:[
+    {
+      title:'The AI Medical Breakthrough 🧠🩺',
+      arTitle:'الطفرة الطبية للذكاء الاصطناعي',
+      text:'Recent studies show that Artificial Intelligence (AI) is transforming modern healthcare. Last month, <span id="ev_0">a team of researchers developed a smart algorithm capable of detecting early signs of heart disease years before symptoms appear.</span> However, medical experts emphasize that <span id="ev_1">AI is not meant to replace human doctors, as empathy and clinical judgment remain "indispensable".</span> Instead, <span id="ev_2">combining AI speed with human wisdom reduces diagnostic errors by 40%.</span>',
+      qs:[
+        {q:'What is the main achievement of the new smart algorithm?',ar:'ما الإنجاز الرئيسي للخوارزمية الذكية الجديدة؟',o:['Detecting heart disease early before symptoms appear','Performing surgery without doctors','Manufacturing cheaper medicines','Building hospital robots'],a:0,ev:0,hint:'الدليل في القطعة: detecting early signs of heart disease years before symptoms appear.'},
+        {q:'In the passage, the word "indispensable" is closest in meaning to ____.',ar:'كلمة "indispensable" (لا غنى عنه) في القطعة أقرب في المعنى إلى:',o:['Essential and necessary','Optional and minor','Outdated and slow','Artificial and fake'],a:0,ev:1,hint:'الدليل في السياق: empathy and clinical judgment remain indispensable (ضرورية ولا غنى عنها).'},
+        {q:'According to the passage, what is the best approach for future healthcare?',ar:'وفقاً للقطعة، ما هو أفضل نهج للرعاية الصحية مستقبلاً؟',o:['Combining AI speed with human doctors\' wisdom','Replacing all doctors with computers','Ignoring AI technology completely','Relying only on traditional tools'],a:0,ev:2,hint:'الدليل في السطر الأخير: combining AI speed with human wisdom reduces diagnostic errors by 40%.'}
+      ]
+    }
+  ]
+};
+function getPsgPool(){
+  var st=S.stage||'m',gr=S.grade||1;
+  if(st==='p')return (gr<=3)?PASSAGES_BANK.p13:PASSAGES_BANK.p46;
+  if(st==='s')return PASSAGES_BANK.s.concat(PASSAGES_BANK.m);
+  return PASSAGES_BANK.m;
+}
+function psgIntro(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  clearInterval(G&&G.t);
+  var cnt=S.psgOk||0;
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>محقق القطعة الذكية 🕵️‍♂️📖</h1><div>افهم القصة واستخرج الدليل المضيء (Reading Detective)</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg('c',58)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">سؤال القطعة (Reading Comprehension) بقى لعبة ممتعة! اقرأ القصة القصيرة بتركيز، واستخرج منها إجابات الـ ٣ أسئلة.. ومع كل إجابة هينور لك <b>الدليل باللون الأصفر جوه القطعة</b> عشان تتعلم إزاي تطلع الحل بنفسك في الامتحان!</div>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.9;font-size:14px">'+
+      '<div class="tag g" style="margin-bottom:8px">مميزات نمط محقق القطعة</div>'+
+      '📖 <b>قصص وألغاز على مقاس صفك:</b> قطع قصيرة ومشوقة تناسب مستواك الدراسي ('+stgLbl()+' - '+gName()+').<br>'+
+      '🔦 <b>كشاف الدليل الذكي:</b> تقدر تضغط على زر <b>«🔦 أضئ مكان الدليل في القطعة»</b> مرة مجاناً لو سؤال وقف معاك!<br>'+
+      '🔊 <b>قراءة صوتية للقطعة:</b> تقدر تسمع القطعة كاملة بالنطق الإنجليزي الصحيح.<br>'+
+      '🏅 <b>وسام محقق القطعة:</b> حل 5 قطع بنجاح وافتح وسام ولقب <b>«🕵️‍♂️ محقق القطعة الذكي» (+180 عملة)</b>!'+
+    '</div>'+
+    '<div class="card row" style="justify-content:space-around;background:#FFE8B5">'+
+      '<div style="text-align:center"><div class="sm">قطع حلّيتها بنجاح</div><div class="big" style="font-size:28px;color:#2F6B4A">'+cnt+' <span style="font-size:14px">قطعة 🕵️‍♂️</span></div></div>'+
+      '<div style="text-align:center"><div class="sm">رصيد عملاتك</div><div class="big" style="font-size:28px;color:#7A3B3B">'+S.coins+' 🪙</div></div>'+
+    '</div>'+
+    '<div class="sp"></div>'+
+    '<button class="btn" style="font-size:20px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="startPsgMode()">🕵️‍♂️ ابدأ تحقيق القطعة الآن!</button>'+
+    '<button class="btn t" onclick="home()">رجوع للرئيسية</button>';
+}
+function startPsgMode(){
+  clearInterval(G&&G.t);
+  var pool=getPsgPool();
+  var p=shuffle(pool.slice())[0];
+  G={psgMode:true,psg:p,qi:0,n:p.qs.length,ok:0,earned:0,done:false,torch:1,hlEv:-1};
+  showPsgQ();
+}
+function highlightPsgEv(evIdx){
+  for(var i=0;i<4;i++){
+    var el=document.getElementById('ev_'+i);
+    if(el)el.className=(i===evIdx?'psg-hl':'');
+  }
+}
+function usePsgTorch(){
+  if(!G||G.done||G.torch<1)return;
+  G.torch--;
+  var q=G.psg.qs[G.qi];
+  highlightPsgEv(q.ev);
+  ding();
+  var tb=$('#torchBtn');
+  if(tb){tb.disabled=true;tb.textContent='🔦 تم إضاءة الدليل في القطعة باللون الأصفر!'}
+}
+function speakCleanPsg(){
+  if(!G||!G.psg)return;
+  var clean=G.psg.text.replace(/<[^>]+>/g,'');
+  speak(clean);
+}
+function showPsgQ(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var p=G.psg,q=p.qs[G.qi];
+  G.done=false;
+  G.ord=shuffle(q.o.map(function(_,k){return k}));
+  G.ci=G.ord.indexOf(q.a);
+  var optsHtml=G.ord.map(function(x,k){
+    return '<button class="opt" onclick="pickPsgOpt('+k+')">'+esc(q.o[x])+'</button>';
+  }).join('');
+  app.innerHTML='<div class="row">'+
+      '<div class="chip" style="background:#2F5F5A;color:#FFE9B8;border-color:#FFD700">🕵️‍♂️ سؤال '+(G.qi+1)+' من '+G.n+'</div>'+
+      '<div class="chip">✅ صح: '+G.ok+'</div>'+
+      '<div class="sp"></div>'+
+      '<div class="chip">'+coin()+'<span id="cn">'+S.coins+'</span></div>'+
+    '</div>'+
+    '<div class="card" style="padding:10px">'+
+      '<div class="row" style="margin-bottom:6px">'+
+        '<span class="tag g" style="flex:1">📖 '+esc(p.title)+' ('+esc(p.arTitle)+')</span>'+
+        '<button class="pwb" style="flex:none;min-height:32px;padding:4px 10px;font-size:12px" onclick="speakCleanPsg()">🔊 اسمع القطعة</button>'+
+      '</div>'+
+      '<div class="psg-box">'+p.text+'</div>'+
+      '<button id="torchBtn" class="pwb" style="width:100%;margin-top:8px;min-height:36px;background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#C9973F;color:#7A3B3B" onclick="usePsgTorch()" '+(G.torch<1?'disabled':'')+'>'+(G.torch>0?'🔦 كشاف المحقق: أضئ مكان الإجابة في القطعة (مجاناً ×1)':'🔦 تم استخدام الكشاف المساعد')+'</button>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="tag">السؤال '+(G.qi+1)+' على القطعة</div>'+
+      '<div class="en" style="font-size:20px">'+esc(q.q)+'</div>'+
+      (tr&&q.ar?'<div class="ar" style="font-size:15px">'+esc(q.ar)+'</div>':'')+
+    '</div>'+
+    optsHtml+
+    '<div id="fb"></div>';
+}
+function pickPsgOpt(k){
+  if(!G||G.done)return;
+  G.done=true;
+  var p=G.psg,q=p.qs[G.qi],good=(k===G.ci),msg='';
+  document.querySelectorAll('.opt').forEach(function(b,j){
+    b.disabled=true;
+    if(j===G.ci)b.classList.add('ok');
+    else if(j===k)b.classList.add('bad');
+  });
+  highlightPsgEv(q.ev);
+  if(good){
+    G.ok++;
+    var gain=20;
+    S.coins+=gain;G.earned+=gain;
+    creditPts(gain);roomAdd(gain);
+    if(S.ts){var a=S.ts.voc||(S.ts.voc=[0,0]);a[0]++;a[1]++}
+    mTick('a');
+    sfxOk(G.ok===3);
+    msg='استنتاج عبقري يا سيادة المحقق! +'+gain+' عملة 🕵️‍♂️✨';
+  }else{
+    if(S.ts){var b=S.ts.voc||(S.ts.voc=[0,0]);b[1]++}
+    sfxBad();
+    msg='إجابة غير دقيقة! انظر للجملة المضيئة باللون الأصفر في القطعة فوق 👆';
+  }
+  if($('#cn'))$('#cn').textContent=S.coins;
+  save();
+  var last=(G.qi>=G.n-1);
+  $('#fb').innerHTML='<div class="card row" style="border-color:'+(good?'#2F6B4A':'#8B2E2E')+'">'+misterImg(good?'c':'h',48)+
+    '<div class="sp"><div style="font-weight:900;color:'+(good?'#2F6B4A':'#8B2E2E')+'">'+msg+'</div><div class="sm">🔦 '+esc(q.hint)+'</div></div>'+
+  '</div>'+
+  '<button class="btn" style="width:100%;margin-top:8px;font-size:18px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="'+(last?'endPsgMode()':'G.qi++;showPsgQ()')+'">'+(last?'إنهاء التحقيق واستلام المكافأة 🏆':'السؤال التالي على القطعة ⬅️')+'</button>';
+}
+function endPsgMode(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(G.ok>=2){S.psgOk=(S.psgOk||0)+1}
+  var full=(G.ok===G.n),bonus=full?35:(G.ok>=2?15:0);
+  if(bonus>0){S.coins+=bonus;G.earned+=bonus;creditPts(bonus);roomAdd(bonus)}
+  if(G.ok>=2){S.nr=(S.nr||0)+1;mTick('r');mTick('w');dayRoundDone()}
+  var bm=bdgCheck();
+  save();submit();
+  if(G.ok>=2)sfxWin();
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>'+(full?'محقق عبقري! كشفت كل الأسرار 🕵️‍♂️👑':'أنهيت تحقيق القطعة الذكية! 📖')+'</h1><div>جاوبت '+G.ok+' من '+G.n+' أسئلة صحيحة</div></div>'+
+    '<div class="card row">'+misterImg(G.ok>=2?'c':'h',56)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">'+(full?'علامة كاملة يا محقق الأبطال! قدرت تطلع كل الأدلة من القطعة وتجاوب 3 من 3 صح وخدت +35 عملة مكافأة إضافية!':(G.ok>=2?'ممتاز يا بطل! فهمك للقطعة جميل جداً، جرب قطعة جديدة واكشف كل أسرارها.':'ولا يهمك! في سؤال القطعة دايماً دور على الكلمات المفتاحية اللي نورت بالأصفر، جرب قطعة تانية دلوقتي!'))+'</div>'+
+    '</div>'+
+    (bm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900">'+bm+'</div>':'')+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+      '<div class="card" style="text-align:center"><div class="sm">النتيجة في القطعة</div><div class="big" style="font-size:28px;color:#2F6B4A">'+G.ok+' / '+G.n+'</div></div>'+
+      '<div class="card" style="text-align:center"><div class="sm">العملات المكتسبة</div><div class="big" style="font-size:28px;color:#7A3B3B">+'+G.earned+' 🪙</div></div>'+
+    '</div>'+
+    '<button class="btn" style="font-size:19px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="startPsgMode()">🕵️‍♂️ العب قطعة ذكية جديدة</button>'+
     '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
 }
 /* === نظام المرافق الذكي الناطق (Smart Pets) === */
