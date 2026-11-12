@@ -699,20 +699,73 @@ body.dark .adv-chip{border-color:#555}
 @keyframes rmPatH{from{left:4%}to{left:92%}}
 @keyframes rmPatV{from{top:31%}to{top:92%}}
 .rmap.ph-night .rm-wall{filter:brightness(.6)}
+
+/* ================================================================
+   v9 — ركن الشرح وقراءة الكلمات بصوت المستر (Learn ➔ Practice ➔ Play)
+   ================================================================ */
+.bnav{grid-template-columns:repeat(6,1fr)}
+@media(max-width:400px){.bnav button{font-size:10px;padding:5px 0}.bnav .ni{font-size:19px}}
+.yt-dock{position:sticky;top:50px;z-index:30;background:#111;border:3px solid #C9973F;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.yt-dock .yt-fr{position:relative;width:100%;aspect-ratio:16/9;max-height:38vh;background:#000}
+.yt-dock iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.yt-dock .yt-cap{display:flex;align-items:center;gap:8px;padding:5px 10px;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);color:#FFE9B8;font-size:12px;font-weight:900}
+.yt-dock .yt-cap .sp{flex:1}
+.yt-dock .yt-cap button{background:rgba(255,255,255,.16);border:1px solid rgba(255,233,184,.6);color:#FFE9B8;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:11px;padding:2px 8px;cursor:pointer}
+.yt-dock.min .yt-fr{display:none}
+.yt-none{background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px dashed #C9973F;border-radius:16px;padding:12px;text-align:center;font-weight:800;font-size:13px;line-height:1.8;color:#4A2F22}
+.lw-list{display:grid;grid-template-columns:1fr;gap:10px}
+.lw{background:var(--card);border:2.5px solid #8A6A4A;border-radius:16px;padding:10px 12px;box-shadow:0 3px 0 rgba(138,106,74,.35);transition:border-color .25s,box-shadow .25s,transform .25s;scroll-margin-top:42vh}
+.lw.on{border-color:#C9973F;box-shadow:0 0 0 4px rgba(227,176,63,.45),0 6px 16px rgba(0,0,0,.18);transform:scale(1.015)}
+.lw.done{border-color:#2F6B4A}
+.lw-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;direction:ltr}
+.lw-en{font-family:Arial,sans-serif;font-size:24px;font-weight:900;color:var(--ink);line-height:1.2}
+.lw-pos{font-family:Arial,sans-serif;font-size:11px;font-weight:900;font-style:italic;background:rgba(47,95,90,.15);color:var(--teal);border-radius:7px;padding:1px 7px}
+.lw-n{margin-left:auto;font-size:11px;font-weight:900;opacity:.55}
+.lw-ar{font-size:17px;font-weight:900;color:#7A3B3B;margin-top:2px}
+.lw-syl{direction:ltr;text-align:left;font-family:Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--teal);margin-top:2px}
+.lw-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lw-btns .pwb{flex:1 1 auto;min-height:36px;font-size:12.5px;padding:4px 8px;white-space:nowrap}
+.lw-btns .pwb.rec{background:#B23A3A;color:#fff;border-color:#FFD700;animation:pl 1s infinite}
+.lw-fb{font-size:12.5px;font-weight:900;margin-top:6px;min-height:0;line-height:1.6}
+.lw-fb.ok{color:#2F6B4A}.lw-fb.bad{color:#B23A3A}
+.cap-sec{border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;line-height:1.85}
+.cap-rule{background:rgba(47,95,90,.1);border-right:5px solid #2F5F5A}
+.cap-keys{display:flex;flex-wrap:wrap;gap:6px;direction:ltr}
+.cap-keys span{background:#FFE8B5;border:1.5px solid #C9973F;color:#4A2F22;border-radius:10px;padding:2px 10px;font-family:Arial,sans-serif;font-weight:900;font-size:13.5px}
+.cap-trap{background:rgba(178,58,58,.1);border-right:5px solid #B23A3A}
+.cap-ex{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid #8A6A4A;border-radius:12px;padding:8px 10px}
+.cap-ex .sp{flex:1;min-width:0}
+.cap-ex .e{direction:ltr;text-align:left;font-family:Arial,sans-serif;font-weight:900;font-size:16px;line-height:1.4}
+.cap-ex .a{font-size:13px;font-weight:700;color:var(--teal)}
+.cap-ex.done{border-color:#2F6B4A}
+.les-row{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:8px 10px;flex-wrap:wrap}
+.les-row .nm{font-weight:900;font-size:15px;min-width:74px;direction:ltr;text-align:right}
+.les-row .pwb{flex:1 1 120px;min-height:38px;font-size:12.5px}
+.les-row .pwb.dn{border-color:#2F6B4A;background:rgba(47,107,74,.14)}
+.les-src{font-size:11px;font-weight:800;line-height:1.7;background:rgba(0,0,0,.06);border-radius:10px;padding:5px 10px;text-align:center}
+.psg-box,.les-tap{cursor:pointer}
+.psg-box::after{content:"👆 اضغط على أي كلمة لتسمعها وتعرف معناها";display:block;direction:rtl;text-align:center;font-family:'Cairo',sans-serif;font-size:11px;font-weight:800;opacity:.65;margin-top:8px;border-top:1px dashed rgba(138,106,74,.45);padding-top:5px}
+#wtip{position:fixed;z-index:9700;transform:translate(-50%,-100%);background:#1B3B38;color:#FFE9B8;border:2px solid #FFD700;border-radius:12px;padding:5px 12px;font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;line-height:1.5;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.4);pointer-events:none;max-width:78vw;animation:popIn .18s ease-out}
+#wtip b{display:block;direction:ltr;font-family:Arial,sans-serif;font-size:16px;color:#FFD700}
+#wtip small{font-size:11px;font-weight:700;opacity:.85}
+.gold-rule[onclick]{cursor:pointer}
+body.dark .lw-ar{color:#FFB59E}
+body.dark .cap-keys span{background:#3A2318;color:#FFE9B8}
+body.dark .yt-none{background:linear-gradient(135deg,#3A2318,#2A1810);color:#FFE9B8}
+body.th-modern .lw,body.th-modern .les-row,body.th-modern .cap-ex{border:1px solid #C7D2FE;box-shadow:0 4px 12px rgba(30,41,59,.06)}
+body.dark.th-galaxy .lw,body.dark.th-galaxy .les-row,body.dark.th-galaxy .cap-ex{border-color:#3B4A6B}
+@media(min-width:768px){.yt-dock{top:62px}.yt-dock .yt-fr{max-height:44vh}.lw-list{grid-template-columns:1fr 1fr}.lw{scroll-margin-top:52vh}}
+#toast{max-width:92vw;white-space:normal;text-align:center;line-height:1.6;box-sizing:border-box}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
 <script src="curriculum.js"></script>
+<script src="lessons.js"></script>
 </head>
 <body>
 <div id="shell">
@@ -751,6 +804,8 @@ if(window.FIREBASE_CONFIG){
     askAdd:(d)=>FS.addDoc(FS.collection(db,'askq'),Object.assign({a:''},d,{t:FS.serverTimestamp()})).then((r)=>r.id),
     askGet:async(id)=>{const x=await FS.getDoc(FS.doc(db,'askq',id));return x.exists()?x.data():null},
     giftGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'gifts',c));return x.exists()?x.data():null},
+    ytSet:(k,d)=>FS.setDoc(FS.doc(db,'cfg','yt'),{[k]:d||null,t:FS.serverTimestamp()},{merge:true}),
+    ytGet:async()=>{const x=await FS.getDoc(FS.doc(db,'cfg','yt'));return x.exists()?x.data():null},
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
     board:async(wk,lo,hi,mine,n)=>{
@@ -875,6 +930,7 @@ function bnav(active){
   var canTax = (S.cTax !== cDay()) && (cityDailyInc() > 0);
   var tabs=[
     ['home','🏠','الرئيسية','home()',0],
+    ['les','🎥','الشرح','lessonHubScr()',0],
     ['city','🏙️','جمهوريتي','cityScr()',canTax],
     ['rep','📊','مستوايا','reportScr()',hasCert],
     ['lb','🏆','الترتيب','board()',0],
@@ -1005,6 +1061,7 @@ function homeTabHtml(k){
   if(k==='rep')return repHomeTab();
   if(k==='lab'){
     return '<div class="mode-grid">'+
+      homeTile('t-room','lessonHubScr()','🎥','ركن الشرح وكلمات المستر','اسمع الكلمات + برشامة القاعدة قبل المعركة',1)+
       homeTile('t-sb','sbIntro()','🧩','تحدي تركيب الجمل',(S.sbOk?'ركّبت '+S.sbOk+' جملة صح 🌟':'رتّب الكلمات • بدون خصم قلوب'))+
       homeTile('t-spk','spkIntro()','🎙️','انطق واضرب الوحش',(S.spkOk?'نطقت '+S.spkOk+' جملة صح 🔥':'تحدي المايك والنطق السليم'))+
       homeTile('t-psg','psgIntro()','🕵️‍♂️','محقق القطعة الذكية',(S.psgOk?'حلّيت '+S.psgOk+' قطع ذكية 🌟':'استنتج الحل من القصة'))+
@@ -2272,7 +2329,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,spkOk:S.spkOk||0,psgOk:S.psgOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,dhp:Math.max(0,Math.min(3,Number(S.dhp)||0)),hpWaitUntil:S.hpWaitUntil||0,lastRevHeartAt:S.lastRevHeartAt||0,statsHelp:S.statsHelp||0,statsPet:S.statsPet||0,statsRevFixed:S.statsRevFixed||0,statsOk:S.statsOk||0,statsOkHelp:S.statsOkHelp||0,vault:(S.vault||[]).slice(0,5),cityTutDone:S.cityTutDone?1:0,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,spkOk:S.spkOk||0,psgOk:S.psgOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,dhp:Math.max(0,Math.min(3,Number(S.dhp)||0)),hpWaitUntil:S.hpWaitUntil||0,lastRevHeartAt:S.lastRevHeartAt||0,statsHelp:S.statsHelp||0,statsPet:S.statsPet||0,statsRevFixed:S.statsRevFixed||0,statsOk:S.statsOk||0,statsOkHelp:S.statsOkHelp||0,vault:(S.vault||[]).slice(0,5),cityTutDone:S.cityTutDone?1:0,watchedVocab:(S.watchedVocab||[]).slice(0,120),studiedUnits:(S.studiedUnits||[]).slice(0,120),saidW:S.saidW||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -2298,7 +2355,7 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),spkOk:n(o.spkOk),psgOk:n(o.psgOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:n(o.dp.chest)}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,dhp:(o.dhp===undefined||o.dhp===null)?3:Math.max(0,Math.min(3,n(o.dhp))),hpWaitUntil:n(o.hpWaitUntil),lastRevHeartAt:n(o.lastRevHeartAt),statsHelp:n(o.statsHelp),statsPet:n(o.statsPet),statsRevFixed:n(o.statsRevFixed),statsOk:n(o.statsOk),statsOkHelp:n(o.statsOkHelp),vault:Array.isArray(o.vault)?o.vault.filter(function(x){return x===1||x===3||x===5}):[],cityTutDone:o.cityTutDone?1:0,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),spkOk:n(o.spkOk),psgOk:n(o.psgOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:n(o.dp.chest)}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,dhp:(o.dhp===undefined||o.dhp===null)?3:Math.max(0,Math.min(3,n(o.dhp))),hpWaitUntil:n(o.hpWaitUntil),lastRevHeartAt:n(o.lastRevHeartAt),statsHelp:n(o.statsHelp),statsPet:n(o.statsPet),statsRevFixed:n(o.statsRevFixed),statsOk:n(o.statsOk),statsOkHelp:n(o.statsOkHelp),vault:Array.isArray(o.vault)?o.vault.filter(function(x){return x===1||x===3||x===5}):[],cityTutDone:o.cityTutDone?1:0,watchedVocab:Array.isArray(o.watchedVocab)?o.watchedVocab.slice(0,120).map(String):[],studiedUnits:Array.isArray(o.studiedUnits)?o.studiedUnits.slice(0,120).map(String):[],saidW:(o.saidW&&typeof o.saidW==='object')?o.saidW:{},ytLinks:(S.ytLinks&&typeof S.ytLinks==='object')?S.ytLinks:{},prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
@@ -5151,6 +5208,7 @@ function sideNavHtml(){
   var hasCert=!!(S.cert||mapDone()),canTax=(S.cTax!==cDay())&&(cityDailyInc()>0);
   var tabs=[
     ['home','🏠','الرئيسية','home()',0],
+    ['les','🎥','ركن الشرح وكلمات المستر','lessonHubScr()',0],
     ['city','🏙️','جمهوريتي ومدينتي','cityScr()',canTax],
     ['rep','📊','مستوايا وتقريري','reportScr()',hasCert],
     ['lb','🏆','لوحة الشرف والترتيب','board()',0],
@@ -6368,7 +6426,7 @@ function vaultHtml(compact){
   '</div>';
 }
 function goldRuleHtml(){
-  return '<div class="gold-rule">💡 القاعدة الذهبية: حل أسئلة إنجليزي أكتر ⬅️ اجمع عملات ونقاط 100% ⬅️ ابنِ جيشك ومصانعك في المدينة ⬅️ تصدّر لوحة الشرف!</div>';
+  return '<div class="gold-rule" onclick="lessonHubScr()">💡 إزاي تسيطر وتتصدر؟ ١. اسمع الكلمات والشرح 🎥 ⬅️ ٢. حل أسئلة واجمع عملات ونقاط 100% ⚔️ ⬅️ ٣. ارجع لمدينتك وطوّر مصانعك وجيشك 🏙️🛡️!</div>';
 }
 /* اسم الوظيفة المُرسل للسحابة: «الجنرال» يظهر لباقي اللاعبين (والنسخ الأقدم) كضابط */
 function pubRole(){return S.role==='general'?'police':(S.role||'police')}
@@ -6466,7 +6524,7 @@ function bossDefeatFx(done){
   }
   if(!mon||!ms){setTimeout(end,250);return}
   ban=document.createElement('div');ban.id='vicBan';ban.className='vic-ban';
-  ban.textContent='💥 تم سحق الزعيم بنجاح! Victory! 🏆';
+  ban.textContent='💥 تم سحق الوحش بنجاح! Victory! 🏆';
   var reduce=false;
   try{reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
   if(reduce){document.body.appendChild(ban);setTimeout(end,1500);return}
@@ -6849,6 +6907,518 @@ function repTreaty(idx){
     }});
 }
 
+
+/* ==========================================================================
+   v9 — ركن الشرح وقراءة الكلمات بصوت المستر (Learn ➔ Practice ➔ Play)
+   • lessons.js (اختياري) يحمل كلمات وقواعد وفيديوهات كل وحدة: LESSONS_DATA[stage][grade]['u1'|'s1']
+   • بدون lessons.js: تُستخرج كلمات الوحدة من أسئلتها (بمعاني words.js) أو من المحتوى العام المدمج بالأسفل
+   • روابط اليوتيوب التي يضيفها المستر من لوحته تُحفظ في S.ytLinks وفي السحابة (cfg/yt)
+   ========================================================================== */
+window.LESSONS_DATA=window.LESSONS_DATA||{};
+/* محتوى عام مدمج (ليس نص الكتاب المدرسي): 6 مجموعات لكل مرحلة — [الكلمة، نوعها، المعنى، المقاطع] */
+var LES_DEFAULT={
+p:[
+ {title:'School & Classroom',ar:'المدرسة والفصل',w:[['classroom','n','فصل دراسي','class • room'],['teacher','n','معلّم','teach • er'],['pencil','n','قلم رصاص','pen • cil'],['ruler','n','مسطرة','rul • er'],['notebook','n','كراسة','note • book'],['listen','v','يستمع','lis • ten'],['write','v','يكتب','write'],['clever','adj','ذكي','clev • er']],
+  g:{t:'المضارع البسيط (Present Simple)',rule:'نستخدمه للعادات والحقائق. مع <b>I / you / we / they</b> الفعل كما هو، ومع <b>he / she / it</b> نضيف <b>s</b> أو <b>es</b>. النفي بـ don\'t / doesn\'t والسؤال بـ Do / Does.',keys:['always','usually','often','sometimes','never','every day'],traps:['بعد <b>doesn\'t</b> و <b>Does</b> الفعل يرجع لأصله بدون s: She doesn\'t <u>play</u> (وليس plays).','الأفعال المنتهية بـ ch / sh / o / x / ss تأخذ <b>es</b>: watches, goes.'],ex:[['She goes to school every day.','هي تذهب إلى المدرسة كل يوم.'],['They play football on Fridays.','هم يلعبون كرة القدم أيام الجمعة.'],['He doesn\'t like milk.','هو لا يحب الحليب.']]}},
+ {title:'Family & Home',ar:'الأسرة والبيت',w:[['family','n','عائلة','fam • i • ly'],['kitchen','n','مطبخ','kitch • en'],['bedroom','n','غرفة نوم','bed • room'],['garden','n','حديقة','gar • den'],['grandmother','n','جدة','grand • moth • er'],['visit','v','يزور','vis • it'],['clean','v','ينظف','clean'],['happy','adj','سعيد','hap • py']],
+  g:{t:'المضارع المستمر (Present Continuous)',rule:'نستخدمه لحدث يحدث الآن. التكوين: <b>am / is / are + الفعل + ing</b>.',keys:['now','at the moment','Look!','Listen!','right now'],traps:['لا تنسَ فعل الكينونة: She <u>is</u> reading (وليس She reading).','الفعل المنتهي بـ e نحذفها قبل ing: write ← writing، وبعض الأفعال نضاعف آخرها: run ← running.'],ex:[['I am reading a story now.','أنا أقرأ قصة الآن.'],['Look! The boys are playing.','انظر! الأولاد يلعبون.'],['She is not sleeping.','هي ليست نائمة.']]}},
+ {title:'Food & Health',ar:'الطعام والصحة',w:[['breakfast','n','فطور','break • fast'],['vegetables','n','خضروات','veg • e • ta • bles'],['water','n','ماء','wa • ter'],['healthy','adj','صحي','health • y'],['hungry','adj','جائع','hun • gry'],['drink','v','يشرب','drink'],['cook','v','يطبخ','cook'],['delicious','adj','لذيذ','de • li • cious']],
+  g:{t:'الماضي البسيط (Past Simple)',rule:'نستخدمه لحدث انتهى في الماضي. الأفعال المنتظمة تأخذ <b>ed</b>، والشاذة تُحفظ (go ← went). النفي بـ <b>didn\'t</b> والسؤال بـ <b>Did</b> + أصل الفعل.',keys:['yesterday','last week','ago','in 2020','last night'],traps:['بعد <b>didn\'t</b> و <b>Did</b> الفعل يرجع لأصله: He didn\'t <u>go</u> (وليس went).','was مع I / he / she / it، و were مع you / we / they.'],ex:[['I visited my uncle yesterday.','زرت عمي أمس.'],['She went to the market last week.','ذهبت إلى السوق الأسبوع الماضي.'],['Did you watch the match?','هل شاهدت المباراة؟']]}},
+ {title:'Animals & Nature',ar:'الحيوانات والطبيعة',w:[['elephant','n','فيل','el • e • phant'],['monkey','n','قرد','mon • key'],['river','n','نهر','riv • er'],['mountain','n','جبل','moun • tain'],['dangerous','adj','خطير','dan • ger • ous'],['beautiful','adj','جميل','beau • ti • ful'],['swim','v','يسبح','swim'],['climb','v','يتسلق','climb']],
+  g:{t:'There is / There are + some / any',rule:'<b>There is</b> مع المفرد وغير المعدود، و<b>There are</b> مع الجمع. نستخدم <b>some</b> في الإثبات و<b>any</b> في النفي والسؤال.',keys:['There is','There are','some','any','a / an'],traps:['There <u>is</u> some water (water غير معدود فلا نقول are).','في النفي والسؤال نستخدم any: There aren\'t <u>any</u> apples.'],ex:[['There is a book on the desk.','يوجد كتاب على المكتب.'],['There are some birds in the tree.','توجد بعض الطيور على الشجرة.'],['Are there any eggs in the fridge?','هل يوجد بيض في الثلاجة؟']]}},
+ {title:'Jobs & Places',ar:'المهن والأماكن',w:[['doctor','n','طبيب','doc • tor'],['farmer','n','فلاح','farm • er'],['engineer','n','مهندس','en • gi • neer'],['hospital','n','مستشفى','hos • pi • tal'],['market','n','سوق','mar • ket'],['help','v','يساعد','help'],['build','v','يبني','build'],['busy','adj','مشغول','bus • y']],
+  g:{t:'المقارنة والتفضيل (Comparatives & Superlatives)',rule:'الصفة القصيرة: نضيف <b>er + than</b> للمقارنة و<b>the + est</b> للتفضيل. الصفة الطويلة: <b>more ... than</b> و <b>the most ...</b>.',keys:['than','the','more','the most','of all'],traps:['لا نجمع more مع er: bigger (وليس more bigger).','الصفات الشاذة: good ← better ← the best، bad ← worse ← the worst.'],ex:[['Ali is taller than Omar.','علي أطول من عمر.'],['This is the biggest room in the house.','هذه أكبر غرفة في البيت.'],['Maths is more difficult than Art.','الرياضيات أصعب من الرسم.']]}},
+ {title:'Daily Routine',ar:'الروتين اليومي',w:[['morning','n','الصباح','morn • ing'],['weekend','n','عطلة نهاية الأسبوع','week • end'],['homework','n','واجب منزلي','home • work'],['early','adv','مبكراً','ear • ly'],['usually','adv','عادةً','u • su • al • ly'],['wake up','v','يستيقظ','wake up'],['study','v','يذاكر','stud • y'],['tired','adj','متعب','tired']],
+  g:{t:'المستقبل بـ be going to',rule:'نستخدم <b>am / is / are + going to + أصل الفعل</b> للخطط والنوايا المستقبلية.',keys:['tomorrow','next week','tonight','soon','in the future'],traps:['بعد going to يأتي أصل الفعل: I am going to <u>visit</u> (وليس visiting).','لا تنسَ am / is / are قبل going to.'],ex:[['I am going to visit my grandfather tomorrow.','سأزور جدي غداً.'],['We are going to play a game.','سوف نلعب لعبة.'],['Is she going to travel next week?','هل ستسافر الأسبوع القادم؟']]}}
+],
+m:[
+ {title:'Technology',ar:'التكنولوجيا',w:[['computer','n','حاسوب','com • pu • ter'],['internet','n','الإنترنت','in • ter • net'],['invention','n','اختراع','in • ven • tion'],['device','n','جهاز','de • vice'],['download','v','يحمّل','down • load'],['useful','adj','مفيد','use • ful'],['search','v','يبحث','search'],['information','n','معلومات','in • for • ma • tion']],
+  g:{t:'المضارع التام (Present Perfect)',rule:'التكوين: <b>have / has + التصريف الثالث</b>. نستخدمه لحدث انتهى وله أثر الآن، أو لحدث بدأ في الماضي وما زال مستمراً، دون ذكر وقت محدد.',keys:['just','already','yet','ever','never','since','for'],traps:['<b>since</b> مع بداية المدة (since 2020) و<b>for</b> مع طول المدة (for two years).','إذا ذُكر وقت محدد في الماضي (yesterday / last year) نستخدم الماضي البسيط لا التام.'],ex:[['I have just finished my homework.','لقد أنهيت واجبي للتو.'],['She has lived here since 2015.','هي تعيش هنا منذ عام 2015.'],['Have you ever visited Luxor?','هل زرت الأقصر من قبل؟']]}},
+ {title:'Travel & Tourism',ar:'السفر والسياحة',w:[['journey','n','رحلة','jour • ney'],['airport','n','مطار','air • port'],['passport','n','جواز سفر','pass • port'],['tourist','n','سائح','tour • ist'],['ancient','adj','قديم / أثري','an • cient'],['explore','v','يستكشف','ex • plore'],['arrive','v','يصل','ar • rive'],['abroad','adv','في الخارج','a • broad']],
+  g:{t:'الماضي المستمر مع الماضي البسيط',rule:'الماضي المستمر (<b>was / were + ing</b>) لحدث كان مستمراً، والماضي البسيط لحدث قصير قطعه. نربط بينهما بـ <b>while</b> و <b>when</b>.',keys:['while','when','as','just as'],traps:['بعد <b>while</b> يأتي غالباً الماضي المستمر، وبعد <b>when</b> يأتي غالباً الماضي البسيط.','was مع المفرد و were مع الجمع و you.'],ex:[['While I was studying, the phone rang.','بينما كنت أذاكر، رن الهاتف.'],['They were playing when it started to rain.','كانوا يلعبون عندما بدأت تمطر.'],['What were you doing at 8 o\'clock?','ماذا كنت تفعل الساعة الثامنة؟']]}},
+ {title:'Health & Sports',ar:'الصحة والرياضة',w:[['exercise','n','تمرين','ex • er • cise'],['energy','n','طاقة','en • er • gy'],['competition','n','مسابقة','com • pe • ti • tion'],['champion','n','بطل','cham • pi • on'],['injury','n','إصابة','in • ju • ry'],['train','v','يتدرب','train'],['avoid','v','يتجنب','a • void'],['active','adj','نشيط','ac • tive']],
+  g:{t:'المبني للمجهول (Passive) — مضارع وماضٍ بسيط',rule:'نستخدمه عندما يكون الفعل أهم من فاعله. التكوين: <b>am / is / are</b> (مضارع) أو <b>was / were</b> (ماضٍ) <b>+ التصريف الثالث</b>، ونذكر الفاعل بعد <b>by</b> إن لزم.',keys:['by','is made','are grown','was built','were invented'],traps:['لا بد من التصريف الثالث بعد be: was <u>written</u> (وليس was wrote).','المفعول به في المعلوم يصبح فاعلاً في المجهول ويحدد is / are أو was / were.'],ex:[['English is spoken in many countries.','الإنجليزية تُتحدث في بلاد كثيرة.'],['The pyramids were built thousands of years ago.','بُنيت الأهرامات منذ آلاف السنين.'],['This book was written by Taha Hussein.','هذا الكتاب كتبه طه حسين.']]}},
+ {title:'Environment',ar:'البيئة',w:[['environment','n','البيئة','en • vi • ron • ment'],['pollution','n','تلوث','pol • lu • tion'],['recycle','v','يعيد التدوير','re • cy • cle'],['protect','v','يحمي','pro • tect'],['waste','n','نفايات','waste'],['climate','n','المناخ','cli • mate'],['save','v','يوفّر / ينقذ','save'],['harmful','adj','ضار','harm • ful']],
+  g:{t:'الجمل الشرطية: الحالة الصفرية والأولى',rule:'<b>الصفرية</b> للحقائق: If + مضارع بسيط، مضارع بسيط. <b>الأولى</b> لاحتمال في المستقبل: If + مضارع بسيط، will + أصل الفعل.',keys:['If','Unless','When','will','won\'t'],traps:['لا نضع will بعد If مباشرة: If it <u>rains</u> (وليس If it will rain).','<b>Unless</b> = If ... not، فلا نضع بعدها نفياً آخر.'],ex:[['If you heat ice, it melts.','إذا سخّنت الثلج فإنه يذوب.'],['If you study hard, you will succeed.','إذا ذاكرت بجد فسوف تنجح.'],['Unless we save water, we will have a problem.','ما لم نوفّر الماء فستكون لدينا مشكلة.']]}},
+ {title:'Jobs & Interviews',ar:'الوظائف والمقابلات',w:[['interview','n','مقابلة','in • ter • view'],['career','n','مهنة','ca • reer'],['experience','n','خبرة','ex • pe • ri • ence'],['skill','n','مهارة','skill'],['apply','v','يتقدم لـ','ap • ply'],['salary','n','راتب','sal • a • ry'],['responsible','adj','مسؤول','re • spon • si • ble'],['succeed','v','ينجح','suc • ceed']],
+  g:{t:'الكلام غير المباشر (Reported Speech) — الجمل الخبرية',rule:'عند نقل الكلام بفعل قول في الماضي (<b>said / told</b>) نرجع بالزمن خطوة: المضارع البسيط ← ماضٍ بسيط، will ← would، can ← could، ونغيّر الضمائر وكلمات الزمان.',keys:['said (that)','told + مفعول','the day before','the next day','then'],traps:['<b>told</b> يأتي بعدها مفعول (told me)، أما <b>said</b> فلا: He said (that) ...','now ← then، today ← that day، tomorrow ← the next day، yesterday ← the day before.'],ex:[['He said that he was tired.','قال إنه كان متعباً.'],['She told me that she would help.','أخبرتني أنها ستساعد.'],['They said they could come the next day.','قالوا إنهم يستطيعون الحضور في اليوم التالي.']]}},
+ {title:'Media & Communication',ar:'الإعلام والتواصل',w:[['newspaper','n','جريدة','news • pa • per'],['article','n','مقال','ar • ti • cle'],['advertise','v','يعلن','ad • ver • tise'],['opinion','n','رأي','o • pin • ion'],['message','n','رسالة','mes • sage'],['communicate','v','يتواصل','com • mu • ni • cate'],['reliable','adj','موثوق','re • li • a • ble'],['share','v','يشارك','share']],
+  g:{t:'ضمائر الوصل (Relative Clauses)',rule:'<b>who</b> للعاقل، <b>which</b> لغير العاقل، <b>that</b> للاثنين، <b>where</b> للمكان، <b>whose</b> للملكية.',keys:['who','which','that','where','whose'],traps:['بعد <b>where</b> تأتي جملة كاملة (فاعل + فعل): the city where <u>I live</u>.','لا نكرر الضمير بعد ضمير الوصل: the man who <s>he</s> lives here.'],ex:[['The man who lives next door is a doctor.','الرجل الذي يسكن بجوارنا طبيب.'],['This is the book which I bought yesterday.','هذا هو الكتاب الذي اشتريته أمس.'],['Alexandria is the city where I was born.','الإسكندرية هي المدينة التي وُلدت فيها.']]}}
+],
+s:[
+ {title:'Science & Research',ar:'العلم والبحث',w:[['research','n','بحث','re • search'],['experiment','n','تجربة','ex • per • i • ment'],['discover','v','يكتشف','dis • cov • er'],['evidence','n','دليل','ev • i • dence'],['theory','n','نظرية','the • o • ry'],['scientist','n','عالِم','sci • en • tist'],['accurate','adj','دقيق','ac • cu • rate'],['analyse','v','يحلل','an • a • lyse']],
+  g:{t:'الحالة الشرطية الثانية والثالثة',rule:'<b>الثانية</b> لموقف غير حقيقي في الحاضر: If + ماضٍ بسيط، would + أصل الفعل. <b>الثالثة</b> لموقف لم يحدث في الماضي: If + ماضٍ تام (had + p.p.)، would have + p.p.',keys:['If','would','would have','If I were you','Had ... (inversion)'],traps:['في الثانية نستخدم <b>were</b> مع كل الضمائر في الأسلوب الرسمي: If I <u>were</u> you.','لا نضع would في جملة If: If I <u>had known</u> (وليس If I would have known).'],ex:[['If I had more time, I would learn French.','لو كان لدي وقت أكثر لتعلمت الفرنسية.'],['If I were you, I would apologise.','لو كنت مكانك لاعتذرت.'],['If he had studied, he would have passed.','لو كان ذاكر لكان نجح.']]}},
+ {title:'Society & Community',ar:'المجتمع',w:[['community','n','مجتمع','com • mu • ni • ty'],['volunteer','n','متطوع','vol • un • teer'],['charity','n','جمعية خيرية','char • i • ty'],['equality','n','مساواة','e • qual • i • ty'],['responsibility','n','مسؤولية','re • spon • si • bil • i • ty'],['support','v','يدعم','sup • port'],['generous','adj','كريم','gen • er • ous'],['tradition','n','تقليد','tra • di • tion']],
+  g:{t:'الماضي التام (Past Perfect)',rule:'التكوين: <b>had + التصريف الثالث</b>. نستخدمه للحدث الأسبق بين حدثين في الماضي.',keys:['after','before','by the time','as soon as','when','already'],traps:['بعد <b>after</b> يأتي الماضي التام (الحدث الأول)، وبعد <b>before</b> يأتي الماضي البسيط (الحدث الثاني).','مع <b>by the time</b> + ماضٍ بسيط، تكون الجملة الأخرى ماضياً تاماً.'],ex:[['After he had finished work, he went home.','بعد أن أنهى عمله ذهب إلى البيت.'],['The train had left before we arrived.','كان القطار قد غادر قبل أن نصل.'],['By the time I got there, the film had started.','عندما وصلت كان الفيلم قد بدأ.']]}},
+ {title:'Economy & Work',ar:'الاقتصاد والعمل',w:[['economy','n','اقتصاد','e • con • o • my'],['investment','n','استثمار','in • vest • ment'],['unemployment','n','بطالة','un • em • ploy • ment'],['profit','n','ربح','prof • it'],['industry','n','صناعة','in • dus • try'],['export','v','يصدّر','ex • port'],['efficient','adj','كفء','ef • fi • cient'],['develop','v','يطوّر','de • vel • op']],
+  g:{t:'المبني للمجهول مع الأفعال الناقصة والأزمنة التامة',rule:'مع الناقصة: <b>modal + be + p.p.</b> (must be done). مع التام: <b>have / has / had + been + p.p.</b> (has been built).',keys:['must be','can be','should be','has been','had been','will be'],traps:['لا تنسَ <b>be</b> بعد الفعل الناقص: It must <u>be</u> finished.','في التام لا بد من <b>been</b>: The work has <u>been</u> done.'],ex:[['The report must be finished today.','يجب أن يُنهى التقرير اليوم.'],['A new bridge has been built.','تم بناء جسر جديد.'],['The problem can be solved easily.','يمكن حل المشكلة بسهولة.']]}},
+ {title:'Space & the Future',ar:'الفضاء والمستقبل',w:[['astronaut','n','رائد فضاء','as • tro • naut'],['satellite','n','قمر صناعي','sat • el • lite'],['gravity','n','الجاذبية','grav • i • ty'],['planet','n','كوكب','plan • et'],['launch','v','يطلق','launch'],['artificial','adj','صناعي','ar • ti • fi • cial'],['predict','v','يتنبأ','pre • dict'],['mission','n','مهمة','mis • sion']],
+  g:{t:'السؤال والأمر في الكلام غير المباشر',rule:'<b>السؤال</b>: asked + (if / whether أو أداة الاستفهام) + فاعل + فعل (بترتيب الجملة الخبرية وبدون علامة استفهام). <b>الأمر</b>: told / asked + مفعول + (not) to + أصل الفعل.',keys:['asked','wanted to know','if / whether','told ... to','not to'],traps:['لا نستخدم do / does / did في السؤال غير المباشر، وترتيب الكلمات خبري: He asked where I <u>lived</u>.','النهي: told me <u>not to</u> go (وليس to not go / don\'t go).'],ex:[['She asked me where I lived.','سألتني أين أسكن.'],['He asked if I had seen the film.','سألني إن كنت قد شاهدت الفيلم.'],['The teacher told us not to be late.','أمرنا المعلم ألا نتأخر.']]}},
+ {title:'Literature & Culture',ar:'الأدب والثقافة',w:[['novel','n','رواية','nov • el'],['author','n','مؤلف','au • thor'],['character','n','شخصية','char • ac • ter'],['heritage','n','تراث','her • i • tage'],['translate','v','يترجم','trans • late'],['influence','n','تأثير','in • flu • ence'],['imagination','n','خيال','i • mag • i • na • tion'],['publish','v','ينشر','pub • lish']],
+  g:{t:'التمني بـ wish / if only',rule:'تمني تغيير <b>الحاضر</b>: wish + ماضٍ بسيط. الندم على <b>الماضي</b>: wish + ماضٍ تام. تمني تغيير تصرف مزعج في <b>المستقبل</b>: wish + would + أصل الفعل.',keys:['wish','if only','were','had + p.p.','would'],traps:['الفعل بعد wish يرجع زمناً للخلف: I wish I <u>had</u> a car (الآن).','للندم على الماضي لا نستخدم الماضي البسيط: I wish I <u>had studied</u> (وليس studied).'],ex:[['I wish I had more free time.','أتمنى لو كان لدي وقت فراغ أكثر.'],['She wishes she had studied harder.','تتمنى لو كانت ذاكرت بجد أكبر.'],['If only it would stop raining.','ليت المطر يتوقف.']]}},
+ {title:'Health & Lifestyle',ar:'الصحة وأسلوب الحياة',w:[['nutrition','n','تغذية','nu • tri • tion'],['disease','n','مرض','dis • ease'],['prevent','v','يمنع / يقي','pre • vent'],['balanced','adj','متوازن','bal • anced'],['stress','n','ضغط نفسي','stress'],['recover','v','يتعافى','re • cov • er'],['treatment','n','علاج','treat • ment'],['lifestyle','n','أسلوب حياة','life • style']],
+  g:{t:'السببية (Causative: have / get something done)',rule:'نستخدمها عندما يقوم شخص آخر بالعمل لنا. التكوين: <b>have / get + المفعول + التصريف الثالث</b>.',keys:['have','get','had ... done','by'],traps:['المفعول يأتي <b>قبل</b> التصريف الثالث: I had my car <u>repaired</u> (وليس had repaired my car).','زمن الجملة يظهر في have / get فقط: I am having my hair cut.'],ex:[['I had my car repaired yesterday.','أصلحت سيارتي أمس (أصلحها لي شخص آخر).'],['She is getting her eyes tested.','هي تُجري فحصاً لعينيها.'],['We will have the house painted next month.','سنطلي البيت الشهر القادم (بواسطة عامل).']]}}
+]};
+var LES=null,LESG=null,LES_DICT=null,LES_YT_READY=false,LES_PULLED=false,LES_REC=null,LES_TIP_T=0,YT_STG='',YT_GRD=1,YT_UNIT='u0';
+function lesKey(type,idx,st,gr){return (st||S.stage||'m')+'_'+(gr||S.grade||1)+'_'+type+'_'+idx}
+function lesTeacher(type,idx){try{var d=window.LESSONS_DATA[S.stage];d=d&&d[S.grade];return (d&&d[type+(idx+1)])||null}catch(e){return null}}
+function lesDefault(idx){var a=LES_DEFAULT[S.stage]||LES_DEFAULT.m;return a[((idx%a.length)+a.length)%a.length]}
+function lesSyl(w){
+  w=String(w||'');if(/\s/.test(w)||w.length<4)return w;
+  var m=w.match(/[^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?/gi);
+  return (m&&m.length>1)?m.join(' • '):w;
+}
+function lesDict(){
+  if(LES_DICT)return LES_DICT;
+  var D={};
+  function put(en,ar){en=String(en||'').toLowerCase().trim();if(en&&ar&&!D[en])D[en]=String(ar)}
+  try{if(typeof WORDS!=='undefined')Object.keys(WORDS).forEach(function(k){(WORDS[k]||[]).forEach(function(x){if(x&&x[0])put(x[0],x[1])})})}catch(e){}
+  try{Object.keys(window.LESSONS_DATA).forEach(function(st){var gs=window.LESSONS_DATA[st]||{};Object.keys(gs).forEach(function(g){var us=gs[g]||{};Object.keys(us).forEach(function(u){((us[u]||{}).words||[]).forEach(function(x){if(x&&x.w)put(x.w,x.ar)})})})})}catch(e){}
+  Object.keys(LES_DEFAULT).forEach(function(st){LES_DEFAULT[st].forEach(function(u){u.w.forEach(function(x){put(x[0],x[2])})})});
+  LES_DICT=D;return D;
+}
+function lesLookup(w){
+  var D=lesDict(),x=String(w||'').toLowerCase().replace(/[’']s$/,'').replace(/[^a-z-]/g,'');
+  if(!x)return '';
+  var c=[x,x.replace(/ies$/,'y'),x.replace(/es$/,''),x.replace(/s$/,''),x.replace(/ed$/,''),x.replace(/d$/,''),x.replace(/ing$/,''),x.replace(/ing$/,'e'),x.replace(/ly$/,''),x.replace(/er$/,''),x.replace(/est$/,'')];
+  for(var i=0;i<c.length;i++){if(c[i]&&D[c[i]])return D[c[i]]}
+  return '';
+}
+function lesRawQs(type,idx){try{var g=(getStageCurr()||{})[S.grade]||{};var a=(type==='u'?g.units:g.story)||[];return a[idx]||[]}catch(e){return []}}
+/* كلمات الوحدة: lessons.js ← ثم كلمات مستخرجة من أسئلة الوحدة نفسها ← ثم المحتوى العام المدمج */
+function lesWords(type,idx){
+  var t=lesTeacher(type,idx);
+  if(t&&t.words&&t.words.length)return {src:'teacher',title:t.title||'',words:t.words.map(function(x){return {w:String(x.w||''),pos:x.pos||'',ar:x.ar||'',syl:x.syl||lesSyl(x.w),t:(x.t===0||x.t>0)?Number(x.t):null}}).filter(function(x){return x.w})};
+  var D=lesDict(),seen={},out=[];
+  lesRawQs(type,idx).forEach(function(q){
+    var txt=String((q&&q.q)||'')+' '+String((q&&q.o&&q.o[q.a])||'');
+    (txt.match(/[A-Za-z]{4,}/g)||[]).forEach(function(w){var k=w.toLowerCase();if(!seen[k]&&D[k]&&out.length<12){seen[k]=1;out.push({w:k,pos:'',ar:D[k],syl:lesSyl(k),t:null})}});
+  });
+  if(out.length>=6)return {src:'auto',title:'',words:out};
+  var d=lesDefault(idx);
+  return {src:'builtin',title:d.title+' — '+d.ar,words:d.w.map(function(x){return {w:x[0],pos:x[1],ar:x[2],syl:x[3],t:null}})};
+}
+function lesGrammar(type,idx){
+  var t=lesTeacher(type,idx),g=t&&t.grammar;
+  if(g&&(g.rule||g.title))return {src:'teacher',t:g.title||'برشامة القاعدة',rule:g.rule||'',keys:g.keys||[],traps:g.traps||[],ex:(g.ex||[]).map(function(e){return Array.isArray(e)?e:[e.en||'',e.ar||'']}),yt:g.yt||t.ytGrammar||''};
+  if(type!=='u')return null;
+  var d=lesDefault(idx).g;
+  return {src:'builtin',t:d.t,rule:d.rule,keys:d.keys,traps:d.traps,ex:d.ex,yt:''};
+}
+function ytParse(s){
+  s=String(s||'').trim();var v='',l='',m;
+  if((m=/[?&]list=([A-Za-z0-9_-]{10,})/.exec(s)))l=m[1];
+  if((m=/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/.exec(s)))v=m[1];
+  else if(/^[A-Za-z0-9_-]{11}$/.test(s))v=s;
+  else if(!l&&/^(PL|UU|OL|FL|LL)[A-Za-z0-9_-]{10,}$/.test(s))l=s;
+  return (v||l)?{v:v,l:l}:null;
+}
+function lesYt(type,idx){
+  var k=lesKey(type,idx),x=(S.ytLinks||{})[k];
+  if(x&&(x.v||x.l))return x;
+  var t=lesTeacher(type,idx);
+  if(t){var p=ytParse(t.ytVocab||'')||{v:'',l:''};if(t.ytList){var q=ytParse(t.ytList)||{l:String(t.ytList)};p.l=p.l||q.l||''}if(p.v||p.l)return p}
+  return null;
+}
+function ytEmbedUrl(y,start){
+  var q='enablejsapi=1&rel=0&playsinline=1&modestbranding=1'+(start>0?'&start='+Math.floor(start)+'&autoplay=1':'');
+  return y.v?('https://www.youtube-nocookie.com/embed/'+y.v+'?'+q+(y.l?'&list='+y.l:'')):('https://www.youtube-nocookie.com/embed/videoseries?list='+y.l+'&'+q);
+}
+function ytDockHtml(y,cap){
+  if(!y)return '<div class="yt-none">🎥 لم يُربط فيديو مستر عبدالرحمن بهذه الوحدة بعد.<br><span style="font-size:12px;font-weight:700">تقدر تذاكر الكلمات دلوقتي بالنطق الآلي من الأزرار تحت 👇</span></div>';
+  if(!isOnline())return '<div class="yt-none">⚡ أنت بدون إنترنت — فيديو المستر يحتاج اتصالاً.<br><span style="font-size:12px;font-weight:700">كمّل مذاكرة الكلمات بالنطق الآلي لحد ما النت يرجع.</span></div>';
+  return '<div class="yt-dock" id="ytDock"><div class="yt-fr"><iframe id="ytFr" src="'+ytEmbedUrl(y,0)+'" title="فيديو مستر عبدالرحمن" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy" onload="ytHello()"></iframe></div>'+
+    '<div class="yt-cap"><span>🎥 '+cap+'</span><span class="sp"></span><button onclick="ytMin()">⬍ تصغير / تكبير</button></div></div>';
+}
+function ytMin(){var d=document.getElementById('ytDock');if(d)d.classList.toggle('min')}
+function ytPost(o){var f=document.getElementById('ytFr');try{if(f&&f.contentWindow)f.contentWindow.postMessage(JSON.stringify(o),'*')}catch(e){}}
+function ytHello(){LES_YT_READY=false;ytPost({event:'listening',id:1,channel:'widget'})}
+window.addEventListener('message',function(e){if(/youtube(-nocookie)?\.com$/.test(String(e.origin||'').replace(/^https?:\/\/(www\.)?/,'')))LES_YT_READY=true});
+function ytSeek(sec){
+  var f=document.getElementById('ytFr'),d=document.getElementById('ytDock');if(!f)return false;
+  if(d)d.classList.remove('min');
+  if(LES_YT_READY){ytPost({event:'command',func:'seekTo',args:[sec,true]});ytPost({event:'command',func:'playVideo',args:[]})}
+  else if(LES&&LES.yt){LES_YT_READY=false;f.src=ytEmbedUrl(LES.yt,Math.max(1,sec))}
+  return true;
+}
+function lesSpeak(t,rate,done){
+  if(!('speechSynthesis' in window)){if(done)setTimeout(done,400);return false}
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(t),fin=false,end=function(){if(fin)return;fin=true;if(done)done()};
+    u.lang=VOICE?VOICE.lang:'en-US';if(VOICE)u.voice=VOICE;u.rate=rate||0.9;u.pitch=1;u.volume=1;
+    u.onend=end;u.onerror=end;
+    speechSynthesis.speak(u);
+    if(done)setTimeout(end,Math.max(1800,String(t).length*(rate<0.7?260:150)+900));
+    return true;
+  }catch(e){if(done)setTimeout(done,400);return false}
+}
+function lesPull(force){
+  if(LES_PULLED&&!force)return;
+  if(!window.FB||!FB.ytGet||!isOnline())return;
+  LES_PULLED=true;
+  FB.ytGet().then(function(d){
+    if(!d)return;
+    S.ytLinks=(S.ytLinks&&typeof S.ytLinks==='object')?S.ytLinks:{};
+    var ch=false;
+    Object.keys(d).forEach(function(k){
+      if(k==='t')return;
+      var x=d[k];
+      if(x&&(x.v||x.l)){if(!S.ytLinks[k]||S.ytLinks[k].v!==x.v||S.ytLinks[k].l!==x.l){S.ytLinks[k]={v:String(x.v||''),l:String(x.l||'')};ch=true}}
+      else if(S.ytLinks[k]){delete S.ytLinks[k];ch=true}
+    });
+    if(ch){save();if(document.getElementById('lesHub'))lessonHubScr()}
+  }).catch(function(){LES_PULLED=false});
+}
+
+/* ---------- فهرس ركن الشرح ---------- */
+function lessonHubScr(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}
+  LES=null;lesPull();
+  var g=(function(){try{return (getStageCurr()||{})[S.grade]||{}}catch(e){return {}}})(),wv=S.watchedVocab||[],su=S.studiedUnits||[],rows='',i;
+  function row(type,idx,name){
+    var k=lesKey(type,idx),dv=wv.indexOf(k)>=0,dg=su.indexOf(k)>=0,gr=lesGrammar(type,idx),y=lesYt(type,idx);
+    return '<div class="les-row"><span class="nm">'+name+'</span>'+
+      '<button class="pwb'+(dv?' dn':'')+'" onclick="wordReaderScr(\''+type+'\','+idx+')">'+(y?'🎥':'🗣️')+' كلمات بصوت المستر'+(dv?' ✅':' (+30)')+'</button>'+
+      (gr?'<button class="pwb'+(dg?' dn':'')+'" onclick="grammarScr(\''+type+'\','+idx+')">📘 برشامة القاعدة'+(dg?' ✅':' (+25)')+'</button>':'')+
+    '</div>';
+  }
+  for(i=0;i<6;i++)rows+=row('u',i,'Unit '+(i+1));
+  var st=(g.story||[]),sr='';
+  for(i=0;i<3;i++){if(st[i]&&st[i].length)sr+=row('s',i,'Story Ch '+(i+1))}
+  var nV=wv.filter(function(k){return k.indexOf(S.stage+'_'+S.grade+'_')===0}).length;
+  app.innerHTML='<div id="lesHub" class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>ركن الشرح وقراءة الكلمات 🎥🗣️</h1><div>بصوت مستر عبدالرحمن • '+stgLbl()+' — '+gName()+'</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg('c',54)+'<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.75"><b>اتعلّم ⬅️ اتدرّب ⬅️ العب!</b> اسمع كلمات الوحدة وردّدها ورايا، وذاكر برشامة القاعدة، وبعدها ادخل المعركة وانت جاهز. كل وحدة تخلّصها = عملات ونقاط هدية 🎁</div></div>'+
+    '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="sm">خلّصت كلمات '+nV+' وحدة في صفك</div></div>'+
+    '<div class="tag g">الوحدات الدراسية (Units)</div>'+rows+
+    (sr?'<div class="tag" style="margin-top:4px">القصة المقررة (Story)</div>'+sr:'')+
+    '<button class="btn t" onclick="curriculum()">📚 تدريبات المنهج والمعارك</button>'+
+    bnav('les');
+}
+function lesSrcNote(src,kind){
+  if(src==='teacher')return '';
+  if(src==='auto')return '<div class="les-src">📌 هذه الكلمات مأخوذة من أسئلة الوحدة نفسها ومعانيها من قاموس المنصة.</div>';
+  return '<div class="les-src">📌 '+(kind==='g'?'قاعدة عامة للمراجعة':'كلمات عامة للمراجعة')+' — تُستبدل تلقائياً بمحتوى الوحدة عندما يرفعه مستر عبدالرحمن.</div>';
+}
+
+/* ---------- قارئ الكلمات بصوت المستر ---------- */
+function wordReaderScr(type,idx){
+  if(type===undefined||type===null){lessonHubScr();return}
+  idx=Number(idx)||0;
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  lesRadioStop(true);lesPull();
+  var W=lesWords(type,idx),y=lesYt(type,idx),k=lesKey(type,idx),done=(S.watchedVocab||[]).indexOf(k)>=0,name=(type==='u'?'Unit '+(idx+1):'Story Chapter '+(idx+1));
+  LES={type:type,idx:idx,key:k,words:W.words,yt:y,heard:{},radio:false,ri:0,need:Math.max(1,Math.ceil(W.words.length/2))};
+  LES_YT_READY=false;
+  var said=((S.saidW||{})[k])||[],hasRaw=lesRawQs(type,idx).length>0,gr=lesGrammar(type,idx);
+  var cards=W.words.map(function(w,i){
+    return '<div class="lw'+(said.indexOf(i)>=0?' done':'')+'" id="lw'+i+'">'+
+      '<div class="lw-top"><span class="lw-en">'+esc(w.w)+'</span>'+(w.pos?'<span class="lw-pos">'+esc(w.pos)+'</span>':'')+'<span class="lw-n">'+(i+1)+' / '+W.words.length+'</span></div>'+
+      '<div class="lw-ar">'+esc(w.ar)+'</div>'+
+      '<div class="lw-syl">'+esc(w.syl)+'</div>'+
+      '<div class="lw-btns">'+
+        (y&&w.t!==null?'<button class="pwb" onclick="lesSeek('+i+')">▶️ في الفيديو</button>':'')+
+        '<button class="pwb" onclick="lesSay('+i+',0)">🔊 نطق عادي</button>'+
+        '<button class="pwb" onclick="lesSay('+i+',1)">🐢 نطق بطيء</button>'+
+        '<button class="pwb" id="lwm'+i+'" onclick="lesMic('+i+')">🎙️ انطقها بنفسك</button>'+
+      '</div><div class="lw-fb" id="lwf'+i+'">'+(said.indexOf(i)>=0?'✅ نطقتها صح قبل كده':'')+'</div></div>';
+  }).join('');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700;padding:12px"><h1 style="font-size:19px">🎥🗣️ كلمات '+name+' بصوت المستر</h1><div>'+(W.title?esc(W.title)+' • ':'')+stgLbl()+' — '+gName()+'</div></div>'+
+    ytDockHtml(y,'اسمع مستر عبدالرحمن وتابع الكلمات تحت')+
+    lesSrcNote(W.src,'w')+
+    '<div class="row" style="gap:6px"><button class="btn" id="lesRadioBtn" style="flex:2;font-size:14px;min-height:42px;padding:6px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700" onclick="lesRadio()">📻 وضع الاستماع المتتالي (Radio Mode)</button>'+
+      '<div class="chip" id="lesProg" style="flex:1;justify-content:center">👂 0 / '+W.words.length+'</div></div>'+
+    '<div class="lw-list">'+cards+'</div>'+
+    '<button class="btn" id="lesClaimBtn" style="font-size:14.5px;font-family:\'Cairo\',sans-serif;font-weight:900;line-height:1.6;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="lesClaim()" '+(done?'disabled':'')+'>'+(done?'✅ استلمت مكافأة كلمات هذه الوحدة':'🎉 خلّصت سماع وقراءة كلمات الوحدة مع المستر (+30 عملة و+30 نقطة)')+'</button>'+
+    (done?'':'<div class="sm" id="lesClaimHint" style="text-align:center">اسمع '+LES.need+' كلمات على الأقل (أو شغّل وضع الاستماع المتتالي) لتفتح المكافأة</div>')+
+    '<div class="row" style="gap:6px;flex-wrap:wrap">'+
+      (gr?'<button class="btn t" style="flex:1;font-size:14px" onclick="grammarScr(\''+type+'\','+idx+')">📘 برشامة القاعدة</button>':'')+
+      (hasRaw?'<button class="btn t" style="flex:1;font-size:14px" onclick="unitPrep(\''+type+'\','+idx+')">⚔️ استعداد المعركة</button>':'')+
+    '</div>'+
+    '<button class="btn t" onclick="lessonHubScr()">رجوع لركن الشرح</button>';
+}
+function lesMark(i){
+  if(!LES)return;
+  LES.heard[i]=1;
+  var n=Object.keys(LES.heard).length,p=document.getElementById('lesProg');
+  if(p)p.textContent='👂 '+n+' / '+LES.words.length;
+  if(n>=LES.need){var h=document.getElementById('lesClaimHint');if(h)h.textContent='✅ تمام! تقدر تستلم مكافأتك دلوقتي'}
+}
+function lesHi(i){
+  var a=document.querySelectorAll('.lw.on');for(var j=0;j<a.length;j++)a[j].classList.remove('on');
+  var el=document.getElementById('lw'+i);if(el)el.classList.add('on');return el;
+}
+function lesSay(i,slow){
+  if(!LES||!LES.words[i])return;
+  if(LES.radio)lesRadioStop();
+  lesHi(i);lesSpeak(LES.words[i].w,slow?0.5:0.9);lesMark(i);
+}
+function lesSeek(i){
+  if(!LES||!LES.words[i]||LES.words[i].t===null)return;
+  if(LES.radio)lesRadioStop();
+  try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}
+  lesHi(i);
+  if(ytSeek(LES.words[i].t))lesMark(i);
+}
+function lesRadio(){
+  if(!LES)return;
+  if(LES.radio){lesRadioStop();return}
+  LES.radio=true;LES.ri=0;
+  var b=document.getElementById('lesRadioBtn');if(b)b.textContent='⏹️ إيقاف الاستماع المتتالي';
+  lesRadioStep();
+}
+function lesRadioStep(){
+  var L=LES;if(!L||!L.radio)return;
+  if(!document.getElementById('lesRadioBtn')){L.radio=false;return}
+  if(L.ri>=L.words.length){lesRadioStop();showToast('📻 خلصت كل كلمات الوحدة — عاش!');try{ding()}catch(e){}return}
+  var i=L.ri,el=lesHi(i);
+  try{if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'})}catch(e){}
+  lesMark(i);
+  lesSpeak(L.words[i].w,0.85,function(){
+    if(LES!==L||!L.radio)return;
+    setTimeout(function(){if(LES!==L||!L.radio)return;
+      lesSpeak(L.words[i].w,0.6,function(){if(LES!==L||!L.radio)return;L.ri++;setTimeout(lesRadioStep,650)});
+    },350);
+  });
+}
+function lesRadioStop(quiet){
+  try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}
+  try{if(LES_REC){LES_REC.onresult=null;LES_REC.onerror=null;LES_REC.onend=null;LES_REC.abort();LES_REC=null}}catch(e){LES_REC=null}
+  if(LES)LES.radio=false;
+  if(quiet)return;
+  var b=document.getElementById('lesRadioBtn');if(b)b.textContent='📻 وضع الاستماع المتتالي (Radio Mode)';
+  var a=document.querySelectorAll('.lw.on');for(var j=0;j<a.length;j++)a[j].classList.remove('on');
+}
+function lesMicResult(i,ok,heard){
+  var L=LES;if(!L)return;
+  var fb=document.getElementById('lwf'+i),card=document.getElementById('lw'+i),mb=document.getElementById('lwm'+i);
+  if(mb){mb.classList.remove('rec');mb.textContent='🎙️ انطقها بنفسك'}
+  if(!fb)return;
+  if(ok){
+    S.saidW=(S.saidW&&typeof S.saidW==='object')?S.saidW:{};
+    var a=S.saidW[L.key]=Array.isArray(S.saidW[L.key])?S.saidW[L.key]:[],first=a.indexOf(i)<0;
+    if(first){a.push(i);S.coins+=5}
+    save();sfxOk(false);
+    fb.className='lw-fb ok';fb.textContent=first?'✅ نطق سليم! (+5 عملات)':'✅ نطق سليم! (أخذت مكافأة هذه الكلمة من قبل)';
+    if(card)card.classList.add('done');
+    lesMark(i);
+  }else{
+    try{tone(220,0,0.12,'sine',0.1)}catch(e){}
+    fb.className='lw-fb bad';
+    fb.textContent=heard?('سمعتك تقول: "'+heard+'" — اسمع 🐢 النطق البطيء وجرّب تاني'):'ماسمعتش الكلمة بوضوح — قرّب من المايك وجرّب تاني';
+  }
+}
+function lesMic(i){
+  var L=LES;if(!L||!L.words[i])return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition,fb=document.getElementById('lwf'+i),mb=document.getElementById('lwm'+i);
+  if(!SR){if(fb){fb.className='lw-fb bad';fb.textContent='المتصفح ده مش بيدعم التعرف على الصوت — افتح المنصة من Google Chrome، أو ردّد الكلمة بعد النطق البطيء 🐢'}return}
+  if(L.radio)lesRadioStop();
+  if(LES_REC){try{LES_REC.abort()}catch(e){}LES_REC=null}
+  try{
+    if('speechSynthesis' in window)speechSynthesis.cancel();
+    var rec=new SR(),got=false,target=L.words[i].w;
+    LES_REC=rec;rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=5;
+    lesHi(i);
+    if(mb){mb.classList.add('rec');mb.textContent='🔴 بسمعك... انطق الآن'}
+    if(fb){fb.className='lw-fb';fb.textContent=''}
+    try{tone(660,0,0.08,'sine',0.12)}catch(e){}
+    rec.onresult=function(ev){
+      got=true;
+      var res=ev.results[0],best=0,txt='',norm=function(s){return String(s||'').toLowerCase().replace(/[^a-z ]/g,'').trim()},tg=norm(target);
+      for(var a=0;a<res.length;a++){
+        var t=norm(res[a].transcript),p=0;
+        if(t===tg||(' '+t+' ').indexOf(' '+tg+' ')>=0)p=100;else{try{p=calcSpkMatch(target,res[a].transcript)}catch(e){p=0}}
+        if(p>=best){best=p;txt=res[a].transcript||''}
+      }
+      if(LES===L)lesMicResult(i,best>=80,txt);
+    };
+    rec.onerror=function(er){got=true;if(LES!==L)return;var m=document.getElementById('lwm'+i),f=document.getElementById('lwf'+i);if(m){m.classList.remove('rec');m.textContent='🎙️ انطقها بنفسك'}if(f){f.className='lw-fb bad';f.textContent=(er&&er.error==='not-allowed')?'لازم تسمح للمنصة باستخدام المايك من إعدادات المتصفح':'مقدرناش نسمع الصوت — جرّب تاني'}};
+    rec.onend=function(){if(LES_REC===rec)LES_REC=null;if(!got&&LES===L)lesMicResult(i,false,'')};
+    rec.start();
+  }catch(e){if(mb){mb.classList.remove('rec');mb.textContent='🎙️ انطقها بنفسك'}}
+}
+function lesClaim(){
+  var L=LES;if(!L)return;
+  S.watchedVocab=Array.isArray(S.watchedVocab)?S.watchedVocab:[];
+  if(S.watchedVocab.indexOf(L.key)>=0)return;
+  if(Object.keys(L.heard).length<L.need){sfxBad(true);rmsg('لازم تسمع '+L.need+' كلمات على الأقل الأول — اضغط 🔊 أو شغّل وضع الاستماع المتتالي 📻');return}
+  S.watchedVocab.push(L.key);S.coins+=30;addPts(30);save();submit();
+  try{sfxChest()}catch(e){}
+  showToast('🎉 عاش! +30 عملة و+30 نقطة ترتيب على مذاكرة كلمات الوحدة');
+  var b=document.getElementById('lesClaimBtn'),h=document.getElementById('lesClaimHint');
+  if(b){b.disabled=true;b.textContent='✅ استلمت مكافأة كلمات هذه الوحدة'}
+  if(h&&h.parentNode)h.parentNode.removeChild(h);
+}
+
+/* ---------- برشامة القاعدة ---------- */
+function grammarScr(type,idx){
+  idx=Number(idx)||0;
+  var g=lesGrammar(type,idx);if(!g){rmsg('لازم مستر عبدالرحمن يضيف برشامة هذا الدرس أولاً');return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  lesRadioStop(true);LES=null;
+  var k=lesKey(type,idx),done=(S.studiedUnits||[]).indexOf(k)>=0,name=(type==='u'?'Unit '+(idx+1):'Story Chapter '+(idx+1)),y=g.yt?ytParse(g.yt):null,need=Math.min(2,g.ex.length);
+  LESG={key:k,g:g,heard:{},need:need,type:type,idx:idx};
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;padding:12px"><h1 style="font-size:19px">📘 برشامة القاعدة — '+name+'</h1><div>'+g.t+'</div></div>'+
+    (y?ytDockHtml(y,'شرح القاعدة بصوت مستر عبدالرحمن'):'')+
+    lesSrcNote(g.src,'g')+
+    '<div class="card"><div class="tag g">📌 القاعدة</div><div class="cap-sec cap-rule" style="margin-top:8px">'+g.rule+'</div></div>'+
+    (g.keys.length?'<div class="card"><div class="tag">🔑 الكلمات الدالة</div><div class="cap-keys" style="margin-top:8px">'+g.keys.map(function(x){return '<span>'+esc(x)+'</span>'}).join('')+'</div></div>':'')+
+    (g.traps.length?'<div class="card"><div class="tag" style="background:#8B2E2E">⚠️ أشهر خدع الامتحان</div>'+g.traps.map(function(x){return '<div class="cap-sec cap-trap" style="margin-top:8px">'+x+'</div>'}).join('')+'</div>':'')+
+    (g.ex.length?'<div class="card"><div class="tag g">🔊 أمثلة ناطقة (اضغط على المثال لتسمعه، أو على أي كلمة لمعناها)</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">'+g.ex.map(function(e,i){
+      return '<div class="cap-ex" id="cex'+i+'"><button class="pwb" style="flex:none;width:44px;min-height:40px;padding:0;font-size:18px" onclick="capSay('+i+')" aria-label="اسمع المثال">🔊</button><div class="sp"><div class="e les-tap">'+esc(e[0])+'</div><div class="a">'+esc(e[1])+'</div></div></div>';
+    }).join('')+'</div></div>':'')+
+    '<button class="btn" id="capClaimBtn" style="font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="capClaim()" '+(done?'disabled':'')+'>'+(done?'✅ ذاكرت هذه البرشامة واستلمت مكافأتها':'✅ ذاكرت البرشامة وفهمتها (+25 عملة)')+'</button>'+
+    (done||!need?'':'<div class="sm" id="capHint" style="text-align:center">اسمع مثالين على الأقل لتفتح المكافأة</div>')+
+    '<div class="row" style="gap:6px;flex-wrap:wrap">'+
+      '<button class="btn t" style="flex:1;font-size:14px" onclick="wordReaderScr(\''+type+'\','+idx+')">🎥 كلمات الوحدة</button>'+
+      (lesRawQs(type,idx).length?'<button class="btn t" style="flex:1;font-size:14px" onclick="unitPrep(\''+type+'\','+idx+')">⚔️ استعداد المعركة</button>':'')+
+    '</div>'+
+    '<button class="btn t" onclick="lessonHubScr()">رجوع لركن الشرح</button>';
+}
+function capSay(i){
+  var G0=LESG;if(!G0||!G0.g.ex[i])return;
+  lesSpeak(G0.g.ex[i][0],0.85);
+  G0.heard[i]=1;
+  var el=document.getElementById('cex'+i);if(el)el.classList.add('done');
+  if(Object.keys(G0.heard).length>=G0.need){var h=document.getElementById('capHint');if(h)h.textContent='✅ تمام! تقدر تستلم مكافأتك دلوقتي'}
+}
+function capClaim(){
+  var G0=LESG;if(!G0)return;
+  S.studiedUnits=Array.isArray(S.studiedUnits)?S.studiedUnits:[];
+  if(S.studiedUnits.indexOf(G0.key)>=0)return;
+  if(Object.keys(G0.heard).length<G0.need){sfxBad(true);rmsg('لازم تسمع مثالين على الأقل الأول — اضغط 🔊 جنب المثال');return}
+  S.studiedUnits.push(G0.key);S.coins+=25;save();
+  try{sfxCoins()}catch(e){}
+  showToast('📘 برافو! +25 عملة على مذاكرة برشامة القاعدة');
+  var b=document.getElementById('capClaimBtn'),h=document.getElementById('capHint');
+  if(b){b.disabled=true;b.textContent='✅ ذاكرت هذه البرشامة واستلمت مكافأتها'}
+  if(h&&h.parentNode)h.parentNode.removeChild(h);
+}
+
+/* ---------- داخل شاشة استعداد الوحدة: بطاقة الشرح + برشامة القاعدة ---------- */
+var _unitPrep9=unitPrep;
+unitPrep=function(type,idx){
+  _unitPrep9(type,idx);
+  try{
+    var first=app.querySelector('.card');if(!first||!app.querySelector('.hd'))return;
+    var k=lesKey(type,idx),dv=(S.watchedVocab||[]).indexOf(k)>=0,dg=(S.studiedUnits||[]).indexOf(k)>=0,g=lesGrammar(type,idx),y=lesYt(type,idx);
+    var h='<div class="card" style="border-color:#7A3B3B;border-width:3px">'+
+      '<div class="tag" style="background:#7A3B3B">🎥 الخطوة ١: اسمع واتعلّم قبل المعركة</div>'+
+      '<button class="btn" style="width:100%;margin-top:8px;font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;line-height:1.6;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="wordReaderScr(\''+type+'\','+idx+')">'+(y?'🎥':'🗣️')+' كلمات الوحدة بصوت مستر عبدالرحمن'+(dv?' ✅':' (+30 عملة)')+'</button>';
+    if(g){
+      h+='<div style="margin-top:10px"><div class="tag g">📘 برشامة القاعدة: '+g.t+'</div>'+
+        '<div class="cap-sec cap-rule" style="margin-top:8px">'+g.rule+'</div>'+
+        (g.keys.length?'<div class="cap-keys" style="margin-top:8px">'+g.keys.slice(0,6).map(function(x){return '<span>'+esc(x)+'</span>'}).join('')+'</div>':'')+
+        (g.traps.length?'<div class="cap-sec cap-trap" style="margin-top:8px">⚠️ '+g.traps[0]+'</div>':'')+
+        '<button class="btn t" style="width:100%;margin-top:8px;font-size:14px" onclick="grammarScr(\''+type+'\','+idx+')">📘 افتح البرشامة كاملة بالأمثلة الناطقة'+(dg?' ✅':' (+25 عملة)')+'</button></div>';
+    }
+    first.insertAdjacentHTML('afterend',h+'</div>');
+  }catch(e){}
+};
+
+/* ---------- اضغط على أي كلمة إنجليزية: نطق + معنى ---------- */
+function lesWordAt(x,y,box){
+  var node=null,off=0,r;
+  try{
+    if(document.caretRangeFromPoint){r=document.caretRangeFromPoint(x,y);if(r){node=r.startContainer;off=r.startOffset}}
+    else if(document.caretPositionFromPoint){r=document.caretPositionFromPoint(x,y);if(r){node=r.offsetNode;off=r.offset}}
+  }catch(e){}
+  if(!node||node.nodeType!==3||!box.contains(node))return '';
+  var t=node.textContent||'',s=off,e=off,re=/[A-Za-z’'-]/;
+  if(s>=t.length||!re.test(t.charAt(s))){if(s>0&&re.test(t.charAt(s-1)))s--;else return ''}
+  e=s;
+  while(s>0&&re.test(t.charAt(s-1)))s--;
+  while(e<t.length&&re.test(t.charAt(e)))e++;
+  return t.slice(s,e).replace(/^[’'-]+|[’'-]+$/g,'');
+}
+function lesTip(x,y,word,ar){
+  var el=document.getElementById('wtip');
+  if(!el){el=document.createElement('div');el.id='wtip';document.body.appendChild(el)}
+  el.innerHTML='<b>🔊 '+esc(word)+'</b>'+(ar?esc(ar):'<small>المعنى غير موجود في قاموس المنصة</small>');
+  el.style.left=Math.max(70,Math.min(window.innerWidth-70,x))+'px';
+  el.style.top=Math.max(64,y-14)+'px';
+  el.style.animation='none';void el.offsetWidth;el.style.animation='';
+  clearTimeout(LES_TIP_T);
+  LES_TIP_T=setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},2800);
+}
+document.addEventListener('click',function(e){
+  try{
+    var t=e.target;if(!t||!t.closest||t.closest('button'))return;
+    var box=t.closest('.psg-box,.les-tap');
+    if(!box){var en=t.closest('.en');if(en&&app.contains(en)&&G&&G.qs&&G.qs[G.i]&&G.qs[G.i][5]==='st')box=en}
+    if(!box)return;
+    var w=lesWordAt(e.clientX,e.clientY,box);
+    if(!w||!/[A-Za-z]{2}/.test(w))return;
+    lesSpeak(w,0.85);
+    lesTip(e.clientX,e.clientY,w,lesLookup(w));
+  }catch(err){}
+});
+
+/* ---------- لوحة المستر: ربط فيديوهات اليوتيوب بالوحدات ---------- */
+var YT_GRADES={p:6,m:3,s:3};
+function tYtScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  S.ytLinks=(S.ytLinks&&typeof S.ytLinks==='object')?S.ytLinks:{};
+  if(!YT_STG)YT_STG=S.stage||'m';
+  if(YT_GRD>YT_GRADES[YT_STG])YT_GRD=1;
+  var type=YT_UNIT.charAt(0),idx=Number(YT_UNIT.slice(1))||0,k=lesKey(type,idx,YT_STG,YT_GRD),cur=S.ytLinks[k],i;
+  function pick(on,lbl,fn){return '<button class="pwb" style="flex:1 1 auto;min-height:36px;font-size:12.5px;'+(on?'background:var(--teal);color:#FFE9B8;border-color:#FFD700':'')+'" onclick="'+fn+'">'+lbl+'</button>'}
+  var stg=['p','m','s'].map(function(s){return pick(YT_STG===s,stgLbl(s),'YT_STG=\''+s+'\';tYtScr()')}).join(''),grd='',uni='';
+  for(i=1;i<=YT_GRADES[YT_STG];i++)grd+=pick(YT_GRD===i,gName(i,YT_STG),'YT_GRD='+i+';tYtScr()');
+  for(i=0;i<6;i++)uni+=pick(YT_UNIT==='u'+i,'Unit '+(i+1),'YT_UNIT=\'u'+i+'\';tYtScr()');
+  for(i=0;i<3;i++)uni+=pick(YT_UNIT==='s'+i,'Story '+(i+1),'YT_UNIT=\'s'+i+'\';tYtScr()');
+  var keys=Object.keys(S.ytLinks).filter(function(x){return S.ytLinks[x]&&(S.ytLinks[x].v||S.ytLinks[x].l)}).sort();
+  var list=keys.map(function(x){
+    var p=x.split('_'),v=S.ytLinks[x];
+    return '<div class="rep-kv"><span class="sp">'+stgLbl(p[0])+' • '+gName(Number(p[1]),p[0])+' • '+(p[2]==='u'?'Unit ':'Story ')+(Number(p[3])+1)+'<br><span class="sm" style="direction:ltr;display:inline-block">'+(v.v?'video: '+esc(v.v):'')+(v.l?' list: '+esc(v.l.slice(0,18))+'…':'')+'</span></span><button class="pwb" style="flex:none;width:auto;min-height:30px;padding:2px 10px;font-size:12px" onclick="tYtDel(\''+x+'\')">🗑️ حذف</button></div>';
+  }).join('');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700"><h1>🎥 ربط فيديوهات اليوتيوب بالوحدات</h1><div>اختر المرحلة والصف والوحدة ثم الصق رابط الفيديو أو قائمة التشغيل</div></div>'+
+    '<div class="card"><div class="tag">١) المرحلة</div><div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">'+stg+'</div>'+
+      '<div class="tag" style="margin-top:10px">٢) الصف</div><div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">'+grd+'</div>'+
+      '<div class="tag" style="margin-top:10px">٣) الوحدة أو فصل القصة</div><div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">'+uni+'</div></div>'+
+    '<div class="card"><div class="tag g">٤) رابط اليوتيوب</div>'+
+      '<div class="sm" style="margin:6px 0">'+(cur?'الرابط الحالي: <b style="direction:ltr;display:inline-block">'+(cur.v?esc(cur.v):'')+(cur.l?' (playlist)':'')+'</b> — الصق رابطاً جديداً لاستبداله':'لا يوجد فيديو مربوط بهذه الوحدة بعد')+'</div>'+
+      '<input class="inp" id="ytIn" dir="ltr" inputmode="url" autocomplete="off" placeholder="https://youtu.be/... أو رابط playlist" style="width:100%;box-sizing:border-box;text-align:left">'+
+      '<button class="btn" style="width:100%;margin-top:8px;font-size:16px" onclick="tYtSave()">💾 حفظ وربط الفيديو</button>'+
+      '<div class="sm" style="margin-top:6px;font-size:11px;line-height:1.7">يُقبل: رابط فيديو عادي أو مختصر (youtu.be) أو Shorts أو بث مباشر أو قائمة تشغيل. يُستخرج رقم الفيديو تلقائياً ويُحفظ على هذا الجهاز وفي السحابة ليظهر لكل الطلاب.</div></div>'+
+    (cur&&isOnline()?'<div class="card" style="padding:8px"><div class="tag g">معاينة</div><div style="margin-top:8px;position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000"><iframe src="'+ytEmbedUrl(cur,0)+'" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen loading="lazy" title="معاينة"></iframe></div></div>':'')+
+    '<div class="card"><div class="tag">📋 الفيديوهات المربوطة ('+keys.length+')</div><div style="margin-top:6px">'+(list||'<div class="sm" style="text-align:center">لم تربط أي فيديو بعد</div>')+'</div></div>'+
+    '<button class="btn t" onclick="tPanelScr()">رجوع للوحة المستر</button>';
+}
+function tYtCloud(k,val){
+  if(!window.FB||!FB.ytSet||!isOnline()){showToast('💾 اتحفظ على جهازك فقط — السحابة غير متصلة',true);return}
+  FB.ytSet(k,val).then(function(){showToast('☁️ تم الحفظ في السحابة — الفيديو هيظهر لكل الطلاب')}).catch(function(){showToast('اتحفظ على جهازك، والحفظ السحابي فشل (صلاحيات cfg)',true)});
+}
+function tYtSave(){
+  if(!T_AUTH)return;
+  var el=document.getElementById('ytIn'),p=ytParse(el?el.value:'');
+  if(!p){sfxBad(true);rmsg('الرابط غلط — الصق رابط يوتيوب كامل');return}
+  var k=lesKey(YT_UNIT.charAt(0),Number(YT_UNIT.slice(1))||0,YT_STG,YT_GRD);
+  S.ytLinks=(S.ytLinks&&typeof S.ytLinks==='object')?S.ytLinks:{};
+  S.ytLinks[k]={v:p.v,l:p.l};save();
+  try{ding()}catch(e){}
+  tYtScr();tYtCloud(k,{v:p.v,l:p.l});
+}
+function tYtDel(k){
+  if(!T_AUTH||!S.ytLinks||!S.ytLinks[k])return;
+  delete S.ytLinks[k];save();tYtScr();tYtCloud(k,null);
+}
+var _tPanelScr9=tPanelScr;
+tPanelScr=function(){
+  _tPanelScr9();
+  try{
+    if(!T_AUTH)return;
+    var sp=null,ch=app.children,ci;
+    for(ci=0;ci<ch.length;ci++){if(ch[ci].classList&&ch[ci].classList.contains('sp')){sp=ch[ci];break}}
+    var h='<button class="btn" style="font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="tYtScr()">🎥 ربط فيديوهات اليوتيوب بالوحدات</button>';
+    if(sp)sp.insertAdjacentHTML('beforebegin',h);else app.insertAdjacentHTML('beforeend',h);
+    lesPull(true);
+  }catch(e){}
+};
+var _onFB9=window.onFB;
+window.onFB=function(){if(_onFB9)_onFB9();setTimeout(function(){lesPull()},2500)};
 
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():(!S.nick?nickReq():home()));if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
 setupManifest();setupSW();updNet();updInstallBtn();syncMode();renderSide();if(isOnline()&&S.pendSync)setTimeout(flushSync,4000);

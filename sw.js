@@ -1,13 +1,13 @@
 /* تحدّي الأصحاب — Service Worker (offline-first)
    ارفع هذا الملف في نفس مجلد index.html.
    عند أي تحديث للعبة غيّر رقم الإصدار في السطر التالي ليتم تجديد الكاش عند الطلاب. */
-var VERSION = 'qd-v8.0.0';
+var VERSION = 'qd-v9.0.0';
 var CORE = VERSION + '-core';
 var RUNTIME = VERSION + '-runtime';
 
 /* ملفات أساسية + ملفات اختيارية (أي ملف غير موجود يتم تجاوزه بدون إفشال التثبيت) */
 var PRECACHE = [
-  './', 'index.html', 'questions.js', 'words.js', 'curriculum.js',
+  './', 'index.html', 'questions.js', 'words.js', 'curriculum.js', 'lessons.js',
   'mister.png', 'mister-cheer.png', 'mister-hint.png',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Lemonada:wght@600;700&display=swap',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js',
