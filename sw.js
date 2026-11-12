@@ -1,7 +1,7 @@
 /* تحدّي الأصحاب — Service Worker (offline-first)
    ارفع هذا الملف في نفس مجلد index.html.
    عند أي تحديث للعبة غيّر رقم الإصدار في السطر التالي ليتم تجديد الكاش عند الطلاب. */
-var VERSION = 'qd-v7.0.0';
+var VERSION = 'qd-v8.0.0';
 var CORE = VERSION + '-core';
 var RUNTIME = VERSION + '-runtime';
 
@@ -9,12 +9,11 @@ var RUNTIME = VERSION + '-runtime';
 var PRECACHE = [
   './', 'index.html', 'questions.js', 'words.js', 'curriculum.js',
   'mister.png', 'mister-cheer.png', 'mister-hint.png',
-  'images/m1.png', 'images/m2.png', 'images/m3.png', 'images/m4.png',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Lemonada:wght@600;700&display=swap',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'
 ];
-var VOICES = ['ok', 'bad', 'win', 'report', 'shatouli', 'combo', 'welcome', 'gift', 'build', 'tax', 'shield', 'rage', 'pet', 'police', 'cards', 'class']
+var VOICES = ['ok', 'bad', 'win', 'report', 'combo', 'welcome', 'gift', 'build', 'tax', 'shield', 'rage', 'pet', 'police', 'cards', 'class']
   .map(function (k) { return k + '.mp3'; });
 
 /* نطاقات تُخزَّن بنمط cache-first (خطوط جوجل + مكتبة Firebase) */

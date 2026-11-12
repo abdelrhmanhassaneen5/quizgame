@@ -589,16 +589,121 @@ body.th-modern .rmap{border-color:#C7D2FE}
 .rm-b{width:13%}
 @media(min-width:768px){.rm-b{width:12%}}
 @media(max-width:520px){.rm-b .stx{display:none}}
+
+/* ================================================================
+   v8 — وحوش متحركة، عدّاد القلوب، صندوق الأكواد، مجلس المستشارين،
+        مركز الأبحاث، سور المدينة والجيش
+   ================================================================ */
+/* --- animated SVG monsters --- */
+.monster-wrap{display:inline-block;position:relative;line-height:0}
+.monster-wrap svg{overflow:visible;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));transition:filter .2s}
+.monster-wrap.boss-glow::before{content:"";position:absolute;inset:6% 6% 2%;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.4),transparent 70%);animation:monGlow 2s ease-in-out infinite;z-index:-1}
+.mon-float{animation:monFloat 3.2s ease-in-out infinite}
+@keyframes monFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.mon-body{transform-box:fill-box;transform-origin:50% 100%;animation:monBreath 2.8s ease-in-out infinite}
+@keyframes monBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.035,.965)}}
+.mon-glow{animation:monGlow 1.6s ease-in-out infinite}
+@keyframes monGlow{0%,100%{opacity:.45}50%{opacity:1}}
+.mon-wing{transform-box:fill-box;transform-origin:100% 60%;animation:monFlap 1.1s ease-in-out infinite}
+@keyframes monFlap{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+.mon-flame{transform-box:fill-box;transform-origin:50% 100%;animation:monFlame .5s ease-in-out infinite alternate}
+@keyframes monFlame{from{transform:scale(1,1)}to{transform:scale(.92,1.14)}}
+.mon-bolt{animation:monBolt 1.3s steps(1) infinite}
+@keyframes monBolt{0%{opacity:0}62%{opacity:1}72%{opacity:.2}76%{opacity:1}86%{opacity:0}100%{opacity:0}}
+.mon-aura{transform-box:fill-box;transform-origin:50% 50%;animation:monAura 7s linear infinite}
+@keyframes monAura{to{transform:rotate(360deg)}}
+.monster-wrap .f-h,.monster-wrap .f-a,.monster-wrap .f-w{display:none}
+.monster-wrap.st-hit .f-n,.monster-wrap.st-angry .f-n,.monster-wrap.st-win .f-n{display:none}
+.monster-wrap.st-hit .f-h,.monster-wrap.st-angry .f-a,.monster-wrap.st-win .f-w{display:inline}
+.monster-wrap.st-hit svg{filter:drop-shadow(0 0 12px #fff) brightness(1.35)}
+.monster-wrap.st-angry svg{filter:drop-shadow(0 0 14px rgba(255,40,40,.95))}
+.monster-wrap.st-angry .mon-body{animation-duration:.8s}
+.monster-wrap.st-win svg{filter:drop-shadow(0 0 12px rgba(255,215,0,.9))}
+/* --- cinematic defeat --- */
+#mon.mon-die #ms{animation:monDie 2.1s cubic-bezier(.3,.1,.3,1) forwards!important}
+@keyframes monDie{
+  0%{transform:scale(.95) translateX(0) rotate(0);filter:brightness(1);opacity:1}
+  5%{transform:scale(1) translateX(-11px) rotate(-6deg);filter:brightness(2)}
+  10%{transform:scale(1) translateX(11px) rotate(6deg);filter:brightness(1)}
+  15%{transform:scale(1.04) translateX(-12px) rotate(-7deg);filter:brightness(2.4)}
+  20%{transform:scale(1.04) translateX(12px) rotate(7deg);filter:brightness(1)}
+  25%{transform:scale(1.07) translateX(-13px) rotate(-8deg);filter:brightness(2.8) sepia(1) saturate(4)}
+  30%{transform:scale(1.07) translateX(13px) rotate(8deg);filter:brightness(1.2)}
+  35%{transform:scale(1.1) translateX(-14px) rotate(-9deg);filter:brightness(3)}
+  40%{transform:scale(1.1) translateX(14px) rotate(9deg);filter:brightness(1.3) sepia(1) saturate(5)}
+  46%{transform:scale(1.13) translateX(-10px) rotate(-6deg);filter:brightness(3.4)}
+  52%{transform:scale(1.16) translateX(8px) rotate(5deg);filter:brightness(2) sepia(1) saturate(6)}
+  60%{transform:scale(1.32) translateX(0) rotate(0);filter:brightness(5) sepia(1) saturate(6);opacity:1}
+  100%{transform:scale(0) rotate(50deg);filter:brightness(6) sepia(1) saturate(8);opacity:0}
+}
+#fxCv{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9700}
+.vic-ban{position:fixed;top:17%;left:50%;transform:translateX(-50%);z-index:9750;width:max-content;max-width:92vw;box-sizing:border-box;background:linear-gradient(135deg,#7A3B3B,#C9973F);color:#FFF8DC;border:3px solid #FFD700;border-radius:18px;padding:12px 20px;font-family:Lemonada,'Cairo',sans-serif;font-weight:700;font-size:clamp(16px,4.6vw,27px);line-height:1.6;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 34px rgba(255,215,0,.65);animation:vicIn 1.5s ease forwards;pointer-events:none}
+@keyframes vicIn{0%{opacity:0;transform:translateX(-50%) scale(.3) rotate(-8deg)}22%{opacity:1;transform:translateX(-50%) scale(1.14) rotate(2deg)}34%{transform:translateX(-50%) scale(1) rotate(0)}86%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1.05) translateY(-18px)}}
+.cn-pop{animation:cnPop .3s ease}
+@keyframes cnPop{50%{transform:scale(1.5);color:#C9973F}}
+/* --- hearts cooldown --- */
+#app .hp-lock,#side .hp-lock{background:linear-gradient(135deg,#3A1C1C,#7A3B3B);color:#FFE9B8;border:3px solid #FFD700;text-align:center;font-weight:900;font-size:14.5px;line-height:1.8;display:flex;flex-direction:column;gap:8px;justify-content:center}
+.hp-cd{direction:ltr;unicode-bidi:isolate;display:inline-block;background:rgba(0,0,0,.4);color:#FFD700;border-radius:8px;padding:0 8px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.btn.key-glow{background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFF3B0;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;line-height:1.6;animation:keyGlow 1.4s ease-in-out infinite;overflow:visible}
+@keyframes keyGlow{0%,100%{box-shadow:0 5px 0 #5A3A10,0 0 0 0 rgba(255,215,0,.85)}50%{box-shadow:0 5px 0 #5A3A10,0 0 0 12px rgba(255,215,0,0)}}
+/* --- VIP code vault + golden rule --- */
+.vault{background:linear-gradient(135deg,#2B1055,#7A3B3B 60%,#B8862E);color:#FFE9B8;border:2.5px solid #FFD700;border-radius:16px;padding:10px 12px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.vault-t{font-weight:900;font-size:14px;color:#FFD700;line-height:1.5}
+.vault-ms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.vault-m{background:rgba(0,0,0,.3);border:1.5px dashed rgba(255,215,0,.6);border-radius:12px;padding:6px 4px;text-align:center;font-size:10.5px;font-weight:700;line-height:1.55}
+.vault-m b{display:block;font-size:12.5px;color:#FFD700}
+.vault-m.on{background:rgba(47,107,74,.6);border-style:solid}
+.gold-rule{background:linear-gradient(135deg,#FFF8E7,#FCE8B2);border:2px dashed #C9973F;border-radius:14px;padding:8px 10px;font-size:12.5px;font-weight:900;line-height:1.8;text-align:center;color:#4A2F22}
+.prof-card.vip{border:3px solid #FFD700;animation:vipGlow 2.4s ease-in-out infinite}
+@keyframes vipGlow{0%,100%{box-shadow:0 0 0 2px #8A5A1E,0 0 8px rgba(255,215,0,.45)}50%{box-shadow:0 0 0 2px #8A5A1E,0 0 22px rgba(255,215,0,.95)}}
+/* --- leaderboard --- */
+.lb-chase{background:linear-gradient(135deg,#7A3B3B,#C9973F);color:#FFF8DC;border-radius:12px;padding:8px 10px;font-weight:900;font-size:14px;text-align:center;margin-top:8px;line-height:1.7}
+.lg-badge{display:inline-flex;align-items:center;gap:6px;border-radius:14px;padding:3px 12px;font-weight:900;font-size:13px;color:#fff;border:2px solid #FFD700;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+/* --- parent transparency block --- */
+.pr-tr{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pr-tr div{border:1px solid #E1E7F0;border-radius:12px;padding:10px;font-size:12px;font-weight:700;color:#475569;line-height:1.7}
+.pr-tr b{display:block;font-size:20px;font-weight:900;color:#1E3C72;line-height:1.3}
+.pr-tr span{display:block;font-size:13px;font-weight:900;color:#111827}
+@media(max-width:480px){.pr-tr{grid-template-columns:1fr}}
+/* --- council of advisors + step-by-step guide --- */
+.btn.adv-guide{width:100%;font-family:'Cairo',sans-serif;font-weight:900;font-size:13.5px;line-height:1.6;min-height:42px;padding:6px 8px;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8}
+.adv-bar{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1E3C72,#2A5298);color:#fff;border:2px solid #FFD700;border-radius:14px;padding:8px 10px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.adv-bar .tx{flex:1;min-width:0;font-size:12.5px;font-weight:800;line-height:1.65}
+.adv-bar .tx b{color:#FFD700}
+.adv-go{flex:none;background:#FFD700;color:#3A2318;border:0;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;padding:7px 10px;cursor:pointer;min-height:36px;white-space:nowrap}
+.adv-go:active{transform:scale(.95)}
+.adv-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.adv-chip{background:var(--card);border:2px solid #8A6A4A;border-radius:12px;padding:5px 2px;font-family:'Cairo',sans-serif;font-weight:900;font-size:10.5px;line-height:1.4;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;position:relative}
+.adv-chip .i{font-size:20px;line-height:1.15}
+.adv-chip.al{border-color:#B23A3A}
+.adv-chip.al::after{content:"";position:absolute;top:3px;left:6px;width:9px;height:9px;border-radius:50%;background:#FF4D4D;border:1.5px solid #fff;animation:pl 1.2s infinite}
+body.th-modern .adv-chip{border:1px solid #C7D2FE}
+body.dark .adv-chip{border-color:#555}
+.tut-dots{display:flex;gap:7px;justify-content:center}
+.tut-dots i{width:10px;height:10px;border-radius:50%;background:#CDB88A;transition:transform .2s,background .2s}
+.tut-dots i.on{background:#2F6B4A;transform:scale(1.35)}
+.tut-art{font-size:46px;text-align:center;line-height:1.25;animation:petBob 2.2s ease-in-out infinite}
+.tut-step{font-size:14px;font-weight:700;line-height:1.9}
+/* --- republic: 6 indicators, defence zone, city wall, patrolling guards --- */
+.rep-bar{grid-template-columns:repeat(6,1fr)}
+@media(max-width:480px){.rep-bar{gap:4px}.rep-ind b{font-size:12px}.rep-ind span{font-size:9px}}
+.rm-zone.z-def{background:repeating-linear-gradient(0deg,rgba(84,90,104,.62) 0 8px,rgba(108,114,128,.62) 8px 16px);color:rgba(255,255,255,.85);border-radius:0}
+.rm-wall{position:absolute;left:.5%;right:.5%;top:27.4%;bottom:.5%;border:5px solid #8B5A2B;border-radius:10px;pointer-events:none;z-index:2;box-shadow:inset 0 0 0 2px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.35)}
+.rm-wall.w2{border-color:#A3A3AB;border-width:6px}
+.rm-wall.w3{border-color:#85858F;border-width:7px;border-style:ridge}
+.rm-wall.w4{border-color:#646A76;border-width:8px;border-style:ridge}
+.rm-wall.w5{border-color:#4E5360;border-width:8px;border-style:ridge;box-shadow:inset 0 0 0 2px #FFD700,0 0 12px rgba(255,215,0,.7)}
+.rm-tw{position:absolute;font-size:clamp(13px,3.2vw,24px);line-height:1;transform:translate(-50%,-50%);pointer-events:none;z-index:3;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.rm-guard{position:absolute;font-size:clamp(11px,2.7vw,19px);line-height:1;z-index:4;pointer-events:none;filter:drop-shadow(0 2px 1px rgba(0,0,0,.4));animation:rmPatH 18s linear infinite alternate}
+.rm-guard.v{animation-name:rmPatV;animation-duration:14s}
+@keyframes rmPatH{from{left:4%}to{left:92%}}
+@keyframes rmPatV{from{top:31%}to{top:92%}}
+.rmap.ph-night .rm-wall{filter:brightness(.6)}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -695,7 +800,7 @@ function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp
 function shuffle(a){return a.map(function(x){return[Math.random(),x]}).sort(function(a,b){return a[0]-b[0]}).map(function(x){return x[1]})}
 function load(){try{S=JSON.parse(localStorage.getItem('qd_v2'))||{}}catch(e){S={}}S.coins=S.coins||0;S.survBest=S.survBest||0;S.gifts=S.gifts||[];S.bdg=S.bdg||[];S.eqBdg=S.eqBdg||'';S.role=S.role||'police';S.city=(S.city&&typeof S.city==='object')?S.city:{house:1};S.cTax=S.cTax||0;S.ver=S.ver||'';S.sbOk=S.sbOk||0;S.spkOk=S.spkOk||0;S.psgOk=S.psgOk||0;S.raidsOk=S.raidsOk||0;S.rLogT=S.rLogT||0;S.max=S.max||1;S.stars=S.stars||{};
 if(S.max===20&&S.stars[20]>0)S.max=21;
-['prog_p','prog_m','prog_s'].forEach(function(pk){if(S[pk]&&S[pk].max===20&&S[pk].stars&&S[pk].stars[20]>0)S[pk].max=21});S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.clsCodes=Array.isArray(S.clsCodes)?S.clsCodes:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
+['prog_p','prog_m','prog_s'].forEach(function(pk){if(S[pk]&&S[pk].max===20&&S[pk].stars&&S[pk].stars[20]>0)S[pk].max=21});S.streak=S.streak||0;S.dark=S.dark||false;S.last=S.last||'';S.dhp=(S.dhp===undefined||S.dhp===null)?3:S.dhp;S.seen=S.seen||[];S.inv=S.inv||{fifty:0,time:0,sc:0};S.own=S.own||{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']};S.own.pet=S.own.pet||['owl'];S.eq=S.eq||{ch:'blob',col:'c0',th:'t0',pet:'owl'};if(!S.eq.pet)S.eq.pet='owl';S.petFed=S.petFed||0;S.cgrps=Array.isArray(S.cgrps)?S.cgrps:[];S.clsCodes=Array.isArray(S.clsCodes)?S.clsCodes:[];S.hpWaitUntil=Number(S.hpWaitUntil)||0;S.lastRevHeartAt=Number(S.lastRevHeartAt)||0;['statsHelp','statsPet','statsRevFixed','statsOk','statsOkHelp'].forEach(function(k){S[k]=Number(S[k])||0});S.vault=Array.isArray(S.vault)?S.vault:[];S.uid=S.uid||(Math.random().toString(36).slice(2)+Date.now().toString(36))}
 function save(){try{localStorage.setItem('qd_v2',JSON.stringify(S))}catch(e){}}
 function daily(){var t=new Date().toDateString();if(S.last!==t){S.last=t;var b=10+5*Math.min(skAlive(),5);S.coins+=b;S.dhp=3;save();return b}return 0}
 var DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -742,7 +847,7 @@ function submitP(){
     logDelta();
     var w=wkKey(),pt=wkPts(),a=[];
     try{
-      var mta={role:S.role||'police',cLv:cityTotalLv(),pLv:bldLv('police')};
+      var mta={role:pubRole(),cLv:cityTotalLv(),pLv:bldLv('police')};
       a.push(FB.submit(wkId(w),S.uid,S.nick,pt,mta));
       if(S.grade)a.push(FB.submit(gId(w),S.uid,S.nick,pt,mta));
       if(S.survBest>0)a.push(FB.submit(svId(w),S.uid,S.nick,S.survBest));
@@ -776,16 +881,18 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v5.0',
-  title:'تحديث التحدي الصوتي والقطعة الذكية! 🎙️🕵️‍♂️🏫',
-  sub:'الإصدار التفاعلي الخامس (v5.0)',
-  gift:120,
-  intro:'أهلاً بيك يا بطل في التحديث الخامس لمنصة «تحدّي الأصحاب»! ضفنا لك نمطين تفاعليين جداد وتطوير شامل لبطولة السنتر:',
+  ver:'v8.0',
+  title:'تحديث الجمهورية الكبرى والوحوش الأسطورية! 🐉🛡️',
+  sub:'الإصدار الثامن (v8.0)',
+  gift:150,
+  intro:'أهلاً بيك يا بطل في أكبر تحديث لمنصة «تحدّي الأصحاب»! نقاطك بقت بكامل قوتها، ومدينتك بقى ليها جيش وسور ومجلس مستشارين:',
   items:[
-    {ic:'🎙️',t:'نمط «انطق واضرب الوحش» (Speak to Attack)',d:'وداعاً لرهبة التحدث! اسمع الكلمة أو الجملة وانطقها بصوتك في الميكروفون عشان تضرب الوحش وتكسب عملات وأوسمة!'},
-    {ic:'🕵️‍♂️',t:'نمط «محقق القطعة الذكية» (Mini-Passage Detective)',d:'قصص وألغاز قصيرة ممتعة لمستوى صفك الدراسي مع إضاءة الكلمات المفتاحية باللون الأصفر لتتعلم حل سؤال القطعة بسهولة!'},
-    {ic:'🏫',t:'نظام «دفعة الأبطال» وخصوصية كود السنتر',d:'تحديث بطولة الحصة ليلعب ٣ طلاب معاً في كل سؤال مع ميزة خطف السؤال، وكود خاص لكل مجموعة لحفظ خصوصية كل مرحلة!'},
-    {ic:'📈',t:'تدرج ذكي لمستوى الأسئلة حسب صفك الدراسي',d:'الأسئلة بقت متفصلة بدقة على مقاس صفك الدراسي (من أولى ابتدائي لحد تالتة ثانوي) مع مراجعة تراكمية مألوفة ليك!'}
+    {ic:'💯',t:'نقاطك ١٠٠٪ طوال اليوم + الصندوق الذهبي',d:'مفيش أي خصم على نقاط الترتيب بعد النهاردة! وكل 2500 نقطة في اليوم تفتح صندوق ذهبي (+200 عملة و+200 نقطة). والشراء من المتجر مش بينقص ولا نقطة من ترتيبك.'},
+    {ic:'🐉',t:'وحوش أسطورية متحركة ومشهد سحق الزعيم',d:'8 وحوش جديدة بتتنفس وعينيها بتنوّر: وحش الغابة، تنين الجليد، فارس الظلام، إمبراطور الوحوش.. ولما تهزم الزعيم بينفجر عملات ذهبية!'},
+    {ic:'🧭',t:'مجلس المستشارين الأربعة ودليل الجمهورية',d:'4 مستشارين (اقتصاد، تعليم، أبحاث، دفاع) بيقولوا لك أحسن خطوة دلوقتي، ودليل خطوة بخطوة بهدية +100 عملة.'},
+    {ic:'🛡️',t:'مركز الأبحاث وسور المدينة والجيش',d:'ابحث تكنولوجيا جديدة بأسئلة الإنجليزي، ابنِ سور المدينة العظيم ووظّف حراساً يصدوا غارات اللصوص، ووقّع معاهدات تجارية تدخل ذهب كل يوم.'},
+    {ic:'⚖️',t:'عدل الدرجات وتقرير الشفافية لولي الأمر',d:'السؤال اللي تحله بمساعدة أو بالمرافق بياخد نص الدرجة، وتقرير ولي الأمر بيوضح نسبة حلّك بمجهودك وتصحيحك لأخطائك.'},
+    {ic:'🔑',t:'صندوق الكنز الملكي وعدّاد القلوب',d:'القلوب بتتشحن بعد ساعتين أو فوراً بكود هدية، وكل ما تجمع أكواد أكتر تفتح كنوز: إطار VIP ذهبي وشخصية الجنرال الملكي السرية!'}
   ]
 };
 function checkWhatsNew(){
@@ -838,12 +945,12 @@ function closeWhatsNew(goCity){
 /* === الصفحة الرئيسية (v6): بطاقة ملخص + تبويبات منظمة بدل تكديس كل البطاقات === */
 var HOME_TAB='play';
 function profCardHtml(){
-  return '<div class="prof-card">'+
+  return '<div class="prof-card'+(vaultHas(3)?' vip':'')+'">'+
     '<div class="row">'+
       misterImg('c',48)+
       '<div class="sp">'+
         '<div style="font-family:Lemonada,sans-serif;font-size:15px;font-weight:700;color:#FFD700;line-height:1.3">منصة تحدّي الأصحاب</div>'+
-        '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+esc(S.nick||'بطل التحدي')+' <span onclick="cityScr(\'roles\')" style="cursor:pointer;background:rgba(255,215,0,0.22);border:1px solid #FFD700;color:#FFE9B8;padding:1px 6px;border-radius:8px;font-size:11px">'+roleInfo().ic+' '+roleInfo().n+'</span></div>'+
+        '<div style="font-size:13px;font-weight:900;margin-top:2px">البطل: '+(vaultHas(3)?'👑 ':'')+esc(S.nick||'بطل التحدي')+' <span onclick="cityScr(\'roles\')" style="cursor:pointer;background:rgba(255,215,0,0.22);border:1px solid #FFD700;color:#FFE9B8;padding:1px 6px;border-radius:8px;font-size:11px">'+roleInfo().ic+' '+roleInfo().n+'</span></div>'+
         '<div style="font-size:11px;font-weight:700;color:#CFE3D4;margin-top:2px">'+stgLbl()+' ('+gName()+')'+(eqBdgTitle()?' • '+eqBdgTitle():' • 🏙️ '+cityRankName())+'</div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:4px">'+
@@ -857,7 +964,7 @@ function statStripHtml(){
   var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
   return '<div class="stat-strip">'+
     '<div class="stat-pill" onclick="store()" style="cursor:pointer"><span class="lbl">رصيد العملات</span><div class="val">'+coin()+'<span>'+S.coins+'</span></div></div>'+
-    '<div class="stat-pill"><span class="lbl">القلوب اليومية</span><div class="val" style="gap:2px">'+dhpStars+'</div></div>'+
+    '<div class="stat-pill"><span class="lbl">'+(S.dhp>0?'القلوب اليومية':'⏳ قلب مجاني بعد')+'</span><div class="val" style="gap:2px">'+(S.dhp>0?dhpStars:'<span class="hp-cd" style="font-size:12px">'+hpCdTxt()+'</span>')+'</div></div>'+
     '<div class="stat-pill"><span class="lbl">سلسلة الأيام</span><div class="val">'+flame(18)+'<span>'+skAlive()+' يوم</span></div></div>'+
   '</div>';
 }
@@ -896,7 +1003,7 @@ function homeTabHtml(k){
       homeTile('t-sb','sbIntro()','🧩','تحدي تركيب الجمل',(S.sbOk?'ركّبت '+S.sbOk+' جملة صح 🌟':'رتّب الكلمات • بدون خصم قلوب'))+
       homeTile('t-spk','spkIntro()','🎙️','انطق واضرب الوحش',(S.spkOk?'نطقت '+S.spkOk+' جملة صح 🔥':'تحدي المايك والنطق السليم'))+
       homeTile('t-psg','psgIntro()','🕵️‍♂️','محقق القطعة الذكية',(S.psgOk?'حلّيت '+S.psgOk+' قطع ذكية 🌟':'استنتج الحل من القصة'))+
-      homeTile('',(misCnt>0?'startReview()':'giftScr()'),(misCnt>0?'🛠️':'🎁'),(misCnt>0?'جولة التصحيح':'صندوق الهدايا'),(misCnt>0?'صحّح '+misCnt+' سؤال واسترجع قلب':'افتح أكواد مستر عبدالرحمن'))+
+      homeTile('',(misCnt>0?'startReview()':'giftScr()'),(misCnt>0?'🛠️':'🎁'),(misCnt>0?'جولة التصحيح':'صندوق الهدايا'),(misCnt>0?'صحّح '+misCnt+' سؤال'+(revHeartReady()?' واسترجع قلب':' وثبّت المعلومة'):'افتح أكواد مستر عبدالرحمن'))+
       homeTile('curr','startVocabCards()','🃏','بطاقات الكلمات الذكية','راجع أهم كلمات مرحلتك بالنطق')+
     '</div>';
   }
@@ -942,6 +1049,7 @@ function homeTab(k){
   document.querySelectorAll('.h-tab').forEach(function(b){var on=(b.getAttribute('data-k')===k);b.classList.toggle('act',on);b.setAttribute('aria-selected',on?'true':'false')});
 }
 function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var VM=vaultCheck();if(VM.length)setTimeout(function(){try{sfxChest()}catch(e){}showToast(VM[VM.length-1])},1300);
   var bMsg=bdgCheck();if(bMsg)setTimeout(function(){rmsg(bMsg)},200);
   setTimeout(function(){ensureReg();claimPrev();askSync();checkWhatsNew()},50);
   var D=dm(),misLeft=D.list.length-D.done.length;
@@ -965,9 +1073,12 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
         '</div>'+
         '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:8px 14px;border-radius:12px;font-size:15px;white-space:nowrap">العب الآن ▶</div>'+
       '</button>'
-    : '<div class="card" style="text-align:center;font-weight:900;background:#E3B03F;display:flex;align-items:center;justify-content:center"><div>قلوبك اليومية خلصت! تقدر تلعب <b>تحدي النجاة</b> أو <b>جولة التصحيح</b> أو تشحن قلوبك بكود هدية 🎁</div></div>')+
+    : hpLockCardHtml())+
     homeSummaryCard()+
   '</div>'+
+
+  /* v8: صندوق الأكواد الملكي + القاعدة الذهبية */
+  vaultHtml(true)+goldRuleHtml()+
 
   /* Smart pet companion (phones only — sidebar on larger screens) */
   '<div class="only-m">'+homePetCard()+'</div>'+
@@ -1166,7 +1277,7 @@ function finishFlashcards(){
     '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
 }
 function startCurriculum(type,idx){
-  if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم! راجع بالبطاقات أو اشحن قلوبك');return}
+  if(S.dhp<=0){home();rmsg('⏳ قلوبك خلصت! قلب مجاني بعد '+hpCdTxt()+' — راجع بالبطاقات أو اشحن بكود هدية 🎁');return}
   var gData=(getStageCurr()||{})[S.grade]||{units:[],story:[]};
   var rawQs=type==='u'?gData.units[idx]:gData.story[idx];
   if(!rawQs||!rawQs.length)return;
@@ -1186,7 +1297,7 @@ function map(w){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   var startLv=(MAP_W===2?21:1),endLv=(MAP_W===2?40:20);
   var g='';for(var i=startLv;i<=endLv;i++){var u=i<=S.max,b=i%5===0;
     g+='<button class="lv'+(b?' boss':'')+'" '+(u?'onclick="start('+i+')"':'disabled')+'><b>'+i+'</b><span>'+(b?(i>20?'زعيم أسطوري':'زعيم'):'جولة')+'</span><div>'+(u?stars(S.stars[i]||0,12):'<span>مقفولة</span>')+'</div></button>'}
-  if(S.dhp<=0){home();rmsg('قلوبك خلصت لليوم!');return}
+  if(S.dhp<=0){home();rmsg('⏳ قلوبك خلصت! قلب مجاني بعد '+hpCdTxt()+' أو اشحن فوراً بكود هدية 🎁');return}
   var wTabs='<div class="row" style="gap:8px">'+
     '<button class="w-tab'+(MAP_W===1?' act':'')+'" onclick="map(1)">🗺️ العالم ١: البداية (1–20)</button>'+
     '<button class="w-tab'+(MAP_W===2?' act':'')+'" onclick="map(2)">⚡ العالم ٢: الأساطير (21–40) '+(S.max>20?'🔥':'🔒')+'</button>'+
@@ -1375,7 +1486,7 @@ function hearts(){var r='';for(var i=1;i<=Math.max(3,G.h);i++)r+=heart(i<=G.h);r
 function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var q=G.qs[G.i],isSB=(q[5]==='sb'),isBoss=(G.lv%5===0&&!G.rev&&!G.currType);
   if(isBoss&&G.mhp===1&&G.shld<=0&&!G.rage){G.rage=true;setTimeout(sfxRage,180)}
-  G.left=G.T+(q[7]?3:(isSB?6:0));G.done=false;G.f50=false;
+  G.left=G.T+(q[7]?3:(isSB?6:0));G.done=false;G.f50=false;G.usedHelpThisQ=false;DCH=0;
   var o='';
   if(isSB){
     G.ci=0;
@@ -1410,13 +1521,18 @@ function pick(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,msg;
   if(good){
-    var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=(G.rev||G.rage)?2:1;
+    var gain=5+Math.floor(G.left/3)+G.tier*2,dmg=1,cm=(G.rev||G.rage)?2:1,helped=!!G.usedHelpThisQ;
     G.combo++;G.ok++;
+    var isCombo=(G.combo%3===0);
     if(S.role==='thief'){var stB=Math.max(2,Math.round(gain*0.3));gain+=stB}
+    if(isCombo){gain+=(S.role==='thief'?15:10);dmg=2}
+    /* v8: سؤال بمساعدة (حذف إجابتين / +5ث / المرافق) = نصف العملات ونقاط الترتيب */
+    if(helped)gain=Math.ceil(gain*0.5);
+    statSolved(helped);if(G.rev)S.statsRevFixed=(S.statsRevFixed||0)+1;
     if(q[5]==='sb'){S.sbOk=(S.sbOk||0)+1;if(!S.mute)setTimeout(function(){speak(q[2][0])},200)}
     misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');
-    msg='إجابة صح! +'+(gain*cm)+' عملة'+(G.rage?' (مكافأة سؤال الغضب ×2 🔥)':'')+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');
-    if(G.combo%3===0){gain+=(S.role==='thief'?15:10);dmg=2;msg+=' • كومبو! ضربة مضاعفة';mTick('k')}
+    msg='إجابة صح! +'+(gain*cm)+' عملة'+(helped?' (نصف الدرجة لاستخدام مساعدة 💡)':'')+(G.rage?' (مكافأة سؤال الغضب ×2 🔥)':'')+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');
+    if(isCombo){msg+=' • كومبو! ضربة مضاعفة';mTick('k')}
     if((S.role==='doctor'||S.role==='nurse')&&G.ok===4&&!G.medUsed&&G.h<3){G.medUsed=1;G.h++;if(!G.rev&&S.dhp<3)S.dhp++;msg+=' • '+(S.role==='doctor'?'👨‍⚕️ إسعاف الطبيب':'👩‍⚕️ عناية الممرضة')+' رجّعت لك قلب ❤️!'}
     if(G.shld>0){
       var shDmg=Math.min(G.shld,dmg);
@@ -1432,16 +1548,18 @@ function pick(k){
     }else{
       G.mhp=Math.max(0,G.mhp-dmg);
     }
-    S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain*cm);if(cr!==gain*cm)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • صندوق هدف اليوم! +'+DCHEST+' عملة';DCH=0}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}
+    S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain*cm);if(cr!==gain*cm)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • 🎁 الصندوق الذهبي اليومي! +'+(DCHEST*DCH)+' عملة و+'+(DCHEST_PTS*DCH)+' نقطة ترتيب';DCH=0;setTimeout(sfxChest,350)}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}
   }else{
-    if(S.role==='police'&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}
+    if((S.role==='police'||S.role==='general')&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}
     else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
   }
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
   var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
-  if(win){msg+=' • الزعيم اتهزم!';setTimeout(sfxWin,450)}
-  $('#fb').innerHTML='<div class="card row" style="align-items:flex-start">'+misterImg(good?'c':'h',46)+'<div class="sp"><div style="font-weight:900">'+msg+'</div><div class="sm">'+(good?cheer()+' • '+q[4]:'افتكر: '+q[4])+'</div></div></div><button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>';
+  if(win){msg+=' • الزعيم اتهزم!';setTimeout(sfxWin,1650)}
+  $('#fb').innerHTML='<div class="card row" style="align-items:flex-start">'+misterImg(good?'c':'h',46)+'<div class="sp"><div style="font-weight:900">'+msg+'</div><div class="sm">'+(good?cheer()+' • '+q[4]:'افتكر: '+q[4])+'</div></div></div>'+(win?'<div class="sm" style="text-align:center;margin-top:12px;font-weight:900;font-size:14px">⚡ الوحش بينهار...</div>':'<button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>');
+  /* v8: مشهد سحق الوحش (≈2.5 ثانية) ثم شاشة النتيجة تلقائياً */
+  if(win){var g0=G;bossDefeatFx(function(){if(G===g0&&!g0.endDone&&document.getElementById('mon'))endRound()})}
 }
 function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
@@ -1663,13 +1781,13 @@ function certShareWA(){
     setTimeout(function(){window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank')},600);
   }
 }
-function endRound(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var win=G.mhp<=0,lv=G.lv,bonus=0;S.nr=(S.nr||0)+1;mTick('r');if(G.mhp<=0)mTick('w');
+function endRound(){if(!G||G.endDone)return;G.endDone=true;app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var win=G.mhp<=0,lv=G.lv,bonus=0,revMsg='';S.nr=(S.nr||0)+1;mTick('r');if(G.mhp<=0)mTick('w');
   var isCurr=!!G.currType;
-  if(win){bonus=20+10*G.h+(lv>20?25:0);if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){if(S.dhp<3)S.dhp++;STMSG='رجعت قلب لرصيدك اليومي!';}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<40)S.max++}save()}
-  dayRoundDone();submit();var mmsg=[mCheck(),STMSG].filter(function(x){return x}).join(' • ');STMSG='';
+  if(win){bonus=20+10*G.h+(lv>20?25:0);if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){var rh=revHeartGrant();revMsg=rh.msg;G.revHeart=rh.ok}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<40)S.max++}save()}
+  dayRoundDone();submit();var mmsg=[mCheck(),STMSG,revMsg].filter(function(x){return x}).join(' • ');STMSG='';
   var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+(S.mis&&S.mis.length&&!G.rev?'<button class="btn t" style="font-size:14px;min-height:38px" onclick="startReview()">راجع أخطاءك دلوقتي ('+S.mis.length+')</button>':'')+'</div>':'';
-  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?'رجعت قلب لرصيدك اليومي! ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
+  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?(G.revHeart?'رجعت قلب لرصيدك اليومي! ':'عاش! ثبّتت المعلومة 👏 ')+'ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
   '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<40?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية ('+(lv+1)+') ⬅️</button>':'')+(win&&(lv===20||lv===40)&&!isCurr?'<button class="btn" style="font-size:17px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certMap()">👑 استلم شهادة ختم الخريطة ('+lv+' جولة)!</button>':''))+
@@ -1709,7 +1827,8 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
   }else{
     topInfoCard='<div class="card" style="line-height:1.9;font-size:14px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+' • <b>'+leftTxt()+'</b></div>'+
     '<div class="card"><div class="tag">جايزة أبطال الأسبوع (أول 3 مراكز)</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب البطل 🥇 • التاني: 100 🥈 • التالت: 50 🥉<br><b>+ شهادة تقدير رسمية من مستر عبدالرحمن لأول 3 أوائل للتحميل والمشاركة على واتساب!</b></div>'+(S.cert?'<button class="btn" style="width:100%;margin-top:8px;font-size:15px" onclick="certScr()">🎓 عرض وتحميل شهادة التقدير</button>':'')+'</div>'+
-    '<div class="card"><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>';
+    '<div class="card"><div style="text-align:center;margin-bottom:8px"><span class="lg-badge" style="background:'+LG[li].c+'">'+lgIcon(li,20)+' دوريك الحالي: الدوري ال'+LG[li].n+'</span></div><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>'+
+    '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border-color:#2F5F5A;font-size:13.5px;font-weight:700;line-height:1.9"><b>🚀 كل نشاط بيضيف 100% من نقاطه لترتيبك الأسبوعي!</b><br>جولات الخريطة 🗺️ • تحدي النجاة ⏱️ • الحلبة اليومية 🎯 • انطق واضرب الوحش 🎙️ • محقق القطعة 🕵️ • بناء المدينة 🏙️<br><span class="sm">والشراء من المتجر مش بينقص ولا نقطة من ترتيبك.</span></div>';
   }
   app.innerHTML='<div class="hd"><h1>لوحة الشرف والترتيب 🏆</h1><div>'+stgFullLbl()+' • النهاردة '+dTxt(cDay())+'</div></div>'+
   '<div class="row" style="flex-wrap:wrap;gap:6px">'+
@@ -1764,7 +1883,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
       if(pts<=0){$('#mr').textContent='العب جولة علشان تدخل الترتيب'}
       else{
         var nxt=myI>0?d.rows[myI-1]:(myI<0?(d.above[0]||null):null);
-        gap=nxt?'<br><span class="sm">باقي '+(nxt.pts-pts+1)+' نقطة وتعدّي '+esc(nxt.name)+'</span>':(rk===1?'<br><span class="sm">إنت الأول!</span>':'');
+        gap=nxt?'<div class="lb-chase">🎯 باقي '+(nxt.pts-pts+1)+' نقطة بس وتعدّي «'+esc(nxt.name)+'» اللي قدامك مباشرة!</div>':(rk===1?'<div class="lb-chase">👑 إنت الأول! حافظ على الصدارة</div>':'');
         var certLiveBtn = (rk>=1 && rk<=3 && pts>0) ? '<br><button class="btn" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="certScr({rk:'+rk+',pts:'+pts+',wk:wkKey(),name:S.nick,live:1})">🎓 استلم شهادة المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][rk-1]+' وحمّلها</button>' : '';
         $('#mr').innerHTML='ترتيبك: <b>#'+rk+'</b> من '+d.total+(BT==='lg'?' في دوريك':(BT==='gr'?' في صفّك':''))+gap+certLiveBtn;
       }
@@ -1795,26 +1914,22 @@ var ITEMS=[
 {id:'fox',k:'pet',ic:'🦊',n:'ثعلب القواعد (Grammar Fox)',d:'يكشف لك تلميح القاعدة أو الكلمة الأولى من الجملة مجاناً مرة في كل جولة!',p:1400},
 {id:'dragon',k:'pet',ic:'🐉',n:'التنين الذهبي (Golden Dragon)',d:'ينفث ناراً تنقص نقطة صحة كاملة من الوحش + يمنحك +25 عملة ذهبية في كل جولة!',p:2500}
 ];
-var DEF={pet:[{k:'pet',id:'owl',ic:'🦉',n:'بومة الحكمة (Wise Owl)',d:'رفيقتك المجانية! تستبعد لك إجابة خاطئة وتنطق السؤال بصوت واضح مرة في كل جولة!'}],ch:[{k:'ch',id:'blob',n:'مستر عبدالرحمن'}],col:[{k:'col',id:'c0',n:'حسب الجولة',h:0}],th:[{k:'th',id:'t0',n:'ورق كلاسيك',c:'#FBE7B5'}]};
+var DEF={pet:[{k:'pet',id:'owl',ic:'🦉',n:'بومة الحكمة (Wise Owl)',d:'رفيقتك المجانية! تستبعد لك إجابة خاطئة وتنطق السؤال بصوت واضح مرة في كل جولة!'}],ch:[{k:'ch',id:'blob',n:'وحوش الخريطة الأسطورية 🐉'}],col:[{k:'col',id:'c0',n:'حسب الجولة',h:0}],th:[{k:'th',id:'t0',n:'ورق كلاسيك',c:'#FBE7B5'}]};
 function item(id){return ITEMS.filter(function(x){return x.id===id})[0]}
-function mName(lv){var t=Math.floor((lv-1)/5);return lv%5===0?(['زعيم الغابة','زعيم الكهف','زعيم البركان','ملك الوحوش','زعيم الرعد ⚡','زعيم الظلام 🌑','زعيم الفضاء 🌌','إمبراطور الزعماء 👑'][t]||'زعيم أسطوري'):(['وحش الغابة','وحش الكهف','وحش البركان','وحش الجليد','حارس الرعد','محارب الظلام','عملاق المجرة','فارس الأساطير'][t]||'وحش أسطوري')}
+function mName(lv){var t=Math.floor((lv-1)/5);return lv%5===0?(['زعيم الغابة 👹','زعيم الكهف 🦇','عملاق البركان 🌋','تنين الجليد 🐉','زعيم الرعد ⚡','فارس الظلام 🌑','وحش الفضاء 👾','إمبراطور الوحوش 👑'][t]||'زعيم أسطوري'):(['وحش الغابة 👹','وحش الكهف 🦇','وحش البركان 🌋','وحش الجليد ❄️','حارس الرعد ⚡','محارب الظلام 🌑','مخلوق الفضاء 👾','فارس الأساطير 👑'][t]||'وحش أسطوري')}
 var bossExprTimer=null;
 function monster(lv,ch,w){
   if(ch==='ghost'||ch==='robot')return svgMonster(lv,ch,w);
-  var isBoss=(lv%5===0)||(ch===true);
-  var defaultImg=isBoss?'images/m2.png':'images/m1.png';
-  var bossClass=isBoss?'boss-glow':'';
-  var sz=w?w:140;
-  return '<div class="monster-wrap '+bossClass+'"><img id="mr-boss-img" src="'+defaultImg+'" alt="Mr. Abdelrahman" style="width:'+sz+'px;height:'+sz+'px;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.35));transition:transform 0.2s ease;" /></div>';
+  /* v8: وحوش خيالية SVG متحركة حسب مستوى الجولة — صورة مستر عبدالرحمن تظهر كمدرب ومستشار فقط، لا كوحش */
+  var isBoss=((Number(lv)||1)%5===0)||(ch===true),sz=w?w:(isBoss?150:132);
+  return '<div class="monster-wrap st-normal'+(isBoss?' boss-glow':'')+'" id="monFx">'+fantasyMonster(lv,isBoss,sz)+'</div>';
 }
 function changeBossExpression(state){
-  var img=document.getElementById('mr-boss-img');
-  if(!img)return;
+  var el=document.getElementById('monFx');
   clearTimeout(bossExprTimer);
-  if(state==='normal')img.src=(G&&G.lv%5===0)?'images/m2.png':'images/m1.png';
-  else if(state==='angry')img.src='images/m2.png';
-  else if(state==='hit')img.src='images/m3.png';
-  else if(state==='win')img.src='images/m4.png';
+  if(!el)return;
+  if(['normal','hit','angry','win'].indexOf(state)<0)state='normal';
+  el.className=el.className.replace(/\bst-[a-z]+\b/,'st-'+state);
 }
 function svgMonster(lv,ch,w){
   var b=lv%5===0,t=Math.floor((lv-1)/5),body,ex='',eye=t>=3?'#B23A3A':'#4A2F22',m='<path d="M40 82Q60 98 80 82" fill="none" stroke="#4A2F22" stroke-width="3"/>';
@@ -1854,13 +1969,13 @@ function useFifty(){
         if(G.sbPool[pi].w===w&&G.sbSel.indexOf(pi)<0){G.sbSel.push(pi);break;}
       }
     }
-    G.f50=true;S.inv.fifty--;save();updPw();sbRefreshUI();return;
+    G.f50=true;markHelp();S.inv.fifty--;save();updPw();sbRefreshUI();return;
   }
   var w=[];q[2].forEach(function(_,j){if(j!==G.ci)w.push(j)});
   shuffle(w).slice(0,2).forEach(function(j){var b=document.querySelectorAll('.opt')[j];b.disabled=true;b.style.opacity='.3'});
-  G.f50=true;S.inv.fifty--;save();updPw();
+  G.f50=true;markHelp();S.inv.fifty--;save();updPw();
 }
-function useTime(){if(G.done||S.inv.time<1)return;G.left+=5;S.inv.time--;save();updPw()}
+function useTime(){if(G.done||S.inv.time<1)return;G.left+=5;markHelp();S.inv.time--;save();updPw()}
 function prev(it){
   if(it.k==='pet')return'<div style="font-size:36px;line-height:1">'+(it.ic||'🦉')+'</div>';
   if(it.k==='ch')return monster(1,it.id,52);
@@ -1881,23 +1996,25 @@ function store(t,m){app.classList.remove('fade-in');void app.offsetWidth;app.cla
   var tabs=TABS.map(function(x){return'<button class="pwb" style="'+(x[0]===TAB?'background:#2F5F5A;color:#FFE9B8':'')+'" onclick="store(\''+x[0]+'\')">'+x[1]+'</button>'}).join('');
   app.innerHTML='<div class="hd"><div style="display:flex;justify-content:center">'+shopIcon(54)+'</div><h1>المتجر</h1><div>اصرف عملاتك بحكمة</div></div>'+
   '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="chip"><span class="sm">نقاط الأسبوع:</span><span>'+wkPts()+'</span></div></div>'+
-  '<div class="card" style="background:#E3B03F"><div class="tag">تنبيه قبل ما تصرف</div><div style="font-size:14px;margin-top:8px;line-height:1.8">• أي حاجة تشتريها بتتخصم من عملاتك، وكمان من نقاطك في ترتيب الأسبوع. لو صرفت كل عملاتك ممكن تنزل في الترتيب.<br>• المساعدات غالية وبتخلص بعد الاستخدام، فاشتري لما تحتاج بس.<br>• في تحديثات جاية هتحتاج فيها عملات (حاجات جديدة وألعاب)، فخلّي باقي من رصيدك.</div></div>'+
+  '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#CFE3D4);border-color:#2F6B4A"><div class="tag g">خبر حلو قبل ما تصرف 🎉</div><div style="font-size:14px;margin-top:8px;line-height:1.8"><b>✨ اصرف عملاتك براحتك! الشراء من المتجر أو تطوير مدينتك بيخصم من العملات الذهبية فقط، ومش بينقص ولا نقطة من ترتيبك الأسبوعي!</b><br>• المساعدات بتخلص بعد الاستخدام، والسؤال اللي تستخدم فيه مساعدة أو المرافق بياخد نص العملات والنقاط ⚖️<br>• خلّي جزء من رصيدك لتطوير مدينتك: كل مبنى أو موظف جديد بيزوّد نقاط ترتيبك 🏙️</div></div>'+
+  vaultHtml(true)+
   '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);font-size:15px;min-height:42px;padding:8px" onclick="giftScr()">🎁 معاك كود هدية سري من المستر؟ افتح صندوقك!</button>'+
   (m?'<div class="card" style="text-align:center;font-weight:900">'+m+'</div>':'')+
   '<div class="row">'+tabs+'</div>'+cards+bnav('shop');
 }
 function eq(k,id){S.eq[k]=id;save();applyTheme();store()}
 function ask(id){
-  var it=item(id),wp=wkPts(),af=Math.max(0,wp-it.p),ok=S.coins>=it.p;
-  app.innerHTML='<div class="hd"><h1>تأكيد الشراء</h1><div>فكّر كويس قبل ما تأكّد</div></div>'+
+  var it=item(id),ok=S.coins>=it.p;
+  app.innerHTML='<div class="hd"><h1>تأكيد الشراء</h1><div>الشراء بالعملات الذهبية فقط</div></div>'+
   '<div class="card" style="text-align:center"><div style="font-weight:900;font-size:22px">'+it.n+'</div>'+(it.d?'<div class="sm">'+it.d+'</div>':'')+'</div>'+
-  '<div class="card" style="background:#E3B03F;line-height:1.9;font-size:15px"><b>هتدفع:</b> '+it.p+' عملة (رصيدك هيبقى '+(S.coins-it.p)+')<br><b>ترتيبك الأسبوعي:</b> نقاطك هتنزل من '+wp+' إلى '+af+'<br>الشراء ده مش بيترجع.</div>'+
+  '<div class="card" style="background:#E3B03F;line-height:1.9;font-size:15px"><b>هتدفع:</b> '+it.p+' عملة (رصيدك هيبقى '+(S.coins-it.p)+')<br><b>ترتيبك الأسبوعي:</b> زي ما هو ('+wkPts()+' نقطة) ✅<br>الشراء ده مش بيترجع.</div>'+
+  '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#CFE3D4);border-color:#2F6B4A;font-weight:900;font-size:13.5px;line-height:1.9;text-align:center">✨ اصرف عملاتك براحتك! الشراء من المتجر أو تطوير مدينتك بيخصم من العملات الذهبية فقط، ومش بينقص ولا نقطة من ترتيبك الأسبوعي!</div>'+
   (ok?'':'<div class="card" style="text-align:center;font-weight:900">رصيدك مش كفاية</div>')+
   '<div class="sp"></div>'+(ok?'<button class="btn" onclick="doBuy(\''+id+'\')">أكّد الشراء</button>':'')+'<button class="btn t" onclick="store()">رجوع</button>';
 }
 function doBuy(id){
   var it=item(id);if(!it||S.coins<it.p)return;
-  S.coins-=it.p;var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p=Math.max(0,S.wk.p-it.p);
+  S.coins-=it.p; /* v8: الشراء يخصم من العملات فقط ولا يمس نقاط الترتيب الأسبوعي S.wk.p */
   if(it.k==='pw')S.inv[id]++;else{S.own[it.k].push(id);S.eq[it.k]=id;applyTheme()}
   sfxCoins();save();submit();TAB=it.k;store(TAB,'اشتريت: '+it.n);
 }
@@ -1993,7 +2110,7 @@ function roomShare(){var c=S.rm.code,t='تعالى نتحدّى بعض في تح
 function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
 /* === محرك المؤثرات الصوتية البرمجي + قوالب الملفات الصوتية بصوت مستر عبدالرحمن ===
    الملفات الصوتية المدعومة تلقائياً (ضع أي ملف منها في فولدر اللعبة وسيعمل فوراً في موضعه):
-   - ok.mp3 / shatouli.mp3 : إجابة صحيحة في المعركة
+   - ok.mp3      : إجابة صحيحة في المعركة
    - combo.mp3   : تحقيق كومبو (3 إجابات صح متتالية)
    - bad.mp3     : إجابة خاطئة في المعركة
    - win.mp3     : الفوز بالجولة وهزيمة الزعيم
@@ -2010,7 +2127,7 @@ function roomLeave(){S.rm=null;RMD=null;save();roomScr()}
    - class.mp3   : حفظ ورفع نتائج بطولة الحصة الحية
 */
 var AC=null,VP=0.35,VOS={},VOKS={},LAST_VO=0;
-var VOICE_SLOTS=['ok','bad','win','report','shatouli','combo','welcome','gift','build','tax','shield','rage','pet','police','cards','class'];
+var VOICE_SLOTS=['ok','bad','win','report','combo','welcome','gift','build','tax','shield','rage','pet','police','cards','class'];
 VOICE_SLOTS.forEach(function(k){
   try{
     var a=new Audio(k+'.mp3');a.preload='auto';a.volume=0.88;
@@ -2037,10 +2154,7 @@ function playVoice(k,force){
   var now=Date.now();
   if(!force&&now-LAST_VO<2200)return false;
   var key=null;
-  if(VOS[k]&&VOKS[k]!==false)key=k;
-  else if(k==='combo'&&VOS['shatouli']&&VOKS['shatouli']!==false)key='shatouli';
-  else if(k==='ok'&&VOS['shatouli']&&VOKS['shatouli']!==false&&Math.random()<0.45)key='shatouli';
-  else if(VOS[k])key=k;
+  if(VOS[k])key=k;
   if(!key||!VOS[key])return false;
   try{
     Object.keys(VOS).forEach(function(x){if(VOS[x]&&!VOS[x].paused){VOS[x].pause();VOS[x].currentTime=0}});
@@ -2153,7 +2267,7 @@ function toggleSnd(r){S.mute=!S.mute;save();if(r){var b=$('#mb');if(b)b.innerHTM
 var CSAVE_AT=0;
 function genRC(){var a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='',b=new Uint8Array(10),i;try{crypto.getRandomValues(b)}catch(e){for(i=0;i<10;i++)b[i]=Math.floor(Math.random()*256)}for(i=0;i<10;i++)c+=a[b[i]%32];return c}
 function fmtRC(c){return c?c.slice(0,5)+'-'+c.slice(5):''}
-function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,spkOk:S.spkOk||0,psgOk:S.psgOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
+function snap(){return JSON.stringify({v:1,u:S.uid,nick:S.nick,stage:S.stage,grade:S.grade,coins:S.coins,max:S.max,stars:S.stars,inv:S.inv,own:S.own,eq:S.eq,rw:S.rw||0,crowns:S.crowns||0,streak:S.streak,last:S.last,wk:S.wk,seen:S.seen,mute:!!S.mute,claim:S.claim||0,dp:S.dp||null,ev:S.ev||null,bdg:(S.bdg||[]).slice(0,30),eqBdg:S.eqBdg||'',role:S.role||'police',city:S.city||{house:1},cTax:S.cTax||0,ver:S.ver||'',clsCodes:(S.clsCodes||[]).slice(0,20),sbOk:S.sbOk||0,spkOk:S.spkOk||0,psgOk:S.psgOk||0,raidsOk:S.raidsOk||0,petFed:S.petFed||0,aq:(S.aq||[]).slice(0,10).map(function(x){return{id:x.id,q:String(x.q).slice(0,60)}}),dm:S.dm||null,sk:S.sk||null,t0:S.t0||0,mis:(S.mis||[]).slice(0,40),ts:S.ts||{},gifts:(S.gifts||[]).slice(0,50),dc:S.dc||null,survBest:S.survBest||0,cert:S.cert||null,dhp:Math.max(0,Math.min(3,Number(S.dhp)||0)),hpWaitUntil:S.hpWaitUntil||0,lastRevHeartAt:S.lastRevHeartAt||0,statsHelp:S.statsHelp||0,statsPet:S.statsPet||0,statsRevFixed:S.statsRevFixed||0,statsOk:S.statsOk||0,statsOkHelp:S.statsOkHelp||0,vault:(S.vault||[]).slice(0,5),cityTutDone:S.cityTutDone?1:0,prog_p:S.prog_p||null,prog_m:S.prog_m||null,prog_s:S.prog_s||null})}
 function cloudSave(force){
   if(!window.FB||!FB.saveSet||!S.uid)return Promise.resolve();
   var now=Date.now();if(!force&&now-CSAVE_AT<60000)return Promise.resolve();
@@ -2179,31 +2293,38 @@ function rcRestore(){
     if(!o||o.v!==1||!o.u){rmsg('الكود تالف');return}
     if(!confirm('هيستبدل تقدمك على الجهاز ده بالتقدم المحفوظ. تكمل؟'))return;
     var n=function(x){return Number(x)||0},iv=o.inv||{};
-    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),spkOk:n(o.spkOk),psgOk:n(o.psgOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:o.dp.chest?1:0}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
+    S={coins:n(o.coins),max:Math.max(1,Math.min(40,n(o.max))),stars:o.stars&&typeof o.stars==='object'?o.stars:{},inv:{fifty:n(iv.fifty),time:n(iv.time),sc:n(iv.sc)},own:o.own&&o.own.ch&&o.own.col&&o.own.th?(function(){o.own.pet=o.own.pet||['owl'];return o.own})():{ch:['blob'],col:['c0'],th:['t0'],pet:['owl']},eq:o.eq&&o.eq.ch?(function(){o.eq.pet=o.eq.pet||'owl';return o.eq})():{ch:'blob',col:'c0',th:'t0',pet:'owl'},rw:n(o.rw),crowns:n(o.crowns),streak:n(o.streak),last:String(o.last||''),wk:o.wk&&typeof o.wk==='object'?{k:n(o.wk.k),p:n(o.wk.p)}:undefined,seen:Array.isArray(o.seen)?o.seen:[],mute:!!o.mute,claim:n(o.claim),ev:(o.ev&&typeof o.ev==='object')?{ck:n(o.ev.ck),b:o.ev.b?1:0}:undefined,bdg:Array.isArray(o.bdg)?o.bdg.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,30):[],eqBdg:o.eqBdg?String(o.eqBdg).slice(0,20):'',role:o.role?String(o.role).slice(0,15):'police',city:(o.city&&typeof o.city==='object')?o.city:{house:1},cTax:n(o.cTax),ver:o.ver?String(o.ver).slice(0,20):'',clsCodes:Array.isArray(o.clsCodes)?o.clsCodes.slice(0,20):[],sbOk:n(o.sbOk),spkOk:n(o.spkOk),psgOk:n(o.psgOk),raidsOk:n(o.raidsOk),petFed:n(o.petFed),aq:Array.isArray(o.aq)?o.aq.filter(function(x){return x&&typeof x.id==='string'&&x.id.length<40}).slice(0,10).map(function(x){return{id:x.id,q:String(x.q||'').slice(0,60),a:'',nw:false}}):[],dm:(o.dm&&typeof o.dm==='object'&&Array.isArray(o.dm.list)&&o.dm.c)?o.dm:undefined,sk:(o.sk&&typeof o.sk==='object')?{n:n(o.sk.n),last:n(o.sk.last),m:Array.isArray(o.sk.m)?o.sk.m:[]}:undefined,t0:n(o.t0),dp:(o.dp&&typeof o.dp==='object')?{d:n(o.dp.d),raw:n(o.dp.raw),rounds:n(o.dp.rounds),cr:n(o.dp.cr),chest:n(o.dp.chest)}:undefined,mis:Array.isArray(o.mis)?o.mis.filter(function(x){return typeof x==='string'&&x.length<20}).slice(0,40):[],ts:(o.ts&&typeof o.ts==='object')?o.ts:{},nick:o.nick?String(o.nick).slice(0,14):undefined,stage:o.stage==='p'?'p':(o.stage==='s'?'s':(o.stage==='m'?'m':undefined)),grade:n(o.grade),uid:String(o.u).slice(0,40),rc:c,rcOk:1,rcAt:Date.now(),rcSeen:1,reg:1,gifts:Array.isArray(o.gifts)?o.gifts.filter(function(x){return typeof x==='string'&&x.length<30}).slice(0,50):[],dc:(o.dc&&typeof o.dc==='object')?o.dc:null,survBest:n(o.survBest),cert:(o.cert&&typeof o.cert==='object')?o.cert:null,dhp:(o.dhp===undefined||o.dhp===null)?3:Math.max(0,Math.min(3,n(o.dhp))),hpWaitUntil:n(o.hpWaitUntil),lastRevHeartAt:n(o.lastRevHeartAt),statsHelp:n(o.statsHelp),statsPet:n(o.statsPet),statsRevFixed:n(o.statsRevFixed),statsOk:n(o.statsOk),statsOkHelp:n(o.statsOkHelp),vault:Array.isArray(o.vault)?o.vault.filter(function(x){return x===1||x===3||x===5}):[],cityTutDone:o.cityTutDone?1:0,prog_p:o.prog_p||null,prog_m:o.prog_m||null,prog_s:o.prog_s||null};
     save();applyTheme();CSAVE_AT=Date.now();
     if(!S.stage)stageScr();else if(!S.grade)gradeScr();else if(!S.nick)nickReq();else home();
   }).catch(function(){rmsg('مقدرناش نوصل للكود، جرّب تاني')});
 }
-var DCAP=[3000,6000],DRATE=[1,0.5,0.25],DEARLY=10,DMULT=2,DCHEST=150,DCH=0;
+/* v8: كل النقاط بكامل قيمتها ١٠٠٪ طوال اليوم (DRATE = 1 دائماً، بلا حد 3000/6000).
+   تبقى مضاعفة أول 10 جولات (×2)، والصندوق الذهبي يُفتح عند كل 2500 نقطة لعب يومية. */
+var DCAP=[3000,6000],DRATE=[1,1,1],DEARLY=10,DMULT=2,DCHEST=200,DCHEST_PTS=200,DCHEST_EVERY=2500,DCH=0;
 function dayState(){var d=cDay();if(!S.dp||S.dp.d!==d)S.dp={d:d,raw:0,rounds:0,cr:0,chest:0};return S.dp}
 function creditPts(raw){
-  var D=dayState(),m=D.rounds<DEARLY?DMULT:1,rem=raw,cred=0;
-  while(rem>0){
-    var r=D.raw,t=r<DCAP[0]?0:(r<DCAP[1]?1:2),room=t===0?DCAP[0]-r:(t===1?DCAP[1]-r:1e12),use=Math.min(rem,room);
-    cred+=use*DRATE[t]*m;D.raw+=use;rem-=use;
+  raw=Math.max(0,Number(raw)||0);
+  var D=dayState(),m=D.rounds<DEARLY?DMULT:1,cred=Math.round(raw*DRATE[0]*m);
+  D.raw+=raw;D.cr+=cred;addPts(cred);
+  var n=Math.floor(D.raw/DCHEST_EVERY),had=Number(D.chest)||0;
+  if(n>had){
+    var k=n-had;D.chest=n;S.coins+=DCHEST*k;addPts(DCHEST_PTS*k);D.cr+=DCHEST_PTS*k;DCH=k;save();
+    /* في المعركة الرئيسية الرسالة تظهر داخل نتيجة السؤال (pick يصفّر DCH)، وفي باقي الأنماط تظهر كإشعار */
+    setTimeout(function(){if(!DCH)return;var z=DCH;DCH=0;try{sfxChest()}catch(e){}showToast('🎁 الصندوق الذهبي اليومي! +'+(DCHEST*z)+' عملة و+'+(DCHEST_PTS*z)+' نقطة ترتيب')},60);
   }
-  cred=Math.round(cred);D.cr+=cred;addPts(cred);
-  if(!D.chest&&D.raw>=DCAP[0]){D.chest=1;S.coins+=DCHEST;DCH=1;save()}
   return cred;
 }
 function dayRoundDone(){var D=dayState();if(D.rounds===0)streakTouch();D.rounds++;save()}
 function dayCard(){
-  var D=dayState(),t=D.raw<DCAP[0]?0:(D.raw<DCAP[1]?1:2),names=['كامل القيمة','نص القيمة','ربع القيمة'],left=DEARLY-D.rounds;
-  return'<div class="card"><div class="tag g">هدف اليوم</div><div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,D.raw/DCAP[1]*100)+'%"></i></div>'+
-  '<div style="font-size:14px;line-height:1.8;margin-top:6px">نقاط ترتيبك النهاردة: <b>'+D.cr+'</b> • نقاطك دلوقتي: <b>'+names[t]+'</b>'+
-  (left>0?'<br><span class="sm">أول '+left+' جولة النهاردة نقاطها ×'+DMULT+'</span>':'')+
-  (D.raw<DCAP[0]&&!D.chest?'<br><span class="sm">باقي '+(DCAP[0]-D.raw)+' للصندوق (+'+DCHEST+' عملة)</span>':(D.chest?'<br><span class="sm">فتحت صندوق النهاردة</span>':''))+
-  '<br><span class="sm">بعد حد معين في اليوم نقاط الترتيب بتقل، لكن العملات من غير حد.</span></div></div>';
+  var D=dayState(),left=DEARLY-D.rounds,n=Number(D.chest)||0,into=Math.max(0,Math.min(DCHEST_EVERY,D.raw-n*DCHEST_EVERY)),rem=Math.max(0,DCHEST_EVERY-into);
+  return'<div class="card"><div class="tag g">هدف اليوم 🎯</div>'+
+  '<div style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border:2px solid #FFD700;border-radius:12px;padding:8px 10px;margin-top:8px;font-weight:900;font-size:13.5px;line-height:1.8;text-align:center">🎉 كل نقاطك وعملاتك تتحسب بكامل قوتها ١٠٠٪ طوال اليوم بدون أي خصم!</div>'+
+  '<div class="row" style="margin-top:8px"><span class="sm">🎁 الصندوق الذهبي</span><div class="bar"><i style="width:'+Math.min(100,into/DCHEST_EVERY*100)+'%"></i></div><span class="sm">'+into+' / '+DCHEST_EVERY+'</span></div>'+
+  '<div style="font-size:14px;line-height:1.8;margin-top:6px">نقاط ترتيبك النهاردة: <b>'+D.cr+'</b> • قيمة نقاطك دلوقتي: <b>١٠٠٪ كاملة</b>'+
+  (left>0?'<br><span class="sm">🔥 أول '+left+' جولة النهاردة نقاطها ×'+DMULT+'</span>':'')+
+  '<br><span class="sm">باقي '+rem+' نقطة للصندوق الذهبي اليومي (+'+DCHEST+' عملة و+'+DCHEST_PTS+' نقطة ترتيب)</span>'+
+  (n>0?'<br><span class="sm">✅ فتحت '+n+' صندوق ذهبي النهاردة — وكل '+DCHEST_EVERY+' نقطة بتفتح صندوق جديد!</span>':'')+
+  '</div></div>';
 }
 var VOICE=null,HASV=false;
 function loadVoices(){try{var v=speechSynthesis.getVoices()||[],en=v.filter(function(x){return/^en/i.test(x.lang)});HASV=en.length>0;VOICE=en.filter(function(x){return/en[-_]US/i.test(x.lang)})[0]||en.filter(function(x){return/en[-_]GB/i.test(x.lang)})[0]||en[0]||null}catch(e){HASV=false}}
@@ -2288,6 +2409,7 @@ function reportScr(){
       statBox('أخطاء للمراجعة',misCnt+' سؤال',misCnt>0?'ادخل جولة التصحيح':'سجلك خالي من الأخطاء!')+
     '</div>'+
     '<div class="card"><div class="tag">إتقان المهارات</div>'+skillRows+'</div>'+
+    transCardHtml()+
     '<button class="btn" style="background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="badgesScr()">🏅 قاعة الأوسمة والإنجازات ('+(S.bdg||[]).length+' / '+BADGES.length+' وسام)</button>'+
     (S.cert?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8" onclick="certScr()">🎓 شهادة تقدير الأسبوع (المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][(S.cert.rk||1)-1]+')</button>':'')+
     (mapDone()?'<button class="btn" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#C9973F" onclick="certMap()">👑 شهادة ختم الخريطة (٢٠ جولة)</button>':'')+
@@ -2310,7 +2432,8 @@ var BADGES=[
   {id:'b_king20',ic:'👑',n:'قاهر العالم الأول',d:'اختم أول 20 جولة في خريطة المغامرات',r:300,prog:function(){var v=mapDone()?20:Math.min(19,S.max||1);return [v,20]}},
   {id:'b_emp40',ic:'⚡',n:'إمبراطور الأساطير',d:'اختم جميع الـ 40 جولة في العالم الثاني وأراضي الأساطير',r:500,prog:function(){var v=mapDone40()?40:Math.min(39,S.max||1);return [v,40]}},
   {id:'b_spk15',ic:'🎙️',n:'المتحدث الفصيح',d:'انطق 15 كلمة أو جملة إنجليزية نطقاً صحيحاً بالمايك',r:180,prog:function(){var v=S.spkOk||0;return [Math.min(15,v),15]}},
-  {id:'b_psg5',ic:'🕵️‍♂️',n:'محقق القطعة الذكي',d:'اقفل 5 قطع قراءة تفاعلية في نمط محقق القطعة',r:180,prog:function(){var v=S.psgOk||0;return [Math.min(5,v),5]}}
+  {id:'b_psg5',ic:'🕵️‍♂️',n:'محقق القطعة الذكي',d:'اقفل 5 قطع قراءة تفاعلية في نمط محقق القطعة',r:180,prog:function(){var v=S.psgOk||0;return [Math.min(5,v),5]}},
+  {id:'b_code3',ic:'🔑',n:'صائد الأكواد',d:'افتح 3 أكواد هدايا سرية من مستر عبدالرحمن',r:500,prog:function(){var v=(S.gifts||[]).length;return [Math.min(3,v),3]}}
 ];
 function bdgCheck(){
   S.bdg=S.bdg||[];
@@ -2445,7 +2568,7 @@ function showSurv(){
     '</div>'+
     '<div class="card" style="padding:8px">'+
       '<div class="row"><span class="sm">⏱️ تحدي النجاة • الكومبو الحالي: <b id="scomb">'+G.combo+'</b></span><span id="tdelta" style="font-weight:900;font-size:14px"></span></div>'+
-      '<div id="mon" style="text-align:center;filter:hue-rotate('+useHue+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(5,S.eq.ch)+'</div></div>'+
+      '<div id="mon" style="text-align:center;filter:hue-rotate('+useHue+'deg)"><div id="ms" style="display:inline-block;transform:scale(.85)">'+monster(5*(1+Math.min(7,Math.floor(G.ok/3))),S.eq.ch)+'</div></div>'+
     '</div>'+
     '<div class="row"><span class="sm">الوقت المتبقي:</span><div class="bar"><i id="bf" style="width:'+pct+'%;background:'+barCol+'"></i></div><div class="tm" id="tm" style="min-width:48px;background:'+(G.left<=10?'#B23A3A':'var(--brown)')+'">'+Math.ceil(G.left)+'ث</div></div>'+
     '<div class="card"><div class="tag g">'+TT[q[5]]+'</div>'+(q[7]?lsBtn():(q[9]?clockSvg(q[9]):'')+'<div class="en">'+q[0]+'</div>')+(tr?'<div class="ar"><div class="sm">الترجمة</div>'+q[1]+'</div>':'')+'</div>'+
@@ -2465,7 +2588,7 @@ function pickSurv(k){
     var gain=4+(S.role==='thief'?2:0)+(G.combo%3===0?8:0);
     S.coins+=gain;G.earned+=gain;
     var cr=creditPts(gain);G.ptsEarned+=cr;roomAdd(gain);
-    misDel(q);tsAdd(q,1);mTick('a');if(G.combo%3===0)mTick('k');
+    statSolved(false);misDel(q);tsAdd(q,1);mTick('a');if(G.combo%3===0)mTick('k');
     if(q[5].charAt(0)==='l')mTick('ls');
     if(q[5]==='ck')evTick();
     mCheck();
@@ -2473,7 +2596,7 @@ function pickSurv(k){
     anim('hit');sfxOk(G.combo%3===0);changeBossExpression('hit');
   }else{
     G.wrong++;G.combo=0;
-    var pen=(S.role==='police'&&G.wrong===1)?0:5;
+    var pen=((S.role==='police'||S.role==='general')&&G.wrong===1)?0:5;
     G.left=Math.max(0,G.left-pen);
     if(G.bad.length<8)G.bad.push(q);
     misAdd(q);tsAdd(q,0);
@@ -2631,7 +2754,7 @@ function pickDaily(k){
     var spd=Math.round(G.left*5),pGain=100+spd,cGain=20+Math.floor(G.left);
     G.dcPts+=pGain;G.earned+=cGain;
     S.coins+=cGain;creditPts(cGain);roomAdd(cGain);
-    misDel(q);tsAdd(q,1);mTick('a');
+    statSolved(false);misDel(q);tsAdd(q,1);mTick('a');
     msg='إجابة صحيحة! +'+pGain+' نقطة حلبة (منها +'+spd+' سرعة ⚡) و+'+cGain+' عملة!';
     anim('hit');sfxOk(G.ok>=3);changeBossExpression('hit');
   }else{
@@ -2715,6 +2838,7 @@ function giftScr(rewardHtml){
       '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">معاك كود سري من حصة السنتر أو من فيديوهات <b>Grammora & EngliFocus</b> أو جروب الواتساب؟ اكتبه هنا وافتح صندوق هديتك فوراً! 🎉</div>'+
     '</div>'+
     (rewardHtml?rewardHtml:'')+
+    vaultHtml()+
     '<div class="card" style="text-align:center;background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border:2px solid #C9973F">'+
       '<div class="tag" style="background:#7A3B3B;margin-bottom:10px">🔑 اكتب كود الهدية السري</div>'+
       '<input id="gcin" class="inp" maxlength="18" placeholder="مثلًا: GRAMMORA" style="direction:ltr;text-transform:uppercase;letter-spacing:2px;font-size:22px;border-color:#C9973F">'+
@@ -2745,6 +2869,7 @@ function applyGiftObj(code,g){
   if(pw.fifty){S.inv.fifty=(S.inv.fifty||0)+pw.fifty;rewards.push('✂️ مساعدة حذف إجابتين ×'+pw.fifty)}
   if(pw.time){S.inv.time=(S.inv.time||0)+pw.time;rewards.push('⏱️ مساعدة +5 ثواني ×'+pw.time)}
   if(pw.sc){S.inv.sc=(S.inv.sc||0)+pw.sc;rewards.push('🛡️ مساعدة الفرصة التانية ×'+pw.sc)}
+  var vm=vaultCheck();if(vm.length)rewards.push('<span style="color:#FFD700">'+vm.join('<br>')+'</span>');
   save();submit();sfxChest();
   var boxHtml='<div class="card" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border:3px solid #FFD700;text-align:center;animation:fadeIn 0.4s ease-out">'+
     '<div style="font-size:22px;font-weight:900;color:#FFD700;margin-bottom:6px">🎉 مبروك! فتحت '+esc(g.t||'صندوق الهدية')+'</div>'+
@@ -3062,7 +3187,7 @@ function startSBMode(){
 }
 function showSBMode(){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var q=G.qs[G.i];G.left=G.T;G.done=false;
+  var q=G.qs[G.i];G.left=G.T;G.done=false;G.usedHelpThisQ=false;
   G.sbTarget=q[10];
   G.sbPool=shuffle(G.sbTarget.map(function(w,idx){return {w:w,id:idx}}));
   if(G.sbPool.map(function(x){return x.w}).join(' ')===G.sbTarget.join(' ')&&G.sbPool.length>1){var tmp=G.sbPool[0];G.sbPool[0]=G.sbPool[1];G.sbPool[1]=tmp}
@@ -3095,7 +3220,7 @@ function showSBMode(){
 }
 function useSBFreeHint(){
   if(!G||G.done||G.freeHint<1)return;
-  G.freeHint--;
+  G.freeHint--;markHelp();
   G.sbSel=[];
   for(var k=0;k<Math.min(2,G.sbTarget.length);k++){
     var w=G.sbTarget[k];
@@ -3118,11 +3243,13 @@ function pickSBOnly(good,built,target){
     S.sbOk=(S.sbOk||0)+1;
     var gain=15+Math.floor(G.left/2)+(S.role==='thief'?5:0);
     if(G.combo%3===0)gain+=12;
+    var helped=!!G.usedHelpThisQ;if(helped)gain=Math.ceil(gain*0.5);
+    statSolved(helped);
     S.coins+=gain;G.earned+=gain;
     creditPts(gain);roomAdd(gain);
     tsAdd(q,1);mTick('a');
     var bm=bdgCheck();
-    msg='تركيب ممتاز! +'+gain+' عملة'+(bm?' • '+bm:'');
+    msg='تركيب ممتاز! +'+gain+' عملة'+(helped?' (نصف الدرجة لاستخدام مساعدة 💡)':'')+(bm?' • '+bm:'');
     sfxOk(G.combo%3===0);
     if(!S.mute)setTimeout(function(){speak(target)},250);
   }else{
@@ -3398,7 +3525,7 @@ function evalSpkResult(pct,heardTxt){
   G.done=true;
   G.ok++;
   G.mhp=Math.max(0,G.mhp-1);
-  S.spkOk=(S.spkOk||0)+1;
+  S.spkOk=(S.spkOk||0)+1;statSolved(false);
   var gain=20+(pct>=90?10:0);
   S.coins+=gain;G.earned+=gain;
   creditPts(gain);roomAdd(gain);
@@ -3563,7 +3690,7 @@ function highlightPsgEv(evIdx){
 }
 function usePsgTorch(){
   if(!G||G.done||G.torch<1)return;
-  G.torch--;
+  G.torch--;markHelp();
   var q=G.psg.qs[G.qi];
   highlightPsgEv(q.ev);
   ding();
@@ -3578,7 +3705,7 @@ function speakCleanPsg(){
 function showPsgQ(){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var p=G.psg,q=p.qs[G.qi];
-  G.done=false;
+  G.done=false;G.usedHelpThisQ=false;
   G.ord=shuffle(q.o.map(function(_,k){return k}));
   G.ci=G.ord.indexOf(q.a);
   var optsHtml=G.ord.map(function(x,k){
@@ -3618,13 +3745,14 @@ function pickPsgOpt(k){
   highlightPsgEv(q.ev);
   if(good){
     G.ok++;
-    var gain=20;
+    var helped=!!G.usedHelpThisQ,gain=helped?10:20;
+    statSolved(helped);
     S.coins+=gain;G.earned+=gain;
     creditPts(gain);roomAdd(gain);
     if(S.ts){var a=S.ts.voc||(S.ts.voc=[0,0]);a[0]++;a[1]++}
     mTick('a');
     sfxOk(G.ok===3);
-    msg='استنتاج عبقري يا سيادة المحقق! +'+gain+' عملة 🕵️‍♂️✨';
+    msg='استنتاج عبقري يا سيادة المحقق! +'+gain+' عملة 🕵️‍♂️✨'+(helped?' (نصف الدرجة لاستخدام مساعدة 💡)':'');
   }else{
     if(S.ts){var b=S.ts.voc||(S.ts.voc=[0,0]);b[1]++}
     sfxBad();
@@ -3700,7 +3828,7 @@ function homePetCard(){
 function usePetSkill(){
   if(!G||G.done||G.petUsed||!isPetAwake())return;
   var pt=petInfo(),q=G.qs[G.i],isSB=(q[5]==='sb');
-  G.petUsed=true;
+  G.petUsed=true;markHelp(1);
   sfxPet();
   if(pt.id==='owl'){
     if(!S.mute)speak(q[7]||q[0]);
@@ -4394,7 +4522,8 @@ var ROLES=[
   {id:'doctor',ic:'👨‍⚕️',n:'طبيب ماهر',p:'الإسعاف الفوري: يرجّع لك قلب تلقائياً بعد 4 إجابات صحيحة في أي جولة + ثانية إضافية في النجاة!',actName:'🚑 مهمة إسعاف طارئة',actDesc:'حل 3 أسئلة طبية سريعة لإنقاذ المصابين وشحن قلوبك اليومية وعملاتك!'},
   {id:'nurse',ic:'👩‍⚕️',n:'ممرضة البطولة',p:'العناية المركزة: تزيد الوقت المكتسب +4 ثواني في النجاة وترجع لك قلب بعد 4 إجابات صح!',actName:'💉 جولة الرعاية الصحية',actDesc:'حل 3 أسئلة سريعة لمساعدة المستشفى وكسب عملات وقلب إضافي!'},
   {id:'thief',ic:'🦹‍♂️',n:'اللص الذكي',p:'خفة اليد: يسرق +30% عملات ذهب إضافية من الوحش مع كل إجابة صح وفي الكومبو!',actName:'💎 غارة الخزنة السرية',actDesc:'تسلل وحل 3 أسئلة صعبة بدون ولا غلطة لفتح الخزنة الذهبية وخطف الجائزة!'},
-  {id:'eng',ic:'👷‍♂️',n:'المهندس المعماري',p:'عبقري التعمير: يمنحك خصم 25% على تكلفة بناء وتطوير كل مباني ومنشآت مدينتك!',actName:'🏗️ مشروع البناء السريع',actDesc:'حل 3 أسئلة هندسية سريعة للحصول على منحة عملات لتطوير مدينتك!'}
+  {id:'eng',ic:'👷‍♂️',n:'المهندس المعماري',p:'عبقري التعمير: يمنحك خصم 25% على تكلفة بناء وتطوير كل مباني ومنشآت مدينتك!',actName:'🏗️ مشروع البناء السريع',actDesc:'حل 3 أسئلة هندسية سريعة للحصول على منحة عملات لتطوير مدينتك!'},
+  {id:'general',ic:'🎖️',lock:5,n:'الجنرال الملكي',p:'شخصية سرية (تُفتح بـ 5 أكواد هدايا): درع يصد أول ضربة للزعيم ويحمي وقتك في النجاة + 10 لقوة دفاع مدينتك دائماً!',actName:'🎖️ حملة الحرس الملكي',actDesc:'قُد حملة من 3 أسئلة سريعة لتأمين المدن وكسب مكافأة الهيبة!'}
 ];
 var BUILDINGS=[
   {id:'house',ic:'🏠',ic3:'🏰',n:'المنزل الكبير (الفيلا)',n3:'القصر الملكي الفخم',d:'مقر سكنك في المدينة، كل تطوير يكبّره لحد ما يبقى قصر ملكي!',cost:[0,2000,6000],inc:[15,40,100],pts:[25,60,140]},
@@ -4472,6 +4601,7 @@ function loadPvpPlayers(){
     PVP_LOADING=false;
     var rows=res[0]||[];
     PVP_LOGS=res[1]||[];
+    try{repPvpDefense()}catch(e){}
     var list=[];
     rows.forEach(function(x){
       if(!x||x.id===S.uid||!x.name)return;
@@ -4499,6 +4629,7 @@ function pvpActionMeta(myRole,targetRole){
   if(myRole==='doctor'||myRole==='nurse'){
     return {btn:'🚑 قافلة إسعاف (+قلب)',title:'إسعاف ودعم طبي لمدينة اللاعب 🏥',bonus:1.2,tag:'إنقاذ طبي ❤️'};
   }
+  if(myRole==='general')return {btn:'🎖️ حملة تأمين (×1.3)',title:'حملة الحرس الملكي على المدينة 🎖️',bonus:1.3,tag:'هيبة الجنرال 🎖️'};
   return {btn:'🏗️ شراكة هندسية',title:'تطوير هندسي مشترك مع المدينة 👷‍♂️',bonus:1.2,tag:'تعاون عمراني 🌟'};
 }
 function jumpToBld(id){CITY_TAB='build';cityScr();setTimeout(function(){var el=document.getElementById('bld_'+id);if(el)el.scrollIntoView({behavior:'smooth'})},80)}
@@ -4533,7 +4664,7 @@ function cityScr(tab){
         '<div style="font-size:36px;line-height:1.1">'+ro.ic+'</div>'+
         '<div style="font-weight:900;font-size:15px;color:'+(isMe?'#2F6B4A':'#7A3B3B')+'">'+ro.n+'</div>'+
         '<div style="font-size:11px;line-height:1.4;font-weight:700;min-height:46px">'+ro.p+'</div>'+
-        '<button class="btn'+(isMe?'':' t')+'" style="width:100%;font-size:12px;min-height:32px;padding:4px;margin-top:4px">'+(isMe?'✅ شخصيتك الحالية':'اختار الشخصية')+'</button>'+
+        '<button class="btn'+(isMe?'':' t')+'" style="width:100%;font-size:12px;min-height:32px;padding:4px;margin-top:4px">'+(isMe?'✅ شخصيتك الحالية':((ro.lock&&!vaultHas(ro.lock))?'🔒 تُفتح بـ '+ro.lock+' أكواد هدايا':'اختار الشخصية'))+'</button>'+
       '</div>';
     }).join('')+'</div>';
   }else if(CITY_TAB==='pvp'){
@@ -4545,7 +4676,7 @@ function cityScr(tab){
         ? 'أنت <b>🦹‍♂️ اللص الذكي</b>! اختار أي لاعب من القائمة وادخل غارة سرية على خزنته.. ولو اخترت تتحدى مدينة <b>«👮‍♂️ ضابط شرطة»</b> وجاوبت 3/3 صح هتكسب <b>مكافأة المخاطرة المضاعفة (×1.5)</b>!'
         : (myR==='doctor'||myR==='nurse'
           ? 'أنت في <b>الفريق الطبي ('+r.ic+' '+r.n+')</b>! اختار أي لاعب من أصدقائك وأرسل له قافلة إسعاف لتحصل على <b>ذهب للمدينة + شحن قلب يومي مجاني ❤️</b>!'
-          : 'أنت <b>👷‍♂️ المهندس المعماري</b>! اختار مدينة أي لاعب وادخل مشروع تطوير مشترك لكسب منحة عملات مع خصم 25% على كل مبانيك!'));
+          : (myR==='general'?'أنت <b>🎖️ الجنرال الملكي</b>! قُد حملات الحرس الملكي على مدن اللاعبين لتكسب <b>مكافأة الهيبة (×1.3 ذهب ونقاط)</b>، ودفاع مدينتك أقوى +10 دائماً!':'أنت <b>👷‍♂️ المهندس المعماري</b>! اختار مدينة أي لاعب وادخل مشروع تطوير مشترك لكسب منحة عملات مع خصم 25% على كل مبانيك!')));
 
     var fBtn=function(k,lbl){
       return '<button class="pwb" style="font-size:11px;padding:4px;min-height:32px;'+(PVP_FILTER===k?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="PVP_FILTER=\''+k+'\';cityScr(\'pvp\')">'+lbl+'</button>';
@@ -4658,6 +4789,8 @@ function cityScr(tab){
     bnav('city');
 }
 function selectRole(id){
+  var ro0=ROLES.filter(function(x){return x.id===id})[0];
+  if(ro0&&ro0.lock&&!vaultHas(ro0.lock)){sfxBad(true);rmsg('🔒 شخصية «الجنرال الملكي» سرية! لازم تفتح '+ro0.lock+' أكواد هدايا من مستر عبدالرحمن');return}
   S.role=id;
   if(id==='police')PVP_FILTER='rec';
   else PVP_FILTER='all';
@@ -4745,7 +4878,7 @@ function pickRoleMission(k){
   if(G.done)return;G.done=true;clearInterval(G.t);
   var q=G.qs[G.i],good=k===G.ci,r=G.rObj;
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
-  if(good){G.ok++;sfxOk(false);misDel(q);tsAdd(q,1)}
+  if(good){G.ok++;sfxOk(false);statSolved(false);misDel(q);tsAdd(q,1)}
   else{G.bad.push(q);sfxBad();misAdd(q);tsAdd(q,0)}
   var last=(G.i>=2);
   $('#fb').innerHTML='<div class="card row">'+misterImg(good?'c':'h',44)+'<div class="sp"><b>'+(good?'ضربة موفقة ضد الهدف! '+cheer():'غلطة! الهدف بيحاول يهرب.. ركز!')+'</b><div class="sm">'+q[4]+'</div></div></div>'+
@@ -4772,12 +4905,12 @@ function endRoleMission(){
       if(G.ok===3){S.coins+=30;cReward+=30;extraMsg='<br>💎 بونص فتح الخزنة السرية بالعلامة الكاملة (3/3): <b>+30 عملة إضافية</b>!'}
     }else if(S.role==='doctor'||S.role==='nurse'){
       storyTxt='🚑 وصلت قافلتك الطبية لمدينة <b>«'+esc(tg.name)+'»</b> وتم إسعاف الأبطال بنجاح!';
-      if(S.dhp<3){S.dhp++;extraMsg='<br>❤️ مكافأة الفريق الطبي: <b>+1 قلب يومي مجاني</b>!'}
+      if(S.dhp<3&&!hpLocked()){S.dhp++;extraMsg='<br>❤️ مكافأة الفريق الطبي: <b>+1 قلب يومي مجاني</b>!'}
     }else{
       storyTxt='🏗️ أنجزت المهمة التفاعلية مع مدينة <b>«'+esc(tg.name)+'» ('+trO.n+')</b> بنجاح باهر!';
     }
     if(window.FB&&FB.raidAdd&&tg.id&&tg.id.indexOf('bot_')!==0){
-      FB.raidAdd(tg.id,{by:S.nick||'بطل',byUid:S.uid,rRole:S.role||'police',win:true,ok:G.ok}).catch(function(){});
+      FB.raidAdd(tg.id,{by:S.nick||'بطل',byUid:S.uid,rRole:pubRole(),win:true,ok:G.ok}).catch(function(){});
     }
     save();submit();sfxWin();
   }else{
@@ -4785,7 +4918,7 @@ function endRoleMission(){
       ? 'تمكّن <b>«'+esc(tg.name)+'»</b> من الهرب هذه المرة! راجع الأسئلة وطوّر قسم الشرطة في مدينتك ثم طارده من جديد.'
       : 'انطلقت صفارات الإنذار في مدينة <b>«'+esc(tg.name)+'»</b> واضطررت للانسحاب! لازم تجاوب سؤالين صح على الأقل.';
     if(window.FB&&FB.raidAdd&&tg.id&&tg.id.indexOf('bot_')!==0){
-      FB.raidAdd(tg.id,{by:S.nick||'بطل',byUid:S.uid,rRole:S.role||'police',win:false,ok:G.ok}).catch(function(){});
+      FB.raidAdd(tg.id,{by:S.nick||'بطل',byUid:S.uid,rRole:pubRole(),win:false,ok:G.ok}).catch(function(){});
     }
   }
   app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,'+(win?'#2F6B4A,#1B432C':'#7A3B3B,#4A1C1C')+')"><h1>'+(win?'نجحت العملية التفاعلية! 🎉':'فشلت العملية هذه المرة!')+'</h1><div>'+r.ic+' '+esc(S.nick||'أنت')+' 🆚 '+trO.ic+' '+esc(tg.name)+'</div></div>'+
@@ -5166,6 +5299,7 @@ function parentScr(){
     '<div class="pr-sec">إتقان المهارات</div>'+
     skillRows+
     '<div class="pr-note">'+note+'</div>'+
+    transParentHtml()+
     '<div class="pr-sec">ترتيب الطالب في مجموعة السنتر</div>'+ctr+
     '<div class="pr-sec">الشهادات والأوسمة</div>'+certs+
     '<div class="pr-act no-print">'+
@@ -5196,6 +5330,9 @@ function parentShareWA(){
   d.skills.forEach(function(s){if(s.all>0)L.push('• '+s.n+': '+s.pct+'%')});
   if(d.ctr)L.push('🏫 ترتيب السنتر ('+d.ctr.g+'): '+d.ctr.rk+' من '+d.ctr.tot+' • '+d.ctr.pts+' نقطة');
   L.push('🏅 الأوسمة: '+d.bdg+' من '+BADGES.length+(S.cert?' • شهادة أوائل الأسبوع ✅':'')+(mapDone()?' • شهادة ختم الخريطة ✅':''));
+  var T=transData();
+  L.push('🔍 الاعتماد على النفس: '+(T.solo===null?'لم تُقَس بعد':T.solo+'%')+' • مساعدات: '+T.help+' • المرافق الذكي: '+T.pet);
+  L.push('🛠️ صحّح '+T.fixed+' خطأ من أخطائه السابقة • متبقي '+T.left+' في قائمة المراجعة');
   L.push('');
   L.push('مع تحيات مستر عبدالرحمن حسانين — '+location.href.split('?')[0]);
   window.open('https://wa.me/?text='+encodeURIComponent(L.join('\n')),'_blank');
@@ -5401,7 +5538,8 @@ var REP_SECT=[
   {id:'edu',ic:'🎓',n:'قطاع التعليم والبحث العلمي',bloc:'كتلة العلماء والمعلمين',c:'#2A5298'},
   {id:'srv',ic:'🏥',n:'قطاع الخدمات والأمن',c:'#2F6B4A'},
   {id:'gov',ic:'🏛️',n:'القطاع المالي والسياسي',bloc:'كتلة التجار والاقتصاديين',c:'#7A3B3B'},
-  {id:'civ',ic:'🏠',n:'السكن والمعالم',c:'#6B4A3A'}
+  {id:'civ',ic:'🏠',n:'السكن والمعالم',c:'#6B4A3A'},
+  {id:'def',ic:'🛡️',n:'قطاع الدفاع والجيش',c:'#4A5568'}
 ];
 /* leg:1 = مبنى من النسخة القديمة (BUILDINGS) — slots = عدد الوظائف لكل مستوى */
 var REP_B=[
@@ -5417,16 +5555,19 @@ var REP_B=[
   {id:'bank',s:'gov',leg:1,ic:'🏦',ic5:'💰',n:'البنك المركزي',sn:'البنك',d:'يمنح الخزينة فوائد يومية على رصيد عملاتك.',role:'اقتصادي',rIc:'💼',slots:2,x:13,y:43.5},
   {id:'parl',s:'gov',ic:'🏛️',ic5:'⚖️',n:'مجلس الشعب',sn:'البرلمان',d:'يفتح تشريع القوانين. كل مستوى يزيد مقاعد النواب وعدد القوانين السارية.',role:'نائب / مستشار',rIc:'🧑‍⚖️',slots:2,cost:[6000,12000,20000,32000,48000],x:30,y:43.5,need:10},
   {id:'house',s:'civ',leg:1,ic:'🏠',ic5:'🏰',n:'الحي السكني',sn:'السكن',d:'يزيد الحد الأقصى لعدد السكان. لا يحتاج موظفين.',slots:0,x:12,y:69.5},
-  {id:'tower',s:'civ',leg:1,ic:'🗼',ic5:'👑',n:'برج الأبطال الذهبي',sn:'البرج',d:'معلم المدينة السياحي: يرفع رضا الشعب ويدر دخلاً يومياً. لا يحتاج موظفين.',slots:0,x:48,y:43.5}
+  {id:'tower',s:'civ',leg:1,ic:'🗼',ic5:'👑',n:'برج الأبطال الذهبي',sn:'البرج',d:'معلم المدينة السياحي: يرفع رضا الشعب ويدر دخلاً يومياً. لا يحتاج موظفين.',slots:0,x:48,y:43.5},
+  {id:'wall',s:'def',ic:'🧱',ic5:'🏯',n:'سور المدينة العظيم',sn:'السور',d:'سور يحيط بالمدينة ويظهر على الخريطة! كل مستوى يرفع «🛡️ قوة التحصين» ويصد غارات اللصوص عن الخزينة. لا يحتاج موظفين.',slots:0,cost:[2500,5000,9000,15000,24000],x:88,y:91},
+  {id:'barracks',s:'def',ic:'⚔️',ic5:'🏰',n:'ثكنات الجيش والحرس الملكي',sn:'الثكنات',d:'وظّف حراساً وجنوداً 💂‍♂️ يتجولون على سور المدينة ويحمون الخزينة من الغارات.',role:'حارس / جندي',rIc:'💂‍♂️',slots:2,cost:[3000,6000,10000,16000,25000],x:12,y:91}
 ];
 var REP_TAX={low:{n:'ضرائب منخفضة',r:5,ap:15,g:0.30,d:'الشعب سعيد جداً والسكان يزيدون بسرعة، ودخل الضرائب أقل.'},bal:{n:'ضرائب متوازنة',r:12,ap:0,g:0.20,d:'توازن بين دخل الخزينة ورضا الشعب.'},high:{n:'ضرائب مرتفعة',r:22,ap:-20,g:0.10,d:'دخل ضرائب كبير (×1.8)، لكن رضا الشعب ينخفض ما لم تعوّضه الخدمات.'}};
 var REP_LAWS=[
   {id:'edu_free',ic:'🎓',n:'قانون مجانية التعليم المتقدم',bloc:'edu',cost:300,d:'+15 لمستوى التعليم و+5 لرضا الشعب.'},
-  {id:'exp_ind',ic:'📦',n:'قانون دعم الصادرات الصناعية',bloc:'ind',cost:400,d:'عائد تصدير المنتجات الصناعية ×1.5.'},
+  {id:'exp_ind',hi:1,ic:'📦',n:'قانون دعم الصادرات الصناعية',bloc:'ind',cost:400,d:'عائد تصدير المنتجات الصناعية ×1.5.'},
   {id:'agri_ex',ic:'🌾',n:'قانون الإعفاء الزراعي',bloc:'agri',cost:300,d:'إنتاج الغذاء ×1.3 و+4 لرضا الشعب.'},
-  {id:'trade',ic:'💼',n:'قانون تشجيع التجارة والاستثمار',bloc:'gov',cost:400,d:'فوائد البنك ×2 ودخل الضرائب +20%.'},
+  {id:'trade',hi:1,ic:'💼',n:'قانون تشجيع التجارة والاستثمار',bloc:'gov',cost:400,d:'فوائد البنك ×2 ودخل الضرائب +20%.'},
   {id:'health',ic:'❤️',n:'قانون التأمين الصحي الشامل',bloc:'edu',cost:350,d:'+25 لمؤشر الصحة و+6 لرضا الشعب.'},
-  {id:'emerg',ic:'🚨',n:'إعلان حالة الطوارئ الأمنية',bloc:'gov',cost:250,d:'+30 لمؤشر الأمن، لكن -5 لرضا الشعب.'}
+  {id:'emerg',ic:'🚨',n:'إعلان حالة الطوارئ الأمنية',bloc:'gov',cost:250,d:'+30 لمؤشر الأمن، لكن -5 لرضا الشعب.'},
+  {id:'natdef',ic:'🛡️',hi:1,n:'قانون الدفاع الوطني والتجنيد',bloc:'gov',cost:450,d:'+25 لقوة الدفاع والتحصين و+10 لمؤشر الأمن.'}
 ];
 var REP_LAW_DAYS=3,REP_FREE_FOOD=40,REP_TAB='map',REP_PHASE='',REP_ACT=null,REP_SEQ=0,RQZ=null,REP_CACHE=null;
 function repB(id){return REP_B.filter(function(b){return b.id===id})[0]}
@@ -5444,6 +5585,8 @@ function rep(){
     S.city.rep=R;ch=true;
   }
   R.lv=R.lv||{};R.st=R.st||{};R.laws=(R.laws&&typeof R.laws==='object')?R.laws:{};
+  R.tech=(R.tech&&typeof R.tech==='object')?R.tech:{};R.tr=Array.isArray(R.tr)?R.tr:[];
+  if(!R.born){R.born=d-2;ch=true}if(!R.v8){R.v8=d;ch=true}
   if(!REP_TAX[R.tax]){R.tax='bal';ch=true}
   REP_B.forEach(function(b){
     var l=Math.max(0,Math.min(5,Math.floor(Number(R.lv[b.id])||0)));
@@ -5457,6 +5600,7 @@ function rep(){
     var days=Math.max(1,Math.min(5,d-(Number(R.day)||d)));
     R.day=d;
     Object.keys(R.laws).forEach(function(k){if(R.laws[k]<=d)delete R.laws[k]});
+    R.tr=R.tr.filter(function(t){return t&&t.end>d});
     for(var i=0;i<days;i++){
       REP_CACHE=null;
       var c=repCalcRaw(R),t=REP_TAX[R.tax],target=Math.min(c.popCap,c.foodCap);
@@ -5477,11 +5621,12 @@ function repLawLeft(id){var R=rep();return R.laws[id]?Math.max(0,R.laws[id]-cDay
 function repStaffTotal(R){var n=0;REP_B.forEach(function(b){n+=(R.st[b.id]||0)});return n}
 function repCalcRaw(R){
   var d=cDay(),law=function(k){return !!(R.laws[k]&&R.laws[k]>d)};
+  var tech=function(k){return !!(R.tech&&R.tech[k])};
   var lv=function(id){return R.lv[id]||0};
   var eff=function(id){var b=repB(id),l=lv(id);if(!l)return 0;if(!b.slots)return 1;return Math.min(1,(R.st[id]||0)/(b.slots*l))};
   var c={pop:R.pop,tax:REP_TAX[R.tax]||REP_TAX.bal};
   c.staff=repStaffTotal(R);
-  c.farmOut=(40*lv('farm')*eff('farm')+30*lv('silo')*eff('silo'))*(law('agri_ex')?1.3:1);
+  c.farmOut=(40*lv('farm')*eff('farm')+30*lv('silo')*eff('silo'))*(law('agri_ex')?1.3:1)*(tech('irr')?1.4:1);
   c.food=Math.round(REP_FREE_FOOD+c.farmOut);
   c.foodNeed=Math.max(1,Math.round(R.pop*0.5));
   c.foodR=c.food/c.foodNeed;
@@ -5489,7 +5634,11 @@ function repCalcRaw(R){
   var others=0;REP_B.forEach(function(b){if(b.id!=='house')others+=lv(b.id)});
   c.popCap=80+lv('house')*70+others*12;
   c.health=Math.min(100,Math.round(20*lv('hosp')*eff('hosp')+(law('health')?25:0)));
-  c.sec=Math.min(100,Math.round(20*lv('police')*eff('police')+(law('emerg')?30:0)));
+  c.sec=Math.min(100,Math.round(20*lv('police')*eff('police')+(law('emerg')?30:0)+(law('natdef')?10:0)));
+  /* v8: قوة الدفاع = السور + الحراس + الأمن + القوانين والمعاهدات */
+  c.guards=lv('barracks')?(R.st.barracks||0):0;
+  c.treaties=(R.tr||[]).filter(function(t){return t&&t.end>d}).length;
+  c.def=Math.max(0,Math.min(100,Math.round(lv('wall')*12+c.guards*5+c.sec*0.15+(law('natdef')?25:0)+(S.role==='general'?10:0)+c.treaties*4)));
   c.edu=Math.min(100,Math.round(10*lv('school')*eff('school')+12*lv('uni')*eff('uni')+(law('edu_free')?15:0)));
   c.eduMult=c.edu/1000; /* حتى +10% على نقاط الترتيب */
   var ap=55+c.tax.ap;
@@ -5514,18 +5663,20 @@ function repCalcRaw(R){
   c.bLegacy=Math.round(legI);
   c.bTax=Math.round(R.pop*c.tax.r/100*2*(law('trade')?1.2:1));
   c.bCrops=Math.round(Math.max(0,c.food-c.foodNeed));
-  c.bGoods=Math.round(c.goods*3*(law('exp_ind')?1.5:1));
+  c.bGoods=Math.round(c.goods*3*(law('exp_ind')?1.5:1)*(tech('auto')?1.5:1));
   c.bInt=Math.round(Math.min(Number(S.coins)||0,10000)*0.003*lv('bank')*eff('bank')*(law('trade')?2:1));
   c.bWages=c.staff*2;
-  c.bNew=Math.max(0,c.bTax+c.bCrops+c.bGoods+c.bInt-c.bWages);
-  c.mult=(c.golden?1.5:1)*(c.strike?0.6:1);
+  c.bTrade=0;(R.tr||[]).forEach(function(t){if(t&&t.end>d)c.bTrade+=repTreatyGold(t)});
+  c.bNew=Math.max(0,c.bTax+c.bCrops+c.bGoods+c.bInt+c.bTrade-c.bWages);
+  c.raid=(R.raidHit===d);
+  c.mult=(c.golden?1.5:1)*(c.strike?0.6:1)*(c.raid?0.7:1);
   c.coins=Math.round((c.bLegacy+c.bNew)*c.mult);
   c.pts=Math.round(legP*(c.golden?1.2:1)*(c.strike?0.6:1));
   c.work=Math.floor(R.pop*0.4);
   return c;
 }
 function repCalc(){
-  var R=rep(),key=JSON.stringify([R.lv,R.st,R.tax,R.pop,R.laws,cDay(),Math.min(Number(S.coins)||0,10000)]);
+  var R=rep(),key=JSON.stringify([R.lv,R.st,R.tax,R.pop,R.laws,cDay(),Math.min(Number(S.coins)||0,10000),R.tech,R.tr,R.raidHit||0,S.role]);
   if(REP_CACHE&&REP_CACHE.k===key)return REP_CACHE.c;
   var c=repCalcRaw(R);REP_CACHE={k:key,c:c};return c;
 }
@@ -5574,6 +5725,8 @@ function repBldOut(id,c){
   if(id==='parl')return (24+l*8)+' مقعداً • حتى '+Math.min(3,l)+' قوانين سارية';
   if(id==='house')return 'يسع +'+(l*70)+' مواطن';
   if(id==='tower')return '+'+(l*2)+' لرضا الشعب';
+  if(id==='wall')return '+'+(l*12)+' لقوة التحصين والدفاع';
+  if(id==='barracks')return '+'+(repStaff(id)*5)+' لقوة الدفاع • '+repStaff(id)+' حارس';
   return '';
 }
 function repEffOf(id){var b=repB(id),l=repLv(id);if(!l)return 0;if(!b.slots)return 1;return Math.min(1,repStaff(id)/(b.slots*l))}
@@ -5589,6 +5742,7 @@ function repBarHtml(c){
     ind('⚡',c.goods,'الإنتاج',c.facCap?c.goods/Math.max(1,c.facCap*1.2)*100:0,(c.strike?'bad':''),'منتجات صناعية يومياً')+
     ind('🎓',c.edu,'التعليم',c.edu,'','مستوى التعليم: +'+(c.edu/10).toFixed(1)+'% نقاط ترتيب')+
     ind('😊',c.appr+'%','رضا الشعب',c.appr,(c.strike?'bad':(c.appr<55?'warn':'')),'رضا الشعب والشارع')+
+    ind('🛡️',c.def,'الدفاع',c.def,(c.def<repRaidBase(rep())?'warn':''),'مؤشر الحماية والجيش (Defense Power)')+
   '</div>';
 }
 function repBanHtml(c){
@@ -5599,7 +5753,7 @@ function repBanHtml(c){
 function repTabsHtml(){
   var r=roleInfo();
   function t(k,l){return '<button class="pwb'+(REP_TAB===k?' act':'')+'" onclick="cityScr(\''+k+'\')">'+l+'</button>'}
-  return '<div class="rep-tabs">'+t('map','🗺️ الخريطة الحية')+t('eco','📊 الضرائب والاقتصاد')+t('parl','🏛️ مجلس الشعب')+t('pvp','🚨 رادار اللاعبين')+t('roles',r.ic+' وظيفتي')+'</div>';
+  return '<div class="rep-tabs">'+t('map','🗺️ الخريطة الحية')+t('eco','📊 الضرائب والاقتصاد')+t('res','🔬 مركز الأبحاث')+t('def','🛡️ الدفاع والدبلوماسية')+t('parl','🏛️ مجلس الشعب')+t('pvp','🚨 رادار اللاعبين')+t('roles',r.ic+' وظيفتي')+'</div>';
 }
 function repTreasuryHtml(c){
   var canTax=(S.cTax!==cDay());
@@ -5642,18 +5796,24 @@ function repMapHtml(c){
     '<div class="rm-zone z-srv" style="left:22%;top:60%;width:26%;height:19.5%">الخدمات</div>'+
     '<div class="rm-zone z-ind" style="left:52%;top:60%;width:42%;height:19.5%">المنطقة الصناعية</div>'+
     '<div class="rm-zone z-agr" style="left:0;top:86.5%;width:100%;height:13.5%">الأراضي الزراعية</div>'+
+    '<div class="rm-zone z-def" style="left:2%;top:86.5%;width:20.5%;height:13.5%">الثكنات</div>'+
+    '<div class="rm-zone z-def" style="left:77.5%;top:86.5%;width:20.5%;height:13.5%">بوابة السور</div>'+
     '<div class="rm-road h" style="top:31%"></div><div class="rm-road h" style="top:56%"></div><div class="rm-road h" style="top:83%"></div>'+
     '<div class="rm-road v" style="left:4%;top:31%;height:52%"></div><div class="rm-road v" style="left:96%;top:31%;height:52%"></div>'+
     '<div class="rm-road v" style="left:20%;top:56%;height:27%"></div><div class="rm-road v" style="left:50%;top:56%;height:27%"></div><div class="rm-road v" style="left:80%;top:56%;height:27%"></div>'+
     '<div class="rm-lamps"></div>'+
     '<span class="rm-deco" style="left:90%;top:23.5%">🏖️</span><span class="rm-deco" style="left:10%;top:23.5%">🌴</span><span class="rm-deco" style="left:70%;top:24%">🌴</span>'+
-    '<span class="rm-deco" style="left:9%;top:93%">🌳</span><span class="rm-deco" style="left:91%;top:93%">🌻</span><span class="rm-deco" style="left:50%;top:94%">🐄</span><span class="rm-deco" style="left:20%;top:94.5%">🌱</span><span class="rm-deco" style="left:80%;top:94.5%">🌱</span>';
+    '<span class="rm-deco" style="left:26%;top:94.5%">🌳</span><span class="rm-deco" style="left:74%;top:94.5%">🌻</span><span class="rm-deco" style="left:50%;top:94%">🐄</span>';
   REP_B.forEach(function(b){
     var l=repLv(b.id),e=repEffOf(b.id),cls=!l?'off':(b.slots&&e<=0?'idle on':'on');
-    var tag=!l?'ابنِ 🚧':(b.slots?(repStaff(b.id)+'/'+repSlots(b.id)+' '+b.rIc):'م'+l);
+    var tag=!l?(repTechBlock(b.id,0)?'🔒 بحث':'ابنِ 🚧'):(b.slots?(repStaff(b.id)+'/'+repSlots(b.id)+' '+b.rIc):'م'+l);
     h+='<button class="rm-b '+cls+'" style="left:'+b.x+'%;top:'+b.y+'%" onclick="repBld(\''+b.id+'\')" aria-label="'+b.n+'">'+
       '<span class="ic">'+(l?repIcon(b,l):'🚧')+'</span><span class="nm">'+b.sn+(l?'<span class="stx"> '+'★'.repeat(l)+'</span>':'')+'</span><span class="tg">'+tag+'</span></button>';
   });
+  /* v8: سور المدينة يظهر حول الأرض، والحراس يتجولون عليه */
+  var wl=repLv('wall'),ng=Math.min(4,Math.ceil((repLv('barracks')?repStaff('barracks'):0)/2)),gi;
+  if(wl)h+='<div class="rm-wall w'+wl+'"></div><span class="rm-tw" style="left:2.5%;top:28.5%">🏰</span><span class="rm-tw" style="left:97.5%;top:28.5%">🏰</span><span class="rm-tw" style="left:2.5%;top:97.5%">🏰</span><span class="rm-tw" style="left:97.5%;top:97.5%">🏰</span>';
+  for(gi=0;gi<ng;gi++)h+='<span class="rm-guard'+(gi%2?' v':'')+'" style="'+(gi%2?('left:'+(gi===1?'0.4%':'95%')+';'):('top:'+(gi===0?'25.6%':'95.4%')+';'))+'animation-delay:-'+(gi*4)+'s">💂‍♂️</span>';
   return h+'<div id="repActors"></div><div class="rm-rain"></div></div>';
 }
 var REP_NODES={K:[4,31],M:[96,31],A:[4,56],B:[20,56],C:[50,56],D:[80,56],E:[96,56],F:[4,83],G:[20,83],H:[50,83],I:[80,83],J:[96,83]};
@@ -5744,7 +5904,8 @@ var _cityScr0=cityScr;
 cityScr=function(tab){
   if(tab==='build')tab='map';
   if(tab)REP_TAB=tab;
-  if(['map','eco','parl','pvp','roles'].indexOf(REP_TAB)<0)REP_TAB='map';
+  if(['map','eco','res','def','parl','pvp','roles'].indexOf(REP_TAB)<0)REP_TAB='map';
+  try{repRaidCheck()}catch(e){}
   var c=repCalc();
   if(REP_TAB==='pvp'||REP_TAB==='roles'){
     _cityScr0(REP_TAB);
@@ -5752,7 +5913,7 @@ cityScr=function(tab){
       var cv=app.querySelector('.city-view'),tr=cv&&cv.nextElementSibling,tb=tr&&tr.nextElementSibling;
       if(tb&&tb.classList.contains('row'))tb.outerHTML=repTabsHtml();
       if(tr&&tr.parentNode)tr.parentNode.removeChild(tr);
-      if(cv)cv.outerHTML=repBarHtml(c);
+      if(cv)cv.outerHTML=repBarHtml(c)+repAdvisorHtml(c);
     }catch(e){}
     return;
   }
@@ -5761,17 +5922,26 @@ cityScr=function(tab){
   var r=roleInfo(),body='';
   if(REP_TAB==='eco')body=repEcoHtml(c);
   else if(REP_TAB==='parl')body=repParlHtml(c);
-  else body=repMapHtml(c)+repTreasuryHtml(c)+repSectorsHtml(c)+
+  else if(REP_TAB==='res')body=repResHtml(c);
+  else if(REP_TAB==='def')body=repDefHtml(c);
+  else body=repMapHtml(c)+repTreasuryHtml(c)+goldRuleHtml()+repSectorsHtml(c)+
     '<button class="btn" style="margin-top:4px" onclick="shareCity()">📲 شارك مدينتك وشخصيتك مع صحابك</button>';
   app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>جمهوريتي ومدينتي الحية 🏛️🏙️</h1><div>الحاكم: '+esc(S.nick||'بطل التحدي')+' ('+r.ic+' '+r.n+') • '+cityRankName()+'</div></div>'+
     '<div class="row">'+
       '<div class="chip">'+coin()+'<span>'+S.coins+'</span></div>'+
       '<div class="chip" onclick="cityScr(\'roles\')" style="cursor:pointer">'+r.ic+' <span>'+r.n+' (غيّر)</span></div>'+
       '<div class="sp"></div>'+
-      '<div class="sm">موظفون: '+c.staff+' • ضرائب '+c.tax.r+'%</div>'+
+      '<div class="sm">موظفون: '+c.staff+' • ضرائب '+c.tax.r+'% • 🛡️ '+c.def+'</div>'+
     '</div>'+
-    repBarHtml(c)+repBanHtml(c)+repTabsHtml()+body+bnav('city');
-  if(REP_TAB==='map')setTimeout(repStartActors,30);
+    repBarHtml(c)+repBanHtml(c)+repRaidBanHtml()+repAdvisorHtml(c)+repTabsHtml()+body+bnav('city');
+  if(REP_TAB==='map'){
+    setTimeout(repStartActors,30);
+    /* أول زيارة: الدليل التفاعلي يفتح تلقائياً مرة واحدة (ويُعاد من زر «إزاي ألعب») */
+    if(!S.cityTutDone&&!S.cityTutSeen){
+      S.cityTutSeen=1;save();
+      setTimeout(function(){if(NAV_ACT==='city'&&!document.getElementById('repModal')&&!document.getElementById('wnModal'))repTutOpen()},500);
+    }
+  }
 };
 function repSectorsHtml(c){
   var h='<details class="rep-det card"><summary>📋 قائمة المنشآت والموظفين حسب القطاع</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">';
@@ -5824,19 +5994,22 @@ function repBld(id){
           '</div>')+
     '</div>';
   }
+  var tb=repTechBlock(id,l),TB=tb?repTech(tb):null;
   if(l>=5)h+='<div class="card" style="text-align:center;font-weight:900;color:#C9973F">👑 وصل لأعلى مستوى (5/5)</div>';
+  else if(TB)h+='<div class="card" style="text-align:center;font-weight:900;line-height:1.9">🔒 '+(l?'التطوير للمستوى '+(l+1):'البناء')+' يحتاج «'+TB.ic+' '+TB.n+'» أولاً<br><button class="btn" style="font-size:14px;margin-top:6px" onclick="repModalClose();cityScr(\'res\')">🔬 افتح مركز الأبحاث</button></div>';
   else h+='<button class="btn" style="font-size:16px" onclick="repUpgrade(\''+id+'\')">'+(l?'⬆️ طوّر للمستوى '+(l+1):'🏗️ ابنِ الآن')+' — 🪙 '+cost+(S.role==='eng'?' (خصم المهندس 25%)':'')+'</button>'+
-    '<div class="sm" style="text-align:center">رصيدك: '+S.coins+' عملة'+(b.slots?' • كل مستوى يفتح '+b.slots+' وظيفة جديدة':'')+'</div>';
+    '<div class="sm" style="text-align:center">رصيدك: '+S.coins+' عملة'+(b.slots?' • كل مستوى يفتح '+b.slots+' وظيفة جديدة':'')+' • 🏆 مكافأة البناء: +'+repBuildPts(id,l,cost)+' نقطة ترتيب'+'</div>';
   repModalOpen(h);
 }
 function repAfter(id){cityScr();repBld(id)}
 function repUpgrade(id){
   var b=repB(id),R=rep(),l=R.lv[id]||0;if(!b||l>=5)return;
-  var cost=repCost(id);
+  var cost=repCost(id),tb=repTechBlock(id,l);
+  if(tb){sfxBad(true);rmsg('🔬 لازم تنجز «'+repTech(tb).n+'» من مركز الأبحاث أولاً!');return}
   if(S.coins<cost){sfxBad(true);rmsg('عملاتك مش كفاية! محتاج '+cost+' عملة — جاوب أسئلة أكتر واجمع ذهب!');return}
   S.coins-=cost;R.lv[id]=l+1;
   if(b.leg)S.city[id]=Math.min(3,l+1);
-  var pb=b.leg&&l<3?repLegB(id).pts[l]:Math.min(300,Math.round(cost/100)+20);
+  var pb=repBuildPts(id,l,cost); /* v8: مكافأة سخية لنقاط الترتيب عند الاستثمار في المدينة */
   addPts(pb);REP_CACHE=null;
   save();submit();sfxBuild();
   rmsg('🎉 '+(l?'طوّرت':'بنيت')+' «'+b.n+'» للمستوى '+(l+1)+' (+'+pb+' نقطة ترتيب)!');
@@ -5844,9 +6017,9 @@ function repUpgrade(id){
 }
 function repDoHire(id,free){
   var R=rep(),b=repB(id);
-  R.st[id]=(R.st[id]||0)+1;REP_CACHE=null;save();
+  R.st[id]=(R.st[id]||0)+1;addPts(REP_HIRE_PTS);REP_CACHE=null;save();
   sfxCoins();
-  rmsg(b.rIc+' تم توظيف '+b.role+' جديد في «'+b.n+'»'+(free?' مجاناً بعد نجاح المقابلة!':'!'));
+  rmsg(b.rIc+' تم توظيف '+b.role+' جديد في «'+b.n+'»'+(free?' مجاناً بعد نجاح المقابلة':'')+' (+'+REP_HIRE_PTS+' نقطة ترتيب 🏆)!');
 }
 function repHire(id){
   var blk=repHireBlock(id);if(blk){sfxBad(true);rmsg(blk);return}
@@ -5890,7 +6063,7 @@ function repQuizPick(k){
   var z=RQZ;if(!z||z.done)return;z.done=true;
   var q=z.qs[z.i],good=(k===z.ci),box=document.getElementById('repModal');
   if(box)box.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===z.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
-  if(good){z.ok++;sfxOk(false);misDel(q);tsAdd(q,1);mTick('a')}else{sfxBad(true);misAdd(q);tsAdd(q,0)}
+  if(good){z.ok++;sfxOk(false);statSolved(false);misDel(q);tsAdd(q,1);mTick('a')}else{sfxBad(true);misAdd(q);tsAdd(q,0)}
   save();
   var last=(z.i>=z.qs.length-1),fb=document.getElementById('repFb');
   if(fb)fb.innerHTML='<div class="card row" style="align-items:flex-start;margin-top:8px;border-color:'+(good?'#2F6B4A':'#8B2E2E')+'">'+misterImg(good?'c':'h',44)+'<div class="sp"><div style="font-weight:900">'+(good?'إجابة صحيحة! '+cheer():'إجابة غير صحيحة')+'</div><div class="sm">'+(good?'':'افتكر: ')+q[4]+'</div></div></div>'+
@@ -5939,9 +6112,11 @@ function repEcoHtml(c){
       kv('🌾 تصدير فائض المحاصيل','+'+c.bCrops)+
       kv('📦 تصدير المنتجات الصناعية ('+c.goods+' × 3)','+'+c.bGoods)+
       kv('🏦 فوائد البنك المركزي','+'+c.bInt)+
+      (c.bTrade?kv('🤝 عوائد المعاهدات التجارية ('+c.treaties+')','+'+c.bTrade):'')+
       kv('👥 رواتب الموظفين ('+c.staff+' × 2)','−'+c.bWages)+
       (c.golden?kv('🎉 مكافأة عصر الازدهار','×1.5'):'')+
       (c.strike?kv('✊ خصم إضراب العمال','×0.6'):'')+
+      (c.raid?kv('🚨 خسائر غارة اللصوص اليوم','×0.7'):'')+
       kv('💰 صافي الخزينة اليوم','+'+c.coins+' 🪙','tot')+
       kv('🏆 نقاط الترتيب اليومية','+'+c.pts)+
     '</div><div class="sm" style="margin-top:6px;font-size:11px;line-height:1.7">الرواتب تُخصم من الضرائب والصادرات والفوائد فقط، ولا تمس عوائد المنشآت.</div></div>'+
@@ -6000,6 +6175,7 @@ function repLawBlock(law){
   if(!(R.lv.parl>0))return 'ابنِ مجلس الشعب أولاً من الخريطة';
   if(!(R.st.parl>0))return 'عيّن نائباً واحداً على الأقل في مجلس الشعب';
   if(repLawOn(law.id))return 'القانون سارٍ حالياً';
+  if(law.hi&&!repTechOn('law'))return 'يحتاج «📜 بحث الدستور المتقدم» من مركز الأبحاث';
   var act=REP_LAWS.filter(function(l){return repLawOn(l.id)}).length,mx=Math.min(3,R.lv.parl);
   if(act>=mx)return 'وصلت للحد الأقصى ('+mx+') من القوانين السارية — طوّر المجلس';
   return '';
@@ -6051,6 +6227,7 @@ function repPropose(id){
 
 /* ---------- تبويب «جمهوريتي ومدينتي» في الرئيسية ---------- */
 function repHomeTab(){
+  try{repRaidCheck()}catch(e){}
   var c=repCalc(),canTax=(S.cTax!==cDay())&&c.coins>0,acts=REP_LAWS.filter(function(l){return repLawOn(l.id)}).length,r=roleInfo();
   return repBarHtml(c)+repBanHtml(c)+
     '<div class="mode-grid">'+
@@ -6058,9 +6235,615 @@ function repHomeTab(){
       homeTile('t-daily','cityScr(\'eco\')','📊','الضرائب والاقتصاد','ضرائب '+c.tax.r+'% • صافي اليوم +'+c.coins+' 🪙')+
       homeTile('t-room','cityScr(\'parl\')','🏛️','مجلس الشعب والقوانين',acts?acts+' قانون سارٍ':'اعرض قانوناً واكسب المناظرة')+
       homeTile('t-spk','cityScr(\'pvp\')','🚨','رادار المطاردات والغارات','بشخصية '+r.ic+' '+r.n)+
+      homeTile('t-psg','cityScr(\'res\')','🔬','مركز الأبحاث',REP_TECH.filter(function(t){return repTechOn(t.id)}).length+' من '+REP_TECH.length+' أبحاث مكتملة',1)+
+      homeTile('t-sb','cityScr(\'def\')','🛡️','الدفاع والدبلوماسية','قوة الدفاع '+c.def+' • '+c.treaties+' معاهدة',1)+
     '</div>'+
     (canTax?'<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;font-size:15px" onclick="claimCityTax()">💰 استلم خزينة اليوم: +'+c.coins+' عملة و+'+c.pts+' نقطة</button>':'');
 }
+
+/* ==========================================================================
+   v8 — طبقة إضافية: عدّاد شحن القلوب، عدالة الدرجات وتقرير الشفافية،
+   صندوق الأكواد الملكي، وحوش SVG متحركة ومشهد سحق الزعيم، مجلس المستشارين
+   الأربعة، دليل الجمهورية، مركز الأبحاث، سور المدينة والجيش والمعاهدات.
+   حالة الجمهورية الجديدة (tech / tr / raid…) محفوظة داخل S.city.rep فتدخل
+   تلقائياً في الحفظ السحابي دون تغيير بنية qd_v2.
+   ========================================================================== */
+
+/* ---------- ١) القلوب: عدّاد شحن ساعتين ---------- */
+var HP_CD=2*3600*1000;
+function fmtCd(ms){ms=Math.max(0,ms);var s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;function z(n){return(n<10?'0':'')+n}return z(h)+':'+z(m)+':'+z(x)}
+function hpCdTxt(){return fmtCd((S.hpWaitUntil||0)-Date.now())}
+function hpLocked(){return !(S.dhp>0)&&Date.now()<(S.hpWaitUntil||0)}
+function hpNorm(){if(!(S.dhp>0)){if(!(S.hpWaitUntil>0))S.hpWaitUntil=Date.now()+HP_CD}else if(S.hpWaitUntil)S.hpWaitUntil=0}
+var _save8=save;
+save=function(){try{hpNorm()}catch(e){}_save8()};
+function hpTick(){
+  try{
+    if(!S||!S.stage)return;
+    if(!(S.dhp>0)){
+      if(!(S.hpWaitUntil>0))save();
+      else if(Date.now()>=S.hpWaitUntil){
+        S.dhp=1;S.hpWaitUntil=0;save();
+        showToast('❤️ اتشحن لك قلب مجاني! ارجع كمّل المغامرة');
+        try{ding()}catch(e){}
+        if(app.querySelector('.hp-lock'))home();
+        return;
+      }
+    }
+    var t=hpCdTxt(),els=document.querySelectorAll('.hp-cd');
+    for(var i=0;i<els.length;i++)els[i].textContent=t;
+  }catch(e){}
+}
+setInterval(hpTick,1000);
+function hpLockCardHtml(){
+  return '<div class="card hp-lock">'+
+    '<div>⏳ قلوبك خلصت! هيتم شحن قلب مجاني بعد: <span class="hp-cd">'+hpCdTxt()+'</span><br><span style="font-size:12.5px;font-weight:700">(أو اشحنهم فوراً بكود هدية من مستر عبدالرحمن 🎁)</span></div>'+
+    '<button class="btn key-glow" onclick="giftScr()">🔑 معاك كود من مستر عبدالرحمن؟ اكسر وقت الانتظار واشحن قلوبك فوراً!</button>'+
+    '<div style="font-size:11.5px;font-weight:700;opacity:.92">في الانتظار تقدر تلعب بدون قلوب: تحدي النجاة ⏱️ • الحلبة اليومية 🎯 • مختبر المهارات 🧠 • جمهوريتك 🏙️</div>'+
+  '</div>';
+}
+/* جولة التصحيح ترجّع قلباً واحداً كحد أقصى كل ساعتين، ولا ترجّع شيئاً أثناء عدّاد الشحن */
+function revHeartWait(){var w=(S.lastRevHeartAt||0)+HP_CD-Date.now();return w>0?w:0}
+function revHeartGrant(){
+  if(S.dhp>=3)return {ok:0,msg:'قلوبك كاملة ❤️❤️❤️ — عاش على مراجعة أخطائك!'};
+  if(hpLocked())return {ok:0,msg:'⏳ قلوبك في فترة الشحن: القلب المجاني هيرجع بعد '+hpCdTxt()+' (أو اشحن فوراً بكود هدية 🎁)'};
+  var w=revHeartWait();
+  if(w>0)return {ok:0,msg:'⏳ جولة التصحيح بترجّع قلب مرة واحدة كل ساعتين — المرة الجاية بعد '+fmtCd(w)};
+  S.dhp++;S.lastRevHeartAt=Date.now();
+  return {ok:1,msg:'❤️ رجعت قلب لرصيدك اليومي!'};
+}
+function revHeartReady(){return S.dhp<3&&!hpLocked()&&!revHeartWait()}
+
+/* ---------- ٢) عدالة الدرجات + عدادات الشفافية ---------- */
+function statSolved(helped){S.statsOk=(S.statsOk||0)+1;if(helped)S.statsOkHelp=(S.statsOkHelp||0)+1}
+function markHelp(pet){
+  if(G)G.usedHelpThisQ=true;
+  if(pet)S.statsPet=(S.statsPet||0)+1;else S.statsHelp=(S.statsHelp||0)+1;
+  save();
+}
+function transData(){
+  var ok=S.statsOk||0,hp=Math.min(ok,S.statsOkHelp||0);
+  return {ok:ok,helped:hp,solo:ok>0?Math.round((ok-hp)/ok*100):null,help:S.statsHelp||0,pet:S.statsPet||0,fixed:S.statsRevFixed||0,left:(S.mis||[]).length};
+}
+function transParentHtml(){
+  var t=transData();
+  function cell(v,l,s){return '<div><b>'+v+'</b><span>'+l+'</span>'+s+'</div>'}
+  return '<div class="pr-sec">🔍 تقرير الشفافية والاعتماد على النفس (لولي الأمر)</div>'+
+    '<div class="pr-tr">'+
+      cell(t.solo===null?'—':t.solo+'%','نسبة الحل بمجهوده الذاتي',t.ok?('أجاب '+(t.ok-t.helped)+' سؤالاً صحيحاً من '+t.ok+' دون أي مساعدة أو تلميح من المرافق.'):'تُحسب من الإجابات الصحيحة المسجلة بدءاً من هذا الإصدار.')+
+      cell(t.help,'مرات استخدام المساعدات','حذف إجابتين / +5 ثوانٍ / تلميح تركيب الجمل / كشاف القطعة. السؤال المُجاب بمساعدة يُمنح 50% فقط من العملات والنقاط.')+
+      cell(t.pet,'مرات الاستعانة بالمرافق الذكي','المرافق (🦉 / 🐱 / 🦊 / 🐉) يتدخل مرة واحدة على الأكثر في الجولة، وسؤاله يُحسب بنصف الدرجة.')+
+      cell(t.fixed,'تفاعل تصحيح الأخطاء','✅ صحّح '+t.fixed+' خطأ من أخطائه السابقة • ومتبقي '+t.left+' خطأ في قائمة المراجعة')+
+    '</div>';
+}
+function transCardHtml(){
+  var t=transData();
+  function kv(l,v){return '<div class="rep-kv"><span class="sp">'+l+'</span><b>'+v+'</b></div>'}
+  return '<div class="card"><div class="tag" style="background:#1E3C72">🔍 تقرير الشفافية والاعتماد على النفس (لولي الأمر)</div><div style="margin-top:6px">'+
+    kv('💪 نسبة الحل بمجهوده الذاتي',t.solo===null?'لسه بتتحسب':t.solo+'% ('+(t.ok-t.helped)+' من '+t.ok+')')+
+    kv('💡 مرات استخدام المساعدات (حذف إجابتين / +5 ثواني / التلميح / كشاف القطعة)',t.help)+
+    kv('🐾 مرات الاستعانة بالمرافق الذكي (🦉/🐱/🦊/🐉)',t.pet)+
+    kv('🛠️ تفاعل تصحيح الأخطاء','صحّح '+t.fixed+' • متبقي '+t.left)+
+  '</div><div class="sm" style="margin-top:6px;font-size:11px;line-height:1.7">السؤال اللي بتستخدم فيه مساعدة أو المرافق بياخد نص العملات والنقاط — حلّ بمجهودك تكسب الدرجة كاملة ١٠٠٪ ⚖️</div></div>';
+}
+
+/* ---------- ٣) صندوق الكنز الملكي ومضاعف الأكواد ---------- */
+var VAULT_M=[
+  {n:1,t:'شحن قلوب فوري ❤️ + 150 عملة'},
+  {n:3,t:'إطار VIP ذهبي + وسام «صائد الأكواد 🔑» + 500 عملة'},
+  {n:5,t:'شخصية «الجنرال الملكي 🎖️» السرية + 1000 عملة'}
+];
+function vaultHas(n){return Array.isArray(S.vault)&&S.vault.indexOf(n)>=0}
+function vaultCheck(){
+  S.vault=Array.isArray(S.vault)?S.vault:[];S.bdg=S.bdg||[];
+  var cnt=(S.gifts||[]).length,out=[];
+  VAULT_M.forEach(function(m){
+    if(cnt<m.n||S.vault.indexOf(m.n)>=0)return;
+    S.vault.push(m.n);
+    if(m.n===1){S.dhp=3;S.coins+=150;out.push('🔓 كنز الكود الأول: شحن القلوب بالكامل ❤️❤️❤️ + 150 عملة')}
+    else if(m.n===3){
+      if(S.bdg.indexOf('b_code3')<0){S.bdg.push('b_code3');S.coins+=500;addPts(250);if(!S.eqBdg)S.eqBdg='b_code3'}
+      out.push('🔓 كنز الـ 3 أكواد: إطار VIP ذهبي 👑 + وسام «صائد الأكواد 🔑» + 500 عملة');
+    }else{S.coins+=1000;out.push('🔓 كنز الـ 5 أكواد: شخصية «الجنرال الملكي 🎖️» السرية (من «وظيفتي» في جمهوريتك) + 1000 عملة')}
+  });
+  if(out.length)save();
+  return out;
+}
+function vaultHtml(compact){
+  var cnt=(S.gifts||[]).length,nxt=null;
+  VAULT_M.forEach(function(m){if(!nxt&&cnt<m.n)nxt=m});
+  var cells=VAULT_M.map(function(m){var on=cnt>=m.n;return '<div class="vault-m'+(on?' on':'')+'"><b>'+(on?'✅':'🔒')+' '+m.n+' '+(m.n===1?'كود':'أكواد')+'</b>'+m.t+'</div>'}).join('');
+  return '<div class="vault">'+
+    '<div class="row"><div class="sp">'+
+      '<div class="vault-t">🔥 صندوق الكنز الملكي ومضاعف الأكواد <span style="font-size:11px;opacity:.9">(VIP Code Vault)</span></div>'+
+      '<div style="font-size:12px;font-weight:700;margin-top:2px">🎁 عداد جوائز الأكواد: <b style="color:#FFD700;font-size:15px">'+cnt+'</b> كود'+(nxt?' • باقي '+(nxt.n-cnt)+' للكنز الجاي!':' • فتحت كل كنوز الصندوق 👑')+'</div>'+
+    '</div>'+(compact?'<button class="adv-go" onclick="giftScr()">🔑 اكتب كود</button>':'')+'</div>'+
+    '<div class="vault-ms">'+cells+'</div>'+
+    (compact?'':'<div style="font-size:11.5px;font-weight:700;margin-top:8px;line-height:1.7">اطلب الأكواد السرية من مستر عبدالرحمن في السنتر، أو دوّر عليها جوه فيديوهات Grammora و EngliFocus! كل كود جديد بيقرّبك من الكنز اللي بعده.</div>')+
+  '</div>';
+}
+function goldRuleHtml(){
+  return '<div class="gold-rule">💡 القاعدة الذهبية: حل أسئلة إنجليزي أكتر ⬅️ اجمع عملات ونقاط 100% ⬅️ ابنِ جيشك ومصانعك في المدينة ⬅️ تصدّر لوحة الشرف!</div>';
+}
+/* اسم الوظيفة المُرسل للسحابة: «الجنرال» يظهر لباقي اللاعبين (والنسخ الأقدم) كضابط */
+function pubRole(){return S.role==='general'?'police':(S.role||'police')}
+
+/* ---------- ٤) وحوش الخيال المتحركة (SVG متعدد الطبقات) ---------- */
+var MON_SEQ=0;
+var MON_DEF=[
+  {c1:'#A5D66B',c2:'#2E6B1A',ol:'#16330C',gl:'#D4FF3A',fy:6},   /* وحش الغابة */
+  {c1:'#B9A2EA',c2:'#3B2478',ol:'#1B0F3F',gl:'#FF3B5C',fy:8},   /* وحش الكهف */
+  {c1:'#FF9A5C',c2:'#7A1C0C',ol:'#3A0A04',gl:'#FFC400',fy:10},  /* عملاق البركان */
+  {c1:'#C9EEFF',c2:'#1B63C4',ol:'#0A2A5E',gl:'#3DF5FF',fy:0},   /* تنين الجليد */
+  {c1:'#9FB3C0',c2:'#27343D',ol:'#0E151A',gl:'#FFEA00',fy:8},   /* زعيم الرعد */
+  {c1:'#6A6282',c2:'#16111F',ol:'#05030A',gl:'#FF2D4A',fy:2,slit:1}, /* فارس الظلام */
+  {c1:'#7DF7C0',c2:'#056B5C',ol:'#02332B',gl:'#F08CFF',fy:10},  /* وحش الفضاء */
+  {c1:'#D9A0E8',c2:'#4B1591',ol:'#1E0638',gl:'#FFD700',fy:12}   /* إمبراطور الوحوش */
+];
+function fantasyMonster(lv,boss,w){
+  var t=Math.max(0,Math.min(7,Math.floor(((Number(lv)||1)-1)/5))),d=MON_DEF[t],u='mg'+(++MON_SEQ),G1='url(#'+u+')',ol=d.ol,gl=d.gl;
+  var st=' stroke="'+ol+'" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"',back='',body='';
+  function mir(s){return s+'<g transform="translate(200 0) scale(-1 1)">'+s+'</g>'}
+  if(t===0){
+    back=mir('<path d="M56 66L40 22L76 52Z" fill="#F1E3B0"'+st+'/>')+mir('<ellipse cx="30" cy="104" rx="14" ry="20" fill="'+d.c2+'"'+st+'/>');
+    body='<path d="M32 180C12 112 44 48 100 48S188 112 168 180Z" fill="'+G1+'"'+st+'/><ellipse cx="100" cy="162" rx="40" ry="15" fill="rgba(255,255,255,.2)"/>'+
+      '<path d="M84 50C86 36 96 34 100 44C104 34 114 36 116 50Z" fill="#4CAF50"'+st+'/>'+
+      '<circle cx="50" cy="150" r="6" fill="rgba(0,0,0,.14)"/><circle cx="152" cy="140" r="8" fill="rgba(0,0,0,.14)"/><circle cx="146" cy="164" r="4" fill="rgba(0,0,0,.14)"/>';
+  }else if(t===1){
+    back=mir('<path class="mon-wing" d="M60 100L6 58L18 96L2 110L22 120L10 142L62 130Z" fill="'+d.c2+'"'+st+'/>')+mir('<path d="M64 70L54 26L90 56Z" fill="'+d.c1+'"'+st+'/>');
+    body='<ellipse cx="100" cy="118" rx="56" ry="60" fill="'+G1+'"'+st+'/><ellipse cx="100" cy="160" rx="28" ry="12" fill="rgba(255,255,255,.16)"/>'+mir('<path d="M76 174L70 190L88 184Z" fill="'+d.c2+'"'+st+'/>');
+  }else if(t===2){
+    back='<path class="mon-flame" d="M62 62C50 40 72 34 66 10C84 22 90 36 96 16C106 34 120 30 122 8C140 30 148 44 138 62Z" fill="#FFB300" stroke="#E65100" stroke-width="4" stroke-linejoin="round"/><path class="mon-flame" d="M80 62C76 46 90 42 92 30C100 42 110 44 112 30C122 44 124 52 120 62Z" fill="#FFF176"/>';
+    body='<path d="M30 182L22 122L42 74L74 54H126L158 74L178 122L170 182Z" fill="'+G1+'"'+st+'/>'+
+      '<g class="mon-glow" fill="none" stroke="'+gl+'" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M38 150L50 136L42 120"/><path d="M162 152L150 138L158 118"/><path d="M40 176L52 166"/><path d="M160 176L148 166"/></g>';
+  }else if(t===3){
+    back=mir('<path class="mon-wing" d="M56 110L4 70L20 104L6 122L28 128L20 150L60 138Z" fill="#E1F5FE"'+st+'/>')+mir('<path d="M66 64L52 14L88 52Z" fill="#E1F5FE"'+st+'/>')+'<path d="M90 54L100 16L110 54Z" fill="#E1F5FE"'+st+'/>';
+    body='<path d="M38 180C20 128 40 60 100 54C160 60 180 128 162 180Z" fill="'+G1+'"'+st+'/><ellipse cx="100" cy="146" rx="42" ry="28" fill="#E1F5FE" stroke="'+ol+'" stroke-width="3"/>'+mir('<circle cx="90" cy="124" r="3" fill="'+ol+'"/>')+
+      '<g class="mon-glow" fill="#fff"><path d="M36 56l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M168 40l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M180 96l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></g>';
+  }else if(t===4){
+    back=mir('<path class="mon-bolt" d="M26 146L40 164L32 166L46 190L20 170L30 168Z" fill="#FFEA00" stroke="#F57F17" stroke-width="2"/>')+mir('<path d="M70 66L62 28L78 46L84 20L92 62Z" fill="#FFEA00"'+st+'/>');
+    body='<path d="M36 180C12 174 12 138 32 132C18 106 42 82 64 92C64 60 108 44 128 70C152 54 184 78 172 106C194 116 192 152 168 160C172 176 152 186 136 180Z" fill="'+G1+'"'+st+'/>'+
+      '<path class="mon-bolt" style="animation-delay:.5s" d="M150 84L162 84L154 98L166 98L146 120L152 104L142 104Z" fill="#FFEA00" stroke="#F57F17" stroke-width="2"/>';
+  }else if(t===5){
+    back='<path d="M26 188L46 92H154L174 188Z" fill="#6D1020"'+st+'/>'+mir('<path d="M50 86C22 78 16 46 30 26C36 52 48 62 64 68Z" fill="#CFD8DC"'+st+'/>')+'<path class="mon-flame" d="M100 42C90 22 102 8 120 10C110 18 110 30 114 42Z" fill="#E53935"'+st+'/>';
+    body='<path d="M44 180V98C44 62 70 42 100 42S156 62 156 98V180Z" fill="'+G1+'"'+st+'/><rect x="54" y="88" width="92" height="36" rx="12" fill="#05030A" stroke="'+d.c1+'" stroke-width="3"/>'+mir('<path d="M56 150V174M66 146V176" stroke="'+ol+'" stroke-width="4" stroke-linecap="round"/>');
+  }else if(t===6){
+    back=mir('<path d="M78 58Q66 32 54 24" fill="none"'+st+'/><circle class="mon-glow" cx="54" cy="22" r="8" fill="'+gl+'" stroke="'+ol+'" stroke-width="3"/>')+mir('<path d="M52 168Q40 182 46 194M72 176Q66 190 74 196" fill="none" stroke="'+d.c2+'" stroke-width="9" stroke-linecap="round"/>');
+    body='<path d="M36 150C28 92 58 52 100 52S172 92 164 150C164 172 140 186 100 186S36 172 36 150Z" fill="'+G1+'"'+st+'/>'+
+      '<circle class="mon-glow" cx="100" cy="76" r="14" fill="'+gl+'" opacity=".5"/><circle cx="100" cy="76" r="9" fill="#fff" stroke="'+ol+'" stroke-width="3"/><circle cx="100" cy="77" r="4" fill="'+ol+'"/>'+
+      '<circle cx="48" cy="140" r="7" fill="rgba(255,255,255,.25)"/><circle cx="154" cy="150" r="5" fill="rgba(255,255,255,.25)"/><circle cx="148" cy="126" r="3" fill="rgba(255,255,255,.25)"/>';
+  }else{
+    back='<circle class="mon-aura" cx="100" cy="112" r="94" fill="none" stroke="#FFD700" stroke-width="3" stroke-dasharray="10 12" opacity=".85"/>'+
+      '<path d="M12 192L40 98H160L188 192Z" fill="#8E1B3A"'+st+'/>'+mir('<path d="M14 190L41 100" fill="none" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>')+
+      mir('<path d="M54 76C30 70 20 44 30 24C40 46 52 54 68 60Z" fill="#F1E3B0"'+st+'/>')+mir('<path d="M38 118L8 102L32 142Z" fill="'+d.c2+'"'+st+'/>');
+    body='<path d="M36 186C20 122 44 56 100 56S180 122 164 186Z" fill="'+G1+'"'+st+'/>'+
+      '<path d="M62 62L56 26L78 44L100 16L122 44L144 26L138 62Z" fill="#FFD700" stroke="#8A5A1E" stroke-width="4" stroke-linejoin="round"/><circle cx="100" cy="36" r="5" fill="#E53935"/><circle cx="72" cy="46" r="4" fill="#29B6F6"/><circle cx="128" cy="46" r="4" fill="#66BB6A"/>';
+  }
+  if(boss&&t<7)back='<circle class="mon-aura" cx="100" cy="112" r="95" fill="none" stroke="'+gl+'" stroke-width="2.5" stroke-dasharray="4 14" opacity=".8"/>'+back;
+  /* الوجه: أربع حالات تتبدل بالـ CSS (normal / hit / angry / win) */
+  var mf='#4A0D12',ms=d.slit?gl:ol,eyeN,eyeA;
+  var sclera=mir('<ellipse cx="78" cy="100" rx="15" ry="16" fill="#fff" stroke="'+ol+'" stroke-width="3"/>');
+  if(d.slit){
+    eyeN=mir('<path class="mon-glow" d="M64 98L92 106L66 112Z" fill="'+gl+'"/>');
+    eyeA=mir('<path d="M60 92L94 108L62 117Z" fill="#fff"/><path class="mon-glow" d="M63 95L91 108L65 114Z" fill="'+gl+'"/>');
+  }else{
+    eyeN=mir('<circle class="mon-glow" cx="78" cy="100" r="21" fill="'+gl+'" opacity=".45"/>')+sclera+
+      mir('<circle cx="81" cy="103" r="8" fill="'+gl+'" stroke="'+ol+'" stroke-width="2"/><circle cx="82" cy="104" r="3.6" fill="'+ol+'"/><circle cx="78" cy="99" r="2" fill="#fff"/>')+
+      mir('<path d="M60 82L94 90" stroke="'+ol+'" stroke-width="6" stroke-linecap="round"/>');
+    eyeA=mir('<circle class="mon-glow" cx="78" cy="100" r="24" fill="#FF1744" opacity=".6"/>')+sclera+
+      mir('<circle cx="82" cy="104" r="5" fill="#D50000"/><circle cx="82" cy="104" r="2" fill="'+ol+'"/>')+
+      mir('<path d="M56 74L96 94" stroke="'+ol+'" stroke-width="8" stroke-linecap="round"/>');
+  }
+  var fN=eyeN+'<path d="M72 136Q100 154 128 136" fill="none" stroke="'+ms+'" stroke-width="5" stroke-linecap="round"/>'+
+      mir('<path d="M80 141L84 153L90 144Z" fill="#fff" stroke="'+ol+'" stroke-width="2" stroke-linejoin="round"/>');
+  var fH=mir('<path d="M64 92L90 101L64 110" fill="none" stroke="'+ms+'" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>')+
+      '<ellipse cx="100" cy="142" rx="11" ry="13" fill="'+mf+'" stroke="'+ms+'" stroke-width="4"/>'+
+      '<path d="M152 62l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFF59D" stroke="'+ol+'" stroke-width="1"/>';
+  var fA=eyeA+'<path d="M64 130Q100 120 136 130Q132 166 100 168Q68 166 64 130Z" fill="'+mf+'" stroke="'+ms+'" stroke-width="4" stroke-linejoin="round"/>'+
+      '<path d="M70 130L78 142L86 131L94 143L102 131L110 143L118 131L126 142L131 130" fill="#fff" stroke="'+ol+'" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M84 165L92 155L100 165L108 155L116 165" fill="#fff" stroke="'+ol+'" stroke-width="1.5" stroke-linejoin="round"/>';
+  var fW=mir('<path d="M66 90L90 110M90 90L66 110" fill="none" stroke="'+ms+'" stroke-width="6" stroke-linecap="round"/>')+
+      '<path d="M72 142Q82 132 92 142T112 142T132 142" fill="none" stroke="'+ms+'" stroke-width="5" stroke-linecap="round"/>'+
+      '<path d="M104 144Q112 160 120 146Z" fill="#FF8A80" stroke="'+ol+'" stroke-width="2" stroke-linejoin="round"/>'+
+      '<g class="mon-aura" fill="#FFF59D" stroke="'+ol+'" stroke-width="1"><path d="M60 50l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M140 50l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M100 30l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></g>';
+  return '<svg viewBox="0 0 200 200" width="'+w+'" height="'+w+'" aria-hidden="true"><defs><radialGradient id="'+u+'" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="'+d.c1+'"/><stop offset="1" stop-color="'+d.c2+'"/></radialGradient></defs>'+
+    '<g class="mon-float">'+back+'<g class="mon-body">'+body+
+      '<g transform="translate(0 '+d.fy+')"><g class="f-n">'+fN+'</g><g class="f-h">'+fH+'</g><g class="f-a">'+fA+'</g><g class="f-w">'+fW+'</g></g>'+
+    '</g></g></svg>';
+}
+/* مشهد سحق الزعيم (حوالي 2.5 ثانية) ثم استدعاء done() لعرض شاشة النتيجة */
+function bossDefeatFx(done){
+  var mon=document.getElementById('mon'),ms=document.getElementById('ms'),cn=document.getElementById('cn'),fin=false,ban=null,cv=null;
+  function end(){
+    if(fin)return;fin=true;
+    try{if(ban&&ban.parentNode)ban.parentNode.removeChild(ban);if(cv&&cv.parentNode)cv.parentNode.removeChild(cv)}catch(e){}
+    done();
+  }
+  if(!mon||!ms){setTimeout(end,250);return}
+  ban=document.createElement('div');ban.id='vicBan';ban.className='vic-ban';
+  ban.textContent='💥 تم سحق الزعيم بنجاح! Victory! 🏆';
+  var reduce=false;
+  try{reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
+  if(reduce){document.body.appendChild(ban);setTimeout(end,1500);return}
+  setTimeout(function(){if(!fin&&document.body.contains(mon))mon.className='mon-die'},380);
+  setTimeout(function(){if(!fin)document.body.appendChild(ban)},1150);
+  try{
+    tone(95,0.4,1.1,'sawtooth',0.2,38);
+    [0,0.22,0.44,0.66,0.88].forEach(function(t){noise(0.42+t,0.1,0.18,480+t*700,0.8)});
+    setTimeout(function(){if(fin)return;noise(0,0.55,0.3,900,0.5);[1047,1319,1568,2093,2637].forEach(function(f,i){tone(f,0.2+i*0.07,0.2,'triangle',0.15)})},1600);
+  }catch(e){}
+  try{
+    cv=document.createElement('canvas');cv.id='fxCv';document.body.appendChild(cv);
+    var dpr=Math.min(2,window.devicePixelRatio||1),W=window.innerWidth,H=window.innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;
+    var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    var r=ms.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,R0=Math.max(44,r.width/2);
+    var tr=cn?cn.getBoundingClientRect():null,tx=tr?tr.left+tr.width/2:W-40,ty=tr?tr.top+tr.height/2:30;
+    var P=[],C=[],B=[],t0=performance.now(),boom=false,nextBolt=380,BOOM=1620;
+    var frame=function(now){
+      if(fin)return;
+      var t=now-t0,i,k;
+      x.clearRect(0,0,W,H);
+      /* شروخ البرق والنار حول الوحش وهو بيتهز */
+      if(t>=nextBolt&&t<BOOM){
+        nextBolt=t+100+Math.random()*110;
+        var a=Math.random()*6.283,len=R0*(0.9+Math.random()*0.9),pts=[[cx,cy]];
+        for(k=1;k<=5;k++){var dd=len*k/5,j=(Math.random()-0.5)*R0*0.4;pts.push([cx+Math.cos(a)*dd-Math.sin(a)*j,cy+Math.sin(a)*dd+Math.cos(a)*j])}
+        B.push({p:pts,t:t,c:Math.random()<0.5?'#FFF7C2':'#FF9F43'});
+        for(k=0;k<4;k++)P.push({x:cx+(Math.random()-0.5)*R0,y:cy+(Math.random()-0.5)*R0,vx:(Math.random()-0.5)*5,vy:-2-Math.random()*4,r:2+Math.random()*2.5,c:(k%2?'#FFB347':'#FFE066'),b:t,l:420});
+      }
+      x.lineJoin='round';x.lineCap='round';
+      for(i=B.length-1;i>=0;i--){
+        var bo=B[i],ag=t-bo.t;if(ag>170){B.splice(i,1);continue}
+        x.globalAlpha=1-ag/170;x.strokeStyle=bo.c;x.lineWidth=3.2;x.shadowColor='#FFD700';x.shadowBlur=14;
+        x.beginPath();x.moveTo(bo.p[0][0],bo.p[0][1]);for(k=1;k<bo.p.length;k++)x.lineTo(bo.p[k][0],bo.p[k][1]);x.stroke();
+      }
+      x.shadowBlur=0;
+      /* الانفجار: جزيئات ذهبية + عملات تطير لعدّاد العملات */
+      if(!boom&&t>=BOOM){
+        boom=true;
+        var cols=['#FFD700','#FFE066','#FFF7C2','#FF9F43','#FFFFFF'];
+        for(k=0;k<72;k++){var an=Math.random()*6.283,sp=3+Math.random()*9;P.push({x:cx,y:cy,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp-2,r:2+Math.random()*4,c:cols[k%cols.length],b:t,l:620+Math.random()*320})}
+        for(k=0;k<16;k++){var a2=Math.random()*6.283,s2=4+Math.random()*7;C.push({x:cx,y:cy,vx:Math.cos(a2)*s2,vy:Math.sin(a2)*s2-3,b:t,dl:k*22,hit:0})}
+        x.globalAlpha=1;x.fillStyle='rgba(255,244,190,.55)';x.fillRect(0,0,W,H);
+      }
+      for(i=P.length-1;i>=0;i--){
+        var p=P[i],pa=t-p.b;if(pa>p.l){P.splice(i,1);continue}
+        p.x+=p.vx;p.y+=p.vy;p.vy+=0.22;p.vx*=0.985;
+        x.globalAlpha=Math.max(0,1-pa/p.l);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fill();
+      }
+      for(i=0;i<C.length;i++){
+        var c=C[i],ca=t-c.b;if(c.hit)continue;
+        if(ca<330+c.dl){c.x+=c.vx;c.y+=c.vy;c.vx*=0.93;c.vy*=0.93}
+        else{
+          if(c.sx===undefined){c.sx=c.x;c.sy=c.y}
+          var q=Math.min(1,(ca-330-c.dl)/360),e=q*q;
+          c.x=c.sx+(tx-c.sx)*e;c.y=c.sy+(ty-c.sy)*e-Math.sin(q*3.1416)*40;
+          if(q>=1){c.hit=1;if(cn){cn.classList.remove('cn-pop');void cn.offsetWidth;cn.classList.add('cn-pop')}try{tone(1568+i*40,0,0.06,'sine',0.07)}catch(er){}continue}
+        }
+        x.globalAlpha=1;x.fillStyle='#E3B03F';x.strokeStyle='#8A6A4A';x.lineWidth=2;
+        x.beginPath();x.arc(c.x,c.y,7.5,0,6.283);x.fill();x.stroke();
+        x.beginPath();x.arc(c.x,c.y,3.6,0,6.283);x.stroke();
+      }
+      x.globalAlpha=1;
+      if(t<2520)requestAnimationFrame(frame);else end();
+    };
+    requestAnimationFrame(frame);
+  }catch(e){}
+  setTimeout(end,2750); /* صمام أمان لو المتصفح أوقف الرسم (تبويب في الخلفية) */
+}
+
+/* ---------- ٥) الجمهورية: الأبحاث، الدفاع، المعاهدات، الغارات ---------- */
+var REP_TECH=[
+  {id:'irr',ic:'💧',n:'بحث الزراعة الذكية',en:'Smart Irrigation',cost:800,d:'يفتح تطوير المزارع والصوامع بعد المستوى 2، ويزيد إنتاج الغذاء +40%.'},
+  {id:'auto',ic:'⚙️',n:'بحث الطاقة النظيفة والآلات',en:'Industrial Automation',cost:1500,d:'يفتح مصنع الإلكترونيات وتطوير مصنع النسيج ومحطة الطاقة بعد المستوى 1، ويزيد عائد تصدير المنتجات الصناعية +50%.'},
+  {id:'mil',ic:'🏹',n:'بحث التحصينات العسكرية',en:'Military Engineering',cost:1200,d:'يفتح بناء «سور المدينة العظيم 🧱» و«ثكنات الجيش ⚔️».'},
+  {id:'law',ic:'📜',n:'بحث الدستور المتقدم',en:'Constitutional Law',cost:1000,d:'يفتح قوانين مجلس الشعب المتقدمة: دعم الصادرات، تشجيع التجارة، والدفاع الوطني.'}
+];
+var REP_TR_DAYS=7,REP_TR_MAX=2,REP_HIRE_PTS=25,TUT_I=0,DEF_POLL=0;
+function repTech(id){return REP_TECH.filter(function(t){return t.id===id})[0]||null}
+function repTechOn(id){var R=rep();return !!(R.tech&&R.tech[id])}
+/* يرجّع رمز البحث المطلوب قبل بناء/تطوير المبنى من المستوى l، أو '' لو مفيش قفل */
+function repTechBlock(id,l){
+  var need='';
+  if((id==='farm'||id==='silo')&&l>=2)need='irr';
+  else if((id==='textile'||id==='power')&&l>=1)need='auto';
+  else if(id==='elec')need='auto';
+  else if(id==='wall'||id==='barracks')need='mil';
+  return (need&&!repTechOn(need))?need:'';
+}
+/* مكافأة نقاط الترتيب عند البناء/التطوير (سخية: الاستثمار في المدينة يرفع الترتيب) */
+function repBuildPts(id,l,cost){
+  var b=repB(id),leg=(b&&b.leg&&l<3)?(repLegB(id).pts[l]||0):0;
+  return Math.max(leg,Math.min(1500,Math.round((Number(cost)||0)*0.06)+40));
+}
+function repTreatyGold(t){return 30+3*Math.max(1,Math.min(18,Number(t&&t.lv)||5))}
+function repSumLv(R){var L=0;REP_B.forEach(function(b){L+=(R.lv[b.id]||0)});return L}
+/* قوة عصابات اللصوص تكبر مع حجم المدينة */
+function repRaidBase(R){return Math.round(18+Math.min(47,repSumLv(R)*1.4))}
+function repCheapest(){
+  var m=1e9;
+  REP_B.forEach(function(b){var l=repLv(b.id);if(l<5&&!repTechBlock(b.id,l)){var c=repCost(b.id);if(c>0&&c<m)m=c}});
+  return m===1e9?0:m;
+}
+/* غارة عصابات عشوائية: مرة واحدة يومياً على الأكثر، بعد فترة سماح لبناء الدفاعات */
+function repRaidCheck(){
+  var R=rep(),d=cDay();
+  if(R.raidDay===d)return;
+  R.raidDay=d;
+  if(repSumLv(R)<5||d-(Number(R.born)||d)<1||d-(Number(R.v8)||d)<2){save();return}
+  var h=0,u=String(S.uid||''),i;
+  for(i=0;i<u.length;i++)h=(h*31+u.charCodeAt(i))%9973;
+  if((h+d*37)%100>=55){save();return}
+  REP_CACHE=null;
+  var c=repCalcRaw(R),str=repRaidBase(R)+((h+d*13)%13)-6,ok=c.def>=str,hit=(!ok&&S.cTax!==d);
+  if(ok){S.coins+=75;R.raidOk=(Number(R.raidOk)||0)+1}
+  else if(hit)R.raidHit=d;
+  R.raidLog=Array.isArray(R.raidLog)?R.raidLog:[];
+  R.raidLog.unshift({d:d,ok:ok?1:0,s:str,f:c.def,hit:hit?1:0});
+  if(R.raidLog.length>6)R.raidLog.length=6;
+  REP_CACHE=null;save();
+  setTimeout(function(){try{if(ok)sfxCoins();else sfxSiren()}catch(e){}},350);
+}
+function repRaidBanHtml(){
+  var R=rep(),x=(R.raidLog||[])[0];
+  if(!x||x.d!==cDay())return '';
+  if(x.ok)return '<div class="rep-ban gold" style="animation:none">🛡️ '+(x.pvp?'تم صد غارة لاعب على مدينتك!':'تم صد هجوم عصابة اللصوص!')+' السور والجيش حموا 100% من الخزينة — مكافأة صد الهجوم: <b>+75 عملة</b> 🪙 (دفاعك '+x.f+' ضد قوة '+x.s+')</div>';
+  return '<div class="rep-ban strike">🚨 غارة لصوص على المدينة! دفاعك ('+x.f+') أضعف من العصابة ('+x.s+')'+(x.hit?' — ضاع 30% من عائد خزينة اليوم.':' — لحسن الحظ كنت استلمت خزينة اليوم قبل الغارة.')+'<br>⚠️ طوّر سور المدينة أو وظّف حراساً لحماية خزينتك من اللصوص.</div>';
+}
+/* غارات اللاعبين (رادار PvP): لو الدفاع قوي تُصد الغارة وتُمنح مكافأة مرة يومياً */
+function repPvpDefense(){
+  var last=Number(S.rLogT)||0,mx=last,nw=0;
+  (PVP_LOGS||[]).forEach(function(lg){
+    var t=(lg&&lg.t&&lg.t.toMillis)?lg.t.toMillis():0;
+    if(t>last){if(lg.rRole==='thief')nw++;if(t>mx)mx=t}
+  });
+  if(mx<=last)return;
+  S.rLogT=mx;
+  var R=rep(),d=cDay();
+  if(nw&&R.pvpDef!==d){
+    var c=repCalc(),str=repRaidBase(R);
+    if(c.def>=str){
+      R.pvpDef=d;S.coins+=75;R.raidOk=(Number(R.raidOk)||0)+1;
+      R.raidLog=Array.isArray(R.raidLog)?R.raidLog:[];
+      R.raidLog.unshift({d:d,ok:1,s:str,f:c.def,hit:0,pvp:1});
+      if(R.raidLog.length>6)R.raidLog.length=6;
+      showToast('🛡️ سورك وجيشك صدّوا غارة لاعب على مدينتك! +75 عملة مكافأة صد الهجوم');
+    }
+  }
+  save();
+}
+
+/* ---------- مجلس المستشارين الأربعة ---------- */
+var REP_ADV={
+  eco:{ic:'💰',n:'المستشار الاقتصادي',s:'اقتصاد'},
+  edu:{ic:'🎓',n:'مستشار التعليم (مستر عبدالرحمن)',s:'تعليم'},
+  res:{ic:'🔬',n:'مستشار الأبحاث والتطوير',s:'أبحاث'},
+  def:{ic:'🛡️',n:'المستشار الدبلوماسي والعسكري',s:'دفاع'}
+};
+function repAdvice(c){
+  var R=rep(),d=cDay(),A={},lv=function(id){return R.lv[id]||0},stf=function(id){return R.st[id]||0};
+  /* --- الاقتصادي --- */
+  var idleB=null,openF=null;
+  REP_B.forEach(function(b){if(!idleB&&b.slots&&b.s!=='def'&&lv(b.id)>0&&stf(b.id)<=0)idleB=b});
+  ['textile','elec'].forEach(function(id){var b=repB(id);if(!openF&&lv(id)>0&&stf(id)<b.slots*lv(id)&&!repHireBlock(id))openF=b});
+  var lawsOn=REP_LAWS.filter(function(l){return !!(R.laws[l.id]&&R.laws[l.id]>d)}).length,cheap=repCheapest();
+  if(S.cTax!==d&&c.coins>0)A.eco={p:100,t:'خزينة مدينتك جاهزة! اضغط على «استلم العائد 🪙» لتحصل على عملاتك ونقاطك اليومية فوراً.',b:'استلم العائد 🪙',a:"claimCityTax()"};
+  else if(idleB)A.eco={p:90,t:'عندك مبنى بدون موظفين («'+idleB.sn+'»)! اضغط عليه في الخريطة ووظّف عاملاً مجاناً بسؤال إنجليزي ليبدأ الإنتاج.',b:'وظّف الآن 🎤',a:"repBld('"+idleB.id+"')"};
+  else if(c.foodR<1)A.eco={p:85,t:'السكان محتاجين غذاء 🌾! طوّر المزارع أو وظّف مزارعين لرفع رضا الشعب.',b:'المزارع 🌾',a:"repBld('farm')"};
+  else if(c.strike)A.eco={p:84,t:'إضراب العمال شغال ✊! خفّض الضرائب إلى 5% أو حسّن الغذاء والخدمات ليرجع الإنتاج.',b:'الضرائب ⚖️',a:"cityScr('eco')"};
+  else if(!lawsOn)A.eco={p:50,t:'ادخل «🏛️ مجلس الشعب» ومرّر قانوناً جديداً لمضاعفة أرباح ونقاط جمهوريتك!',b:'مجلس الشعب 🏛️',a:"cityScr('parl')"};
+  else if(cheap&&S.coins<cheap)A.eco={p:40,t:'العب جولة في الخريطة أو رادار المطاردات لتجمع عملات وتطوّر مبنى جديد!',b:'العب جولة ▶',a:(S.dhp>0?"map()":"survIntro()")};
+  else if(openF)A.eco={p:55,t:'وظّف عاملاً في «'+openF.sn+'» لزيادة أرباح التصدير (كل منتج صناعي = 3 عملات).',b:'وظّف عاملاً 👷‍♂️',a:"repBld('"+openF.id+"')"};
+  else if(!lv('textile'))A.eco={p:45,t:'ابنِ «مصنع النسيج 🧵» ليحوّل محاصيلك إلى منتجات تُصدَّر بثلاثة أضعاف قيمتها.',b:'المصنع 🧵',a:"repBld('textile')"};
+  else A.eco={p:10,t:'اقتصادك مستقر 👏 صافي اليوم +'+c.coins+' عملة. لو رضا الشعب فوق 70% جرّب ضرائب 22%، أو طوّر البنك لزيادة الفوائد.',b:'الاقتصاد 📊',a:"cityScr('eco')"};
+  /* --- التعليم (مستر عبدالرحمن) --- */
+  var eb='+'+(c.edu/10).toFixed(1)+'%';
+  if(!lv('school'))A.edu={p:60,t:'ابنِ «أكاديمية مستر عبدالرحمن 🏫»: كل نقطة في 🧠 مستوى التعليم بتزوّد نقاط ترتيبك من كل أسئلة الإنجليزي!',b:'الأكاديمية 🏫',a:"repBld('school')"};
+  else if(stf('school')<=0)A.edu={p:72,t:'الأكاديمية بدون معلمين! وظّف معلماً مجاناً بسؤال إنجليزي ليرتفع 🧠 مستوى التعليم.',b:'وظّف معلماً 👨‍🏫',a:"repBld('school')"};
+  else if(c.edu<30)A.edu={p:46,t:'🧠 مستوى التعليم '+c.edu+' = '+eb+' على نقاط ترتيبك. طوّر الأكاديمية أو وظّف معلمين لتوصل 30 وتقدر توظّف مهندسي مصنع الإلكترونيات.',b:'الأكاديمية 🏫',a:"repBld('school')"};
+  else if(!lv('uni'))A.edu={p:36,t:'🧠 مستوى التعليم '+c.edu+' = '+eb+' نقاط. ابنِ «جامعة Grammora 🏛️» لرفع التعليم بقوة.',b:'الجامعة 🏛️',a:"repBld('uni')"};
+  else A.edu={p:9,t:'🧠 مستوى التعليم '+c.edu+' من 100 = مكافأة دائمة '+eb+' على نقاط الترتيب من كل أسئلة الإنجليزي. استمر يا بطل!',b:'الأكاديمية 🏫',a:"repBld('school')"};
+  /* --- الأبحاث --- */
+  var order=['mil','irr','auto','law'],nx=null;
+  if(lv('farm')>=2||lv('silo')>=2)order=['irr','mil','auto','law'];
+  order.forEach(function(k){if(!nx&&!R.tech[k])nx=repTech(k)});
+  if(nx)A.res={p:(S.coins>=nx.cost?64:30),t:'ابحث «'+nx.ic+' '+nx.n+'» (🪙 '+nx.cost+' + سؤالان إنجليزي): '+nx.d,b:'مركز الأبحاث 🔬',a:"cityScr('res')"};
+  else A.res={p:5,t:'كل الأبحاث الأربعة مكتملة 🎓 مدينتك في قمة التكنولوجيا!',b:'الأبحاث 🔬',a:"cityScr('res')"};
+  /* --- الدبلوماسي والعسكري --- */
+  var str=repRaidBase(R),openG=(lv('barracks')>0&&stf('barracks')<2*lv('barracks'));
+  if(!R.tech.mil)A.def={p:52,t:'مدينتك بدون سور ولا جيش! أنجز «🏹 بحث التحصينات العسكرية» لتبني سور المدينة وتحمي خزينتك من اللصوص.',b:'الأبحاث 🔬',a:"cityScr('res')"};
+  else if(!lv('wall'))A.def={p:76,t:'ابنِ «سور المدينة العظيم 🧱» ليصد غارات اللصوص عن خزينتك.',b:'ابنِ السور 🧱',a:"repBld('wall')"};
+  else if(c.def<str)A.def={p:82,t:'⚠️ دفاعات المدينة ضعيفة! طوّر سور المدينة أو وظّف حراساً لحماية خزينتك من اللصوص. (الدفاع '+c.def+' والمطلوب '+str+')',b:(lv('barracks')?(openG?'وظّف حراساً 💂‍♂️':'طوّر السور 🧱'):'ابنِ الثكنات ⚔️'),a:(lv('barracks')?(openG?"repBld('barracks')":"repBld('wall')"):"repBld('barracks')")};
+  else if(!c.treaties)A.def={p:38,t:'دفاعك قوي 💪 وقّع «🤝 معاهدة تجارة ودفاع مشترك» مع مدينة صديقة لتكسب ذهباً سلمياً كل يوم.',b:'الدبلوماسية 🤝',a:"cityScr('def')"};
+  else A.def={p:8,t:'المدينة آمنة 🛡️ (قوة الدفاع '+c.def+') ومعاهداتك التجارية بتدخل +'+c.bTrade+' عملة يومياً.',b:'الدفاع 🛡️',a:"cityScr('def')"};
+  var top='eco';
+  ['eco','def','res','edu'].forEach(function(k){if(A[k].p>A[top].p)top=k});
+  return {A:A,top:top};
+}
+function repAdvisorHtml(c){
+  var r=repAdvice(c),a=r.A[r.top],m=REP_ADV[r.top];
+  return '<button class="btn adv-guide" onclick="repTutOpen()">❓ إزاي ألعب وأكسب من مدينتي؟ (دليل الجمهورية خطوة بخطوة)'+(S.cityTutDone?'':' 🎁')+'</button>'+
+    '<div class="adv-bar" role="status">'+misterImg('h',40)+
+      '<div class="tx"><b>💡 نصيحة المستشار الآن — '+m.ic+' '+m.n+':</b> '+a.t+'</div>'+
+      (a.a?'<button class="adv-go" onclick="'+a.a+'">'+a.b+'</button>':'')+
+    '</div>'+
+    '<div class="adv-row" aria-label="مجلس المستشارين الأربعة">'+['eco','edu','res','def'].map(function(k){
+      var x=REP_ADV[k];
+      return '<button class="adv-chip'+(r.A[k].p>=70?' al':'')+'" onclick="repCouncil(\''+k+'\')"><span class="i">'+x.ic+'</span><span>مستشار ال'+x.s+'</span></button>';
+    }).join('')+'</div>';
+}
+function repCouncil(focus){
+  var c=repCalc(),r=repAdvice(c),R=rep(),done=REP_TECH.filter(function(t){return R.tech[t.id]}).length;
+  var info={
+    eco:'يتابع الخزينة والضرائب (5% / 12% / 22%) وصادرات المصانع ورصيد العملات.<br>صافي اليوم: <b>+'+c.coins+' 🪙</b> • الضرائب الحالية: <b>'+c.tax.r+'%</b> • رضا الشعب: <b>'+c.appr+'%</b>',
+    edu:'يتابع الأكاديمية والجامعة والمعلمين.<br>🧠 مستوى التعليم: <b>'+c.edu+' / 100</b> = مكافأة <b>+'+(c.edu/10).toFixed(1)+'%</b> على نقاط الترتيب من كل أسئلة الإنجليزي.',
+    res:'يدير «🔬 مركز الأبحاث»: ادفع عملات وجاوب سؤالين إنجليزي لتفتح مباني وقوانين متقدمة.<br>أبحاث مكتملة: <b>'+done+' من '+REP_TECH.length+'</b>',
+    def:'يدير سور المدينة والجيش والمعاهدات مع المدن الأخرى.<br>🛡️ قوة الدفاع: <b>'+c.def+'</b> (قوة أخطر عصابة: '+repRaidBase(R)+') • معاهدات سارية: <b>'+c.treaties+'</b>'
+  };
+  var keys=['eco','edu','res','def'];
+  if(focus&&keys.indexOf(focus)>0){keys.splice(keys.indexOf(focus),1);keys.unshift(focus)}
+  var h='<button class="rep-x" onclick="repModalClose()">✕ إغلاق</button>'+
+    '<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;padding:12px"><h1 style="font-size:19px">🧭 مجلس المستشارين الأربعة</h1><div>كل مستشار بيقولك أحسن خطوة دلوقتي في تخصصه</div></div>';
+  keys.forEach(function(k){
+    var m=REP_ADV[k],a=r.A[k];
+    h+='<div class="card" style="'+(k===r.top?'border-color:#C9973F;border-width:3px':'')+'">'+
+      '<div class="row" style="align-items:flex-start">'+(k==='edu'?misterImg('c',44):'<div style="font-size:34px;line-height:1.1;flex:none">'+m.ic+'</div>')+
+        '<div class="sp"><div style="font-weight:900;font-size:15px">'+m.ic+' '+m.n+(k===r.top?' <span class="sm">• الأولوية الآن</span>':'')+'</div>'+
+        '<div class="sm" style="line-height:1.7;margin-top:2px">'+info[k]+'</div></div></div>'+
+      '<div style="font-size:13.5px;font-weight:800;line-height:1.75;margin-top:8px">💡 '+a.t+'</div>'+
+      (a.a?'<button class="btn t" style="width:100%;margin-top:8px;font-size:14px;min-height:40px;padding:6px" onclick="repModalClose();'+a.a+'">'+a.b+'</button>':'')+
+    '</div>';
+  });
+  h+='<button class="btn" style="font-size:14px;font-family:\'Cairo\',sans-serif;font-weight:900" onclick="repTutOpen()">❓ دليل الجمهورية خطوة بخطوة</button>';
+  repModalOpen(h);
+}
+
+/* ---------- دليل الجمهورية خطوة بخطوة ---------- */
+var REP_TUT=[
+  {ic:'🏗️🌾🏠',t:'الخطوة ١: ابنِ مبانيك على الخريطة 🏗️',d:'القاعدة الذهبية: <b>حل أسئلة إنجليزي ⬅️ اجمع عملات ⬅️ ابنِ مدينتك</b>.<br>اضغط على أي مبنى في الخريطة الحية يفتح لك لوحة التحكم بتاعته، ومنها تبنيه أو تطوّره. ابدأ بـ<b>المزرعة 🌾</b> عشان الغذاء و<b>الحي السكني 🏠</b> عشان عدد السكان.'},
+  {ic:'👨‍🌾👷‍♂️👨‍🏫',t:'الخطوة ٢: وظّف الموظفين والعمال مجاناً بأسئلة الإنجليزي',d:'كل مبنى محتاج موظفين عشان يشتغل بكفاءة 100% (المبنى من غير موظفين إنتاجه صفر!).<br>🤫 <b>السر:</b> اضغط «🎤 مقابلة توظيف» وجاوب <b>سؤال إنجليزي واحد</b> صح = موظف جديد <b>مجاناً</b> ومعاه نقاط ترتيب!'},
+  {ic:'💰😊',t:'الخطوة ٣: اجمع الضرائب وعوائد الخزينة كل يوم 💰',d:'زرار <b>«استلم العائد 🪙»</b> بيديك كل يوم عملات ونقاط ترتيب أسبوعية مجاناً.<br>ومن «📊 الضرائب والاقتصاد» اختار نسبة الضرائب (5% / 12% / 22%): ضرائب أعلى = ذهب أكتر لكن <b>رضا الشعب 😊</b> بيقل، وضرائب أقل = شعب سعيد وسكان بيزيدوا.'},
+  {ic:'🏛️🚨',t:'الخطوة ٤: مجلس الشعب ورادار المطاردات 🏛️🚨',d:'في «🏛️ مجلس الشعب» اعرض قانوناً واكسب <b>مناظرة من 3 أسئلة</b> (إجابتين صح على الأقل)، والقانون يقوّي المدينة كلها 3 أيام.<br>وفي «🚨 رادار اللاعبين» طارد اللصوص أو نفّذ مهمة وظيفتك واكسب جوائز كبيرة!'},
+  {ic:'🔬💧⚙️',t:'الخطوة ٥: مركز الأبحاث والتكنولوجيا 🔬',d:'من «🔬 مركز الأبحاث» ادفع عملات وجاوب <b>سؤالين إنجليزي</b> لتفتح تكنولوجيا جديدة: الزراعة الذكية (+40% غذاء)، الآلات (+50% أرباح المصانع)، التحصينات العسكرية، والدستور المتقدم.'},
+  {ic:'🧱💂‍♂️🤝',t:'الخطوة ٦: السور والجيش والدبلوماسية 🛡️',d:'ابنِ <b>سور المدينة العظيم 🧱</b> ووظّف <b>حراساً 💂‍♂️</b> في الثكنات: لو «🛡️ قوة الدفاع» قوية الغارات بتتصد تلقائياً وتاخد <b>+75 عملة</b>!<br>ووقّع «🤝 معاهدة تجارة ودفاع مشترك» مع مدينة صديقة (3 أسئلة) لتكسب ذهباً كل يوم.'}
+];
+function repTutOpen(i){TUT_I=Math.max(0,Math.min(REP_TUT.length-1,Number(i)||0));repTutShow()}
+function repTutNav(d){TUT_I=Math.max(0,Math.min(REP_TUT.length-1,TUT_I+d));try{tone(d>0?700:520,0,0.07,'triangle',0.1)}catch(e){}repTutShow()}
+function repTutShow(){
+  var s=REP_TUT[TUT_I],n=REP_TUT.length,last=(TUT_I===n-1),first=!S.cityTutDone,dots='',i;
+  for(i=0;i<n;i++)dots+='<i'+(i===TUT_I?' class="on"':'')+'></i>';
+  repModalOpen('<button class="rep-x" onclick="repModalClose()">✕ إغلاق</button>'+
+    '<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;padding:12px"><h1 style="font-size:19px">🧭 دليل الجمهورية خطوة بخطوة</h1><div>مع مستشار الجمهورية — مستر عبدالرحمن</div></div>'+
+    '<div class="tut-dots">'+dots+'</div>'+
+    '<div class="tut-art">'+s.ic+'</div>'+
+    '<div class="card"><div class="tag g">'+s.t+'</div><div class="row" style="align-items:flex-start;margin-top:8px">'+misterImg('c',48)+'<div class="sp tut-step">'+s.d+'</div></div></div>'+
+    '<div class="row" style="gap:8px">'+
+      (TUT_I>0?'<button class="btn t" style="flex:1;font-size:15px" onclick="repTutNav(-1)">➡️ السابق</button>':'')+
+      (last
+        ? '<button class="btn" style="flex:2;font-size:14px;font-family:\'Cairo\',sans-serif;font-weight:900;line-height:1.6;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="repTutDone()">'+(first?'🎉 استلم +100 عملة ذهبية هدية تأسيس الجمهورية':'✅ تمام، يلا نبني!')+'</button>'
+        : '<button class="btn" style="flex:2;font-size:15px" onclick="repTutNav(1)">التالي ⬅️ ('+(TUT_I+1)+'/'+n+')</button>')+
+    '</div>');
+}
+function repTutDone(){
+  var first=!S.cityTutDone;
+  if(first){S.cityTutDone=1;S.coins+=100;save();try{sfxChest()}catch(e){}}
+  repModalClose();
+  if(first)showToast('🎉 +100 عملة ذهبية هدية تأسيس الجمهورية!');
+  if(NAV_ACT==='city')cityScr();
+}
+
+/* ---------- مركز الأبحاث ---------- */
+function repResHtml(c){
+  var R=rep(),done=REP_TECH.filter(function(t){return R.tech[t.id]}).length;
+  var cards=REP_TECH.map(function(t){
+    var on=!!R.tech[t.id];
+    return '<div class="card rep-law'+(on?' on':'')+'">'+
+      '<div class="hdr"><span class="ic">'+t.ic+'</span><div class="sp" style="flex:1"><div style="font-weight:900;font-size:14.5px">'+t.n+' <span class="sm" style="direction:ltr;display:inline-block">('+t.en+')</span></div><div class="sm">'+t.d+'</div></div></div>'+
+      (on
+        ? '<div class="tag g">✅ تم البحث — التأثير مفعّل دائماً</div>'
+        : '<div class="sm" style="font-size:11px">التكلفة: 🪙 '+t.cost+' + اختبار بحثي من سؤالين إنجليزي (مطلوب إجابتان صحيحتان)</div>'+
+          '<button class="btn" style="font-size:14px;min-height:40px;padding:6px" onclick="repResearch(\''+t.id+'\')">🔬 ابدأ البحث</button>')+
+    '</div>';
+  }).join('');
+  return '<div class="card row" style="align-items:flex-start"><div style="font-size:36px;line-height:1.1;flex:none">🔬</div><div class="sp" style="font-size:13px;font-weight:700;line-height:1.7"><b>مستشار الأبحاث والتطوير:</b> كل بحث بيفتح مباني أو قوانين متقدمة وبيدّي مدينتك قوة دائمة. موّل البحث بالعملات ثم اجتز <b>الاختبار البحثي (سؤالان إنجليزي)</b>. لو لم تنجح تسترجع نصف التكلفة وتعيد المحاولة.</div></div>'+
+    '<div class="h-sec">الأبحاث المكتملة: '+done+' من '+REP_TECH.length+'</div>'+
+    '<div class="rep-laws">'+cards+'</div>';
+}
+function repResearch(id){
+  var T=repTech(id),R=rep();
+  if(!T||R.tech[id])return;
+  if(S.coins<T.cost){sfxBad(true);rmsg('محتاج '+T.cost+' عملة لتمويل البحث — جاوب أسئلة أكتر واجمع ذهب!');return}
+  S.coins-=T.cost;save();
+  repQuiz({n:2,ic:'🔬',title:'اختبار بحثي: '+T.n,sub:'جاوب السؤالين صح ليكتمل البحث',
+    end:function(ok){
+      var pass=ok>=2,R2=rep(),back=Math.round(T.cost/2);
+      if(pass){R2.tech[id]=1;addPts(60)}else S.coins+=back;
+      REP_CACHE=null;save();
+      if(pass){submit();sfxWin()}else sfxBad(true);
+      cityScr('res');
+      repModalOpen('<div class="hd" style="background:linear-gradient(135deg,'+(pass?'#2F6B4A,#1B432C':'#7A3B3B,#4A1C1C')+');border-color:#FFD700;padding:12px"><div style="font-size:44px;line-height:1.1">'+T.ic+'</div><h1 style="font-size:19px">'+(pass?'اكتمل البحث ✅':'البحث لم يكتمل ❌')+'</h1><div>'+T.n+'</div></div>'+
+        '<div class="card row">'+misterImg(pass?'c':'h',48)+'<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7">'+(pass?'مبروك! '+T.d+' (+60 نقطة ترتيب 🏆)':'نتيجتك '+ok+' من 2. استرجعت نصف التكلفة ('+back+' عملة) — راجع الأسئلة وأعد المحاولة.')+'</div></div>'+
+        '<button class="btn" style="font-size:16px" onclick="repModalClose()">تمام</button>');
+    }});
+}
+
+/* ---------- الدفاع والدبلوماسية ---------- */
+function repDefPoll(){
+  if(DEF_POLL)return;
+  var tries=0;
+  DEF_POLL=setInterval(function(){
+    tries++;
+    if(PVP_LIST||tries>10){
+      clearInterval(DEF_POLL);DEF_POLL=0;
+      if(PVP_LIST&&REP_TAB==='def'&&document.getElementById('repDefBox')&&!document.getElementById('repModal'))cityScr('def');
+    }
+  },700);
+}
+function repDefHtml(c){
+  var R=rep(),d=cDay(),str=repRaidBase(R),strong=c.def>=str,wl=R.lv.wall||0,bl=R.lv.barracks||0;
+  function kv(l,v){return '<div class="rep-kv"><span class="sp">'+l+'</span><b>'+v+'</b></div>'}
+  var col=strong?'#2F6B4A':(c.def>=str*0.6?'#C9973F':'#B23A3A');
+  function brow(id){
+    var b=repB(id),l=repLv(id),tb=repTechBlock(id,l);
+    return '<button class="rep-row" onclick="repBld(\''+id+'\')"><span class="ic">'+(l?repIcon(b,l):'🚧')+'</span><span class="sp"><span class="t">'+b.n+'</span><br><span class="s">'+(l?'مستوى '+l+'/5 • '+repBldOut(id,c):(tb?'🔒 يحتاج بحث التحصينات العسكرية':'غير مبني — '+repCost(id)+' 🪙'))+'</span></span><span class="sm">'+(l?'⬆️':'ابنِ')+'</span></button>';
+  }
+  var log=(R.raidLog||[]).slice(0,4).map(function(x){
+    return '<div class="rep-kv"><span class="sp">'+(x.ok?'🛡️ ':'🚨 ')+dTxt(x.d)+' — '+(x.pvp?'غارة لاعب':'عصابة لصوص')+' (قوتها '+x.s+' ضد دفاعك '+x.f+')</span><b style="color:'+(x.ok?'#2F6B4A':'#B23A3A')+'">'+(x.ok?'صُدّت +75 🪙':(x.hit?'−30% خزينة':'لم تُصد'))+'</b></div>';
+  }).join('');
+  var act=(R.tr||[]).filter(function(t){return t&&t.end>d});
+  var trRows=act.map(function(t){return kv('🤝 معاهدة مع «'+esc(t.n)+'» • باقي '+(t.end-d)+' يوم','+'+repTreatyGold(t)+' 🪙/يوم')}).join('');
+  var src=(PVP_LIST&&PVP_LIST.length)?PVP_LIST:FALLBACK_PLAYERS;
+  var cand=src.filter(function(p){return p&&p.id&&p.name&&!act.some(function(t){return t.id===p.id})}).slice(0,5);
+  window.CUR_TR_LIST=cand;
+  if(!PVP_LIST){setTimeout(loadPvpPlayers,20);repDefPoll()}
+  var canSign=act.length<REP_TR_MAX;
+  var candRows=cand.map(function(p,i){
+    var pr=roleInfo(p.role);
+    return '<div class="rep-row" style="cursor:default"><span class="ic">'+pr.ic+'</span><span class="sp"><span class="t">'+esc(p.name)+'</span><br><span class="s">🏙️ مدينة مستوى '+(p.cLv||5)+' • ذهب المعاهدة: +'+repTreatyGold({lv:p.cLv})+' 🪙/يوم</span></span>'+
+      (canSign?'<button class="btn" style="font-size:12px;min-height:36px;padding:4px 10px;white-space:nowrap" onclick="repTreaty('+i+')">🤝 وقّع معاهدة</button>':'')+'</div>';
+  }).join('');
+  return '<div id="repDefBox" class="rep-grid2"><div style="display:flex;flex-direction:column;gap:12px">'+
+    '<div class="card"><div class="tag" style="background:#4A5568">🛡️ مؤشر الحماية والجيش (Defense Power)</div>'+
+      '<div class="row" style="margin-top:8px"><div class="big" style="font-size:34px;color:'+col+'">'+c.def+'</div><div class="sp"><div class="bar"><i style="width:'+c.def+'%;background:'+col+'"></i></div><div class="sm" style="margin-top:3px">'+(strong?'✅ دفاعك أقوى من أخطر عصابة (قوتها حوالي '+str+'): الغارات تُصد تلقائياً وتكسب +75 عملة عن كل غارة.':'⚠️ دفاعات المدينة ضعيفة! أخطر عصابة قوتها حوالي '+str+' — طوّر السور أو وظّف حراساً لحماية خزينتك.')+'</div></div></div>'+
+      '<div style="margin-top:6px">'+
+        kv('🧱 سور المدينة (مستوى '+wl+' × 12)','+'+(wl*12))+
+        kv('💂‍♂️ الحراس والجنود ('+c.guards+' × 5)','+'+(bl?c.guards*5:0))+
+        kv('🚓 الشرطة ومؤشر الأمن ('+c.sec+')','+'+Math.round(c.sec*0.15))+
+        (repLawOn('natdef')?kv('📜 قانون الدفاع الوطني','+25'):'')+
+        (c.treaties?kv('🤝 معاهدات الدفاع المشترك ('+c.treaties+' × 4)','+'+(c.treaties*4)):'')+
+        (S.role==='general'?kv('🎖️ هيبة الجنرال الملكي','+10'):'')+
+      '</div></div>'+
+    '<div class="rep-sec"><div class="tag" style="background:#4A5568">🧱⚔️ منشآت الدفاع</div>'+brow('wall')+brow('barracks')+'</div>'+
+    '<div class="card"><div class="tag">📜 سجل الغارات</div><div style="margin-top:6px">'+(log||'<div class="sm" style="text-align:center;line-height:1.8">لا توجد غارات مسجلة بعد. عصابات اللصوص بتهاجم المدن الكبيرة من وقت للتاني — جهّز دفاعك!</div>')+'</div>'+
+      '<div class="sm" style="margin-top:6px;font-size:11px;line-height:1.7">لو الغارة نجحت بيضيع 30% من عائد خزينة نفس اليوم فقط (رصيد عملاتك نفسه في أمان).</div></div>'+
+  '</div><div style="display:flex;flex-direction:column;gap:12px">'+
+    '<div class="card row" style="align-items:flex-start"><div style="font-size:34px;line-height:1.1;flex:none">🕊️</div><div class="sp" style="font-size:13px;font-weight:700;line-height:1.7"><b>المستشار الدبلوماسي:</b> وقّع «معاهدة تجارة ودفاع مشترك» مع مدينة لاعب آخر بحل <b>3 أسئلة دبلوماسية</b> (إجابتان صحيحتان على الأقل). المعاهدة تسري '+REP_TR_DAYS+' أيام، تدر ذهباً يومياً في الخزينة وتزيد دفاعك +4.</div></div>'+
+    '<div class="card"><div class="tag g">🤝 المعاهدات السارية: '+act.length+' من '+REP_TR_MAX+'</div><div style="margin-top:6px">'+(trRows||'<div class="sm" style="text-align:center">لا توجد معاهدات سارية — اختر مدينة من القائمة ووقّع أول معاهدة.</div>')+'</div></div>'+
+    '<div class="rep-sec"><div class="tag">🌍 مدن متاحة للتفاوض</div>'+(candRows||'<div class="sm" style="text-align:center">بنحمّل قائمة المدن...</div>')+
+      (canSign?'':'<div class="sm" style="text-align:center">وصلت للحد الأقصى من المعاهدات السارية.</div>')+'</div>'+
+  '</div></div>';
+}
+function repTreaty(idx){
+  var R=rep(),d=cDay(),p=(window.CUR_TR_LIST||[])[idx];
+  if(!p)return;
+  var act=(R.tr||[]).filter(function(t){return t&&t.end>d});
+  if(act.length>=REP_TR_MAX){sfxBad(true);rmsg('وصلت للحد الأقصى ('+REP_TR_MAX+') من المعاهدات السارية');return}
+  if(act.some(function(t){return t.id===p.id})){rmsg('عندك معاهدة سارية مع المدينة دي بالفعل');return}
+  var nm=String(p.name||'مدينة صديقة').slice(0,20);
+  repQuiz({n:3,ic:'🤝',title:'مفاوضات المعاهدة',sub:'مع مدينة «'+esc(nm)+'» — تحتاج إجابتين صحيحتين على الأقل لتوقيع المعاهدة',
+    end:function(ok){
+      var pass=ok>=2,R2=rep(),gold=repTreatyGold({lv:p.cLv});
+      if(pass){R2.tr=(R2.tr||[]).filter(function(t){return t&&t.end>cDay()});R2.tr.push({id:String(p.id).slice(0,40),n:nm,lv:Math.max(1,Math.min(18,Number(p.cLv)||5)),end:cDay()+REP_TR_DAYS});addPts(50)}
+      REP_CACHE=null;save();
+      if(pass){submit();sfxWin()}else sfxBad(true);
+      cityScr('def');
+      repModalOpen('<div class="hd" style="background:linear-gradient(135deg,'+(pass?'#2F6B4A,#1B432C':'#7A3B3B,#4A1C1C')+');border-color:#FFD700;padding:12px"><div style="font-size:44px;line-height:1.1">'+(pass?'🤝':'📄')+'</div><h1 style="font-size:19px">'+(pass?'تم توقيع المعاهدة ✅':'فشلت المفاوضات ❌')+'</h1><div>مدينة «'+esc(nm)+'»</div></div>'+
+        '<div class="card row">'+misterImg(pass?'c':'h',48)+'<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7">'+(pass?'معاهدة تجارة ودفاع مشترك لمدة '+REP_TR_DAYS+' أيام: +'+gold+' عملة يومياً في خزينتك و+4 لقوة الدفاع (+50 نقطة ترتيب 🏆).':'نتيجتك '+ok+' من 3. الدبلوماسية محتاجة إجابتين صح على الأقل — جرّب تاني!')+'</div></div>'+
+        '<button class="btn" style="font-size:16px" onclick="repModalClose()">تمام</button>');
+    }});
+}
+
 
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():(!S.nick?nickReq():home()));if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
 setupManifest();setupSW();updNet();updInstallBtn();syncMode();renderSide();if(isOnline()&&S.pendSync)setTimeout(flushSync,4000);
