@@ -758,14 +758,9 @@ body.dark.th-galaxy .lw,body.dark.th-galaxy .les-row,body.dark.th-galaxy .cap-ex
 #toast{max-width:92vw;white-space:normal;text-align:center;line-height:1.6;box-sizing:border-box}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -778,6 +773,7 @@ window.FIREBASE_CONFIG = {
   <div class="tb-brand">🏆 <b>تحدّي الأصحاب</b> <small>Grammora &amp; EngliFocus</small></div>
   <span id="netBadge" class="net" role="status" aria-live="polite">🟢 متصل</span>
   <span class="sp"></span>
+  <button id="topPtsBtn" class="tb-pill" onclick="board()" title="نقاط ترتيبك الأسبوعي (اضغط لفتح لوحة الترتيب)">🏆 <span id="topPtsVal">0</span><span class="lg"> نقطة</span></button>
   <button id="thBtn" class="tb-pill" onclick="cycleUiTheme()" aria-label="تغيير المظهر">🎨 <span>المظهر</span><span class="lg" id="thLbl" style="display:none"></span></button>
   <button id="insBtn" class="tb-pill" style="display:none" onclick="installApp()" aria-label="تثبيت المنصة على جهازك">📲 <span>تثبيت</span><span class="lg">المنصة على جهازك</span></button>
 </header>
@@ -877,7 +873,34 @@ function wkKey(){return Math.floor((cDay()-2)/7)}
 function dTxt(dn){var t=new Date(dn*864e5);return DN[t.getUTCDay()]+' '+t.getUTCDate()+'/'+(t.getUTCMonth()+1)}
 function wkRange(k){return'من '+dTxt(7*k+2)+' إلى '+dTxt(7*k+8)}
 function wkPts(){return(S.wk&&S.wk.k===wkKey())?S.wk.p:0}
-function addPts(n){var k=wkKey();if(!S.wk||S.wk.k!==k)S.wk={k:k,p:0};S.wk.p+=n;save()}
+var SYNC_TMR=0;
+function effNick(){return (S.nick&&S.nick.trim())?S.nick.trim():('بطل '+String(S.uid||'').slice(0,4))}
+function updTopPts(delta){
+  var el=document.getElementById('topPtsVal'),btn=document.getElementById('topPtsBtn');
+  if(el)el.textContent=wkPts();
+  if(btn&&delta>0){btn.classList.remove('cn-pop');void btn.offsetWidth;btn.classList.add('cn-pop')}
+}
+function scheduleCloudSync(){
+  clearTimeout(SYNC_TMR);
+  SYNC_TMR=setTimeout(function(){
+    if(typeof isOnline==='function'&&!isOnline()){S.pendSync=1;save();return}
+    submitP();
+  },3000);
+}
+function addPts(n){
+  n=Math.round(Number(n)||0);
+  if(!n)return;
+  var k=wkKey();
+  if(!S.wk||S.wk.k!==k){
+    if(S.wk&&S.wk.p>0)S.prevWk={k:S.wk.k,p:S.wk.p};
+    S.wk={k:k,p:0};
+  }
+  S.wk.p=Math.max(0,(S.wk.p||0)+n);
+  LBD=null;LLB=0;
+  save();
+  updTopPts(n);
+  scheduleCloudSync();
+}
 var GP=['الأول الابتدائي','الثاني الابتدائي','الثالث الابتدائي','الرابع الابتدائي','الخامس الابتدائي','السادس الابتدائي'],GM=['الأول الإعدادي','الثاني الإعدادي','الثالث الإعدادي'],GS=['الأول الثانوي (بكالوريا)','الثاني الثانوي (بكالوريا)','الثالث الثانوي (بكالوريا)'];
 function stgArr(st){st=st||S.stage;return st==='p'?GP:(st==='s'?GS:GM)}
 function stgLbl(st){st=st||S.stage;return st==='p'?'ابتدائي':(st==='s'?'ثانوي (بكالوريا)':'إعدادي')}
@@ -885,13 +908,13 @@ function stgFullLbl(st){st=st||S.stage;return st==='p'?'المرحلة الاب�
 function gName(g,st){g=g||S.grade;return stgArr(st)[g-1]||''}
 function gId(k,g){return wkId(k)+'g'+(g||S.grade)}
 function logDelta(){
-  if(!window.FB||!FB.log||!S.uid||!S.nick)return;
-  var k=wkId(wkKey()),pt=wkPts(),now=Date.now();
+  if(!window.FB||!FB.log||!S.uid)return;
+  var nk=effNick(),k=wkId(wkKey()),pt=wkPts(),now=Date.now();
   if(!S.ls||S.ls.w!==k){S.ls={w:k,p:pt,t:now};save();return}
   var d=pt-S.ls.p;if(d===0)return;
   var sec=Math.min(7200,Math.round((now-S.ls.t)/1000)),r=Math.min(1000,S.nr||0);
   S.ls.p=pt;S.ls.t=now;S.nr=0;save();
-  while(d!==0){var c=Math.max(-5000,Math.min(5000,d));d-=c;try{FB.log({u:S.uid,n:S.nick,w:k,g:c,sec:sec,r:r}).catch(function(){})}catch(e){}sec=0;r=0}
+  while(d!==0){var c=Math.max(-5000,Math.min(5000,d));d-=c;try{FB.log({u:S.uid,n:nk,w:k,g:c,sec:sec,r:r}).catch(function(){})}catch(e){}sec=0;r=0}
 }
 function adjP(){
   if(!window.FB||!FB.adjGet||!S.uid)return Promise.resolve();
@@ -899,7 +922,8 @@ function adjP(){
     var t=d&&d.t&&d.t.toMillis?d.t.toMillis():0;
     if(!d||d.w!==wkId(wkKey())||t<=(S.adjT||0))return;
     S.adjT=t;
-    if(wkPts()>d.p){S.wk.p=d.p;S.ls={w:d.w,p:d.p,t:Date.now()}}
+    if(d.forceReset===true&&wkPts()>d.p){S.wk.p=d.p;S.ls={w:d.w,p:d.p,t:Date.now()}}
+    else if(d.bonusPts>0){addPts(d.bonusPts)}
     save();
   }).catch(function(){});
 }
@@ -907,16 +931,18 @@ function dcId(d){return 'dc_'+(d||cDay())+(S.stage==='p'?'p':(S.stage==='s'?'s':
 function svId(k){return 'sv_'+wkId(k||wkKey())}
 function dcPts(){return (S.dc&&S.dc.d===cDay())?(S.dc.pts||0):0}
 function submitP(){
-  if(!window.FB||!S.nick)return Promise.resolve();
+  if(!window.FB||!S.uid)return Promise.resolve();
+  var nk=effNick();
+  LBD=null;LLB=0;
   return adjP().then(function(){
     logDelta();
     var w=wkKey(),pt=wkPts(),a=[];
     try{
       var mta={role:pubRole(),cLv:cityTotalLv(),pLv:bldLv('police')};
-      a.push(FB.submit(wkId(w),S.uid,S.nick,pt,mta));
-      if(S.grade)a.push(FB.submit(gId(w),S.uid,S.nick,pt,mta));
-      if(S.survBest>0)a.push(FB.submit(svId(w),S.uid,S.nick,S.survBest));
-      if(dcPts()>0)a.push(FB.submit(dcId(cDay()),S.uid,S.nick,dcPts()));
+      a.push(FB.submit(wkId(w),S.uid,nk,pt,mta));
+      if(S.grade)a.push(FB.submit(gId(w),S.uid,nk,pt,mta));
+      if(S.survBest>0)a.push(FB.submit(svId(w),S.uid,nk,S.survBest));
+      if(dcPts()>0)a.push(FB.submit(dcId(cDay()),S.uid,nk,dcPts()));
     }catch(e){}
     return Promise.all(a.map(function(x){return x.catch(function(){})}));
   });
@@ -947,18 +973,17 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v8.0',
-  title:'تحديث الجمهورية الكبرى والوحوش الأسطورية! 🐉🛡️',
-  sub:'الإصدار الثامن (v8.0)',
-  gift:150,
-  intro:'أهلاً بيك يا بطل في أكبر تحديث لمنصة «تحدّي الأصحاب»! نقاطك بقت بكامل قوتها، ومدينتك بقى ليها جيش وسور ومجلس مستشارين:',
+  ver:'v9.5',
+  title:'هدية وتعويض ملكي لكل أبطال المنصة! 🎁🏆',
+  sub:'الإصدار التاسع المطور (v9.5) — تحديث فوري للترتيب',
+  gift:1000,
+  giftPts:1500,
+  intro:'تقديراً لكل بطل بيلعب ويجتهد في «تحدّي الأصحاب»، جهزنا لك هدية تعويض ملكية ضخمة وتحديثاً فورياً للترتيب:',
   items:[
-    {ic:'💯',t:'نقاطك ١٠٠٪ طوال اليوم + الصندوق الذهبي',d:'مفيش أي خصم على نقاط الترتيب بعد النهاردة! وكل 2500 نقطة في اليوم تفتح صندوق ذهبي (+200 عملة و+200 نقطة). والشراء من المتجر مش بينقص ولا نقطة من ترتيبك.'},
-    {ic:'🐉',t:'وحوش أسطورية متحركة ومشهد سحق الزعيم',d:'8 وحوش جديدة بتتنفس وعينيها بتنوّر: وحش الغابة، تنين الجليد، فارس الظلام، إمبراطور الوحوش.. ولما تهزم الزعيم بينفجر عملات ذهبية!'},
-    {ic:'🧭',t:'مجلس المستشارين الأربعة ودليل الجمهورية',d:'4 مستشارين (اقتصاد، تعليم، أبحاث، دفاع) بيقولوا لك أحسن خطوة دلوقتي، ودليل خطوة بخطوة بهدية +100 عملة.'},
-    {ic:'🛡️',t:'مركز الأبحاث وسور المدينة والجيش',d:'ابحث تكنولوجيا جديدة بأسئلة الإنجليزي، ابنِ سور المدينة العظيم ووظّف حراساً يصدوا غارات اللصوص، ووقّع معاهدات تجارية تدخل ذهب كل يوم.'},
-    {ic:'⚖️',t:'عدل الدرجات وتقرير الشفافية لولي الأمر',d:'السؤال اللي تحله بمساعدة أو بالمرافق بياخد نص الدرجة، وتقرير ولي الأمر بيوضح نسبة حلّك بمجهودك وتصحيحك لأخطائك.'},
-    {ic:'🔑',t:'صندوق الكنز الملكي وعدّاد القلوب',d:'القلوب بتتشحن بعد ساعتين أو فوراً بكود هدية، وكل ما تجمع أكواد أكتر تفتح كنوز: إطار VIP ذهبي وشخصية الجنرال الملكي السرية!'}
+    {ic:'🎁',t:'هدية تعويض فورية للجميع: +1500 نقطة ترتيب و+1000 عملة!',d:'بمجرد ضغطك على زر الاستلام بالأسفل، هيزيد رصيدك فوراً +1500 نقطة في الترتيب الأسبوعي و+1000 عملة ذهبية وشحن كامل للقلوب (3/3 ❤️)!'},
+    {ic:'⚡',t:'مزامنة لحظية لنقاط الترتيب مع كل إجابة صحيحة',d:'تم تطوير نظام احتساب النقاط ليحفظ نقاطك ويرفعها للترتيب فور إجابتك على أي سؤال في أي نمط لعب، مع عداد حي لنقاط الأسبوع في أعلى الشاشة!'},
+    {ic:'🎥',t:'ركن الشرح وقراءة الكلمات بصوت مستر عبدالرحمن',d:'اسمع نطق كلمات كل وحدة بصوت المستر، راجع برشامة القاعدة، واضغط على أي كلمة في القصص والقطع لتنطق وتترجم فوراً!'},
+    {ic:'🔑',t:'كود تعويض إضافي في صندوق الهدايا (HERO2000)',d:'تقدر كمان تدخل صندوق الهدايا وتكتب كود HERO2000 أو GIFT1000 لو حابب تضاعف نقاطك وعملاتك!'}
   ]
 };
 function checkWhatsNew(){
@@ -990,8 +1015,8 @@ function showWhatsNew(manual){
       '<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">'+APP_UPDATE.intro+'</div>'+
     '</div>'+
     itemsHtml+
-    (isNew&&APP_UPDATE.gift>0?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;font-size:14px;padding:8px">🎁 هدية التحديث الجديد: +'+APP_UPDATE.gift+' عملة ذهبية مجانية!</div>':'')+
-    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="closeWhatsNew(1)">'+(isNew&&APP_UPDATE.gift>0?'🎉 استلم الهدية واستكشف التحديث!':'🚀 تمام، يلا نلعب!')+'</button>'+
+    (isNew&&APP_UPDATE.gift>0?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;font-size:14px;padding:10px;line-height:1.7">🎁 هدية وتعويض هذا التحديث:<br>🪙 <b>+'+APP_UPDATE.gift+' عملة ذهبية</b> + 🏆 <b>+'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب أسبوعي</b> + ❤️ <b>شحن 3 قلوب</b>!</div>':'')+
+    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="closeWhatsNew(1)">'+(isNew&&APP_UPDATE.gift>0?'🎉 استلم +1500 نقطة و+1000 عملة الآن!':'🚀 تمام، يلا نلعب!')+'</button>'+
   '</div>';
   document.body.appendChild(ov);
 }
@@ -1000,9 +1025,11 @@ function closeWhatsNew(goCity){
   if(isNew){
     S.ver=APP_UPDATE.ver;
     if(APP_UPDATE.gift>0){S.coins+=(APP_UPDATE.gift||0)}
-    save();
-    sfxCoins();
-    if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+APP_UPDATE.gift+' عملة هدية التحديث الجديد!');
+    if(APP_UPDATE.giftPts>0){addPts(APP_UPDATE.giftPts||0)}
+    S.dhp=3;S.hpWaitUntil=0;
+    save();submit();
+    try{sfxChest()}catch(e){}
+    if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب و+'+APP_UPDATE.gift+' عملة ذهبية و3 قلوب!');
   }
   var el=document.getElementById('wnModal');
   if(el&&el.parentNode)el.parentNode.removeChild(el);
@@ -1144,8 +1171,14 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
     homeSummaryCard()+
   '</div>'+
 
-  /* v8: صندوق الأكواد الملكي + القاعدة الذهبية */
-  vaultHtml(true)+goldRuleHtml()+
+  /* v9.5: صندوق الأكواد الملكي وخطة اللعب في شريط أنيق قابل للطي لمنع الزحام على الموبايل */
+  '<details class="card rep-det" style="padding:10px 12px;border-color:#C9973F;background:linear-gradient(135deg,#FFFDF5,#FCE8B2)">'+
+    '<summary style="color:#7A3B3B;display:flex;align-items:center;justify-content:space-between;gap:8px">'+
+      '<span>🔑 خزنة الأكواد الملكية ('+(S.gifts||[]).length+') وخطة الصدارة الذهبية</span>'+
+      '<span class="sm" style="background:#7A3B3B;color:#FFE9B8;padding:1px 8px;border-radius:8px;font-size:11px">اضغط للعرض ▾</span>'+
+    '</summary>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">'+vaultHtml(true)+goldRuleHtml()+'</div>'+
+  '</details>'+
 
   /* Smart pet companion (phones only — sidebar on larger screens) */
   '<div class="only-m">'+homePetCard()+'</div>'+
@@ -1892,7 +1925,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
     var mySV=S.survBest||0;
     topInfoCard='<div class="card" style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:#D9742B;line-height:1.8;font-size:14px"><div class="tag" style="background:#B23A3A">⏱️ ترتيب أبطال النجاة (60 ثانية)</div><div style="margin-top:6px">أقوى وأسرع أبطال جاوبوا أكبر عدد من الأسئلة الصح في تحدي النجاة هذا الأسبوع!<br>أعلى رقم قياسي ليك: <b>'+mySV+' إجابة صح 🔥</b></div><button class="btn" style="width:100%;margin-top:8px;font-size:15px;min-height:40px;background:linear-gradient(135deg,#B23A3A,#6B1D1D)" onclick="survIntro()">🚀 العب تحدي النجاة واكسر رقمك!</button></div>';
   }else{
-    topInfoCard='<div class="card" style="line-height:1.9;font-size:14px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+' • <b>'+leftTxt()+'</b></div>'+
+    topInfoCard='<div class="card" style="line-height:1.9;font-size:14px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+' • <b>'+leftTxt()+'</b><br><span class="sm">📢 ملاحظة: الترتيب الأسبوعي يبدأ دورة جديدة كل يوم سبت (مع حفظ أبطال الأسبوع الماضي بالأسفل)، وكل إجابة صحيحة تزيد نقاطك فوراً!</span></div>'+
     '<div class="card"><div class="tag">جايزة أبطال الأسبوع (أول 3 مراكز)</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب البطل 🥇 • التاني: 100 🥈 • التالت: 50 🥉<br><b>+ شهادة تقدير رسمية من مستر عبدالرحمن لأول 3 أوائل للتحميل والمشاركة على واتساب!</b></div>'+(S.cert?'<button class="btn" style="width:100%;margin-top:8px;font-size:15px" onclick="certScr()">🎓 عرض وتحميل شهادة التقدير</button>':'')+'</div>'+
     '<div class="card"><div style="text-align:center;margin-bottom:8px"><span class="lg-badge" style="background:'+LG[li].c+'">'+lgIcon(li,20)+' دوريك الحالي: الدوري ال'+LG[li].n+'</span></div><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>'+
     '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border-color:#2F5F5A;font-size:13.5px;font-weight:700;line-height:1.9"><b>🚀 كل نشاط بيضيف 100% من نقاطه لترتيبك الأسبوعي!</b><br>جولات الخريطة 🗺️ • تحدي النجاة ⏱️ • الحلبة اليومية 🎯 • انطق واضرب الوحش 🎙️ • محقق القطعة 🕵️ • بناء المدينة 🏙️<br><span class="sm">والشراء من المتجر مش بينقص ولا نقطة من ترتيبك.</span></div>';
@@ -2877,7 +2910,9 @@ var PROMO_CODES={
   'QUIZ100':{t:'مكافأة التحدي السريع ⚡',c:120,p:100,h:0,pw:{time:1},m:'برافو عليك! 120 عملة و100 نقطة و+5 ثواني إضافية عشان تكسر الدنيا.'},
   'SUPERSTAR':{t:'صندوق التميز الذهبي 👑',c:250,p:200,h:2,pw:{sc:1},m:'أنت نجم حقيقي! خدت الفرصة التانية + 250 عملة + 200 نقطة ترتيب.'},
   'FRIDAY':{t:'هدية جمعة الأبطال المسائية 🔥',c:180,p:150,h:1,pw:{fifty:1,time:1},ws:1,m:'فرصتك الأخيرة قبل التصفير الأسبوعي! انطلق دلوقتي للمراكز التلاتة الأولى.'},
-  'CHAMPION':{t:'كنز أبطال مستر عبدالرحمن 🏆',c:300,p:250,h:3,pw:{fifty:1,time:1,sc:1},m:'مفاجأة كبرى! خدت الباقة الكاملة (300 عملة + 250 نقطة + 3 قلوب + كل المساعدات)!'}
+  'CHAMPION':{t:'كنز أبطال مستر عبدالرحمن 🏆',c:300,p:250,h:3,pw:{fifty:1,time:1,sc:1},m:'مفاجأة كبرى! خدت الباقة الكاملة (300 عملة + 250 نقطة + 3 قلوب + كل المساعدات)!'},
+  'HERO2000':{t:'التعويض الملكي الكبير للأبطال 👑🔥',c:1500,p:2000,h:3,pw:{fifty:2,time:2,sc:1},m:'هدية خاصة من مستر عبدالرحمن لتعويض الأبطال: +2000 نقطة في ترتيب الأسبوع و+1500 عملة ذهبية و3 قلوب وكل المساعدات!'},
+  'GIFT1000':{t:'صندوق الألف نقطة الذهبي 🎁⚡',c:1000,p:1000,h:3,pw:{fifty:1,time:1},m:'ألف مبروك يا بطل! +1000 نقطة ترتيب أسبوعي و+1000 عملة ذهبية وشحن كامل للقلوب!'}
 };
 var GIFT_HISTORY_NAMES={
   'GRAMMORA':'هدية منصة Grammora 🌟',
@@ -2887,7 +2922,9 @@ var GIFT_HISTORY_NAMES={
   'QUIZ100':'مكافأة التحدي السريع ⚡',
   'SUPERSTAR':'صندوق التميز الذهبي 👑',
   'FRIDAY':'هدية جمعة الأبطال 🔥',
-  'CHAMPION':'كنز أبطال المستر 🏆'
+  'CHAMPION':'كنز أبطال المستر 🏆',
+  'HERO2000':'التعويض الملكي (+2000 نقطة) 👑',
+  'GIFT1000':'صندوق الألف نقطة الذهبي 🎁'
 };
 function giftKey(code,obj){
   return obj&&obj.ws ? (code+'_w'+wkKey()) : code;
@@ -7410,6 +7447,68 @@ function tYtDel(k){
   if(!T_AUTH||!S.ytLinks||!S.ytLinks[k])return;
   delete S.ytLinks[k];save();tYtScr();tYtCloud(k,null);
 }
+function tGiftBroadcastScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var gid='g_'+wkKey()+'_'+(cDay()%7);
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#C9973F,#7A4E12);border-color:#FFD700"><h1>إرسال هدية نقاط جماعية للطلاب 🎁🏆</h1><div>عوّض طلابك أو كافئهم برابط مباشر يزود نقاطهم وعملاتهم فوراً!</div></div>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="tag g">١. إعداد رابط الهدية المباشر</div>'+
+      '<div class="sm">عدد نقاط الترتيب الأسبوعي في الهدية:</div>'+
+      '<input id="gbPts" type="number" class="inp" value="1500" style="font-size:20px;direction:ltr">'+
+      '<div class="sm">عدد العملات الذهبية في الهدية:</div>'+
+      '<input id="gbCoins" type="number" class="inp" value="1000" style="font-size:20px;direction:ltr">'+
+      '<div class="sm">كود تعريف الهدية (لمنع تكرار استلام نفس الرابط مرتين):</div>'+
+      '<input id="gbId" class="inp" value="'+gid+'" style="font-size:16px;direction:ltr">'+
+      '<button class="btn" style="font-size:17px;background:#1E7E48;margin-top:6px" onclick="sendGiftBroadcastWA()">📲 إرسال رابط الهدية على جروب واتساب</button>'+
+      '<button class="btn t" style="font-size:15px" onclick="copyGiftBroadcastLink()">📋 نسخ رابط الهدية المباشر</button>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.8;font-size:13.5px">'+
+      '<div class="tag">٢. أكواد التعويض الجاهزة في صندوق الهدايا 🔑</div>'+
+      'يقدر أي طالب يفتح <b>«🎁 كود هدية»</b> ويكتب أحد هذه الأكواد:<br>'+
+      '• الكود <b style="color:#7A3B3B;direction:ltr;display:inline-block">HERO2000</b> ⬅️ يمنح <b>+2000 نقطة ترتيب و+1500 عملة و3 قلوب</b>!<br>'+
+      '• الكود <b style="color:#7A3B3B;direction:ltr;display:inline-block">GIFT1000</b> ⬅️ يمنح <b>+1000 نقطة ترتيب و+1000 عملة و3 قلوب</b>!'+
+    '</div>'+
+    '<button class="btn t" onclick="tPanelScr()">رجوع للوحة المستر</button>';
+}
+function makeGiftBroadcastUrl(){
+  var pts=Math.max(50,Math.min(10000,Number(document.getElementById('gbPts')&&document.getElementById('gbPts').value)||1500));
+  var cns=Math.max(50,Math.min(10000,Number(document.getElementById('gbCoins')&&document.getElementById('gbCoins').value)||1000));
+  var gid=String((document.getElementById('gbId')&&document.getElementById('gbId').value)||('g_'+cDay())).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,20)||'g1';
+  var base=location.href.split('?')[0].split('#')[0];
+  return {url:base+'?giftpts='+pts+'&giftcoins='+cns+'&gid='+gid,pts:pts,cns:cns,gid:gid};
+}
+function sendGiftBroadcastWA(){
+  var o=makeGiftBroadcastUrl();
+  var txt='🎁 *هدية ومكافأة خاصة من مستر عبدالرحمن حسانين لكل أبطال تحدّي الأصحاب!* 🏆\n\n'+
+    'اضغط على الرابط التالي لاستلام *+'+o.pts+' نقطة في الترتيب الأسبوعي* و*+'+o.cns+' عملة ذهبية* وشحن كامل للقلوب فوراً:\n'+o.url+'\n\n'+
+    '🔑 أو افتح (صندوق الهدايا 🎁) داخل المنصة واكتب الكود: *HERO2000*';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+function copyGiftBroadcastLink(){
+  var o=makeGiftBroadcastUrl();
+  try{navigator.clipboard.writeText(o.url).then(function(){ding();rmsg('تم نسخ رابط الهدية المباشر! 🎁')})}catch(e){rmsg(o.url)}
+}
+function checkUrlGiftLink(){
+  try{
+    var sp=new URLSearchParams(location.search);
+    var gp=Number(sp.get('giftpts'))||0,gc=Number(sp.get('giftcoins'))||0,gid=sp.get('gid')||'';
+    if(gp<=0&&gc<=0)return;
+    var key='urlgift_'+(gid||(gp+'_'+gc+'_'+wkKey()));
+    S.gifts=S.gifts||[];
+    if(S.gifts.indexOf(key)>=0)return;
+    S.gifts.push(key);
+    var pts=Math.min(10000,Math.max(0,gp)),cns=Math.min(10000,Math.max(0,gc));
+    if(cns>0)S.coins+=cns;
+    if(pts>0)addPts(pts);
+    S.dhp=3;S.hpWaitUntil=0;
+    save();submit();
+    setTimeout(function(){
+      try{sfxChest()}catch(e){}
+      showToast('🎉 هدية مستر عبدالرحمن وصلت! +'+pts+' نقطة ترتيب و+'+cns+' عملة ذهبية!');
+    },600);
+  }catch(e){}
+}
 var _tPanelScr9=tPanelScr;
 tPanelScr=function(){
   _tPanelScr9();
@@ -7417,7 +7516,8 @@ tPanelScr=function(){
     if(!T_AUTH)return;
     var sp=null,ch=app.children,ci;
     for(ci=0;ci<ch.length;ci++){if(ch[ci].classList&&ch[ci].classList.contains('sp')){sp=ch[ci];break}}
-    var h='<button class="btn" style="font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="tYtScr()">🎥 ربط فيديوهات اليوتيوب بالوحدات</button>';
+    var h='<button class="btn" style="font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="tYtScr()">🎥 ربط فيديوهات اليوتيوب بالوحدات</button>'+
+          '<button class="btn" style="font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="tGiftBroadcastScr()">🎁 إرسال هدية نقاط جماعية للطلاب (تعويض ومكافأة)</button>';
     if(sp)sp.insertAdjacentHTML('beforebegin',h);else app.insertAdjacentHTML('beforeend',h);
     lesPull(true);
   }catch(e){}
@@ -7426,7 +7526,7 @@ var _onFB9=window.onFB;
 window.onFB=function(){if(_onFB9)_onFB9();setTimeout(function(){lesPull()},2500)};
 
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():(!S.nick?nickReq():home()));if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
-setupManifest();setupSW();updNet();updInstallBtn();syncMode();renderSide();if(isOnline()&&S.pendSync)setTimeout(flushSync,4000);
+setupManifest();setupSW();updNet();updTopPts(0);checkUrlGiftLink();updInstallBtn();syncMode();renderSide();if(isOnline()&&S.pendSync)setTimeout(flushSync,4000);
 </script>
 </body>
 </html>
