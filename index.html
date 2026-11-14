@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تحدّي الأصحاب</title>
-<meta name="description" content="تحدّي الأصحاب — منصة ألعاب تعليمية للغة الإنجليزية مع مستر عبدالرحمن حسنين (Grammora &amp; EngliFocus)">
+<meta name="description" content="تحدّي الأصحاب — منصة ألعاب تعليمية للغة الإنجليزية مع مستر عبدالرحمن حسانين (Grammora &amp; EngliFocus)">
 <meta name="theme-color" id="metaTheme" content="#2F5F5A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -758,14 +758,9 @@ body.dark.th-galaxy .lw,body.dark.th-galaxy .les-row,body.dark.th-galaxy .cap-ex
 #toast{max-width:92vw;white-space:normal;text-align:center;line-height:1.6;box-sizing:border-box}
 </style>
 <script>
-window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
-  authDomain: "grammoraquiz.firebaseapp.com",
-  projectId: "grammoraquiz",
-  storageBucket: "grammoraquiz.firebasestorage.app",
-  messagingSenderId: "571134930786",
-  appId: "1:571134930786:web:1479920ed9eeb1c579063b"
-};
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
+window.FIREBASE_CONFIG = null;
 </script>
 <script src="questions.js"></script>
 <script src="words.js"></script>
@@ -796,7 +791,11 @@ if(window.FIREBASE_CONFIG){
   const vs=FS.collection(db,'visitors');
   const cnt=(q)=>FS.getCountFromServer(q).then((x)=>x.data().count);
   window.FB={
-    submit:(wk,uid,name,pts,meta)=>FS.setDoc(FS.doc(db,'weeks',String(wk),'scores',uid),Object.assign({name:name,pts:pts,t:FS.serverTimestamp()},meta||{})),
+    submit:(wk,uid,name,pts,meta)=>{
+      const ref=FS.doc(db,'weeks',String(wk),'scores',uid);
+      const base={name:String(name||'بطل').slice(0,14),pts:Math.max(0,Math.min(500000,Math.round(Number(pts)||0))),t:FS.serverTimestamp()};
+      return FS.setDoc(ref,base).catch((err)=>{console.warn('FB.submit error:',err);throw err});
+    },
     grpSet:(id,d)=>FS.setDoc(FS.doc(db,'cgroups',String(id)),Object.assign({},d,{t:FS.serverTimestamp()})),
     grpDel:(id)=>FS.deleteDoc(FS.doc(db,'cgroups',String(id))),
     grpList:async()=>{const s=await FS.getDocs(FS.collection(db,'cgroups'));return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -978,17 +977,17 @@ function bnav(active){
 }
 /* === نظام رسائل التحديثات التلقائي (عدّل الرقم والعناصر مع كل تحديث جديد) === */
 var APP_UPDATE={
-  ver:'v9.5',
+  ver:'v9.6',
   title:'هدية وتعويض ملكي لكل أبطال المنصة! 🎁🏆',
-  sub:'الإصدار التاسع المطور (v9.5) — تحديث فوري للترتيب',
+  sub:'الإصدار التاسع المطور (v9.6) — إصلاح شامل للترتيب + ركن الشرح',
   gift:1000,
   giftPts:1500,
-  intro:'تقديراً لكل بطل بيلعب ويجتهد في «تحدّي الأصحاب»، جهزنا لك هدية تعويض ملكية ضخمة وتحديثاً فورياً للترتيب:',
+  intro:'تقديراً لكل بطل بيلعب ويجتهد في «تحدّي الأصحاب»، جهزنا لك هدية تعويض ملكية ضخمة وإصلاحاً جذرياً لرفع نقاط الترتيب على السحابة:',
   items:[
     {ic:'🎁',t:'هدية تعويض فورية للجميع: +1500 نقطة ترتيب و+1000 عملة!',d:'بمجرد ضغطك على زر الاستلام بالأسفل، هيزيد رصيدك فوراً +1500 نقطة في الترتيب الأسبوعي و+1000 عملة ذهبية وشحن كامل للقلوب (3/3 ❤️)!'},
-    {ic:'⚡',t:'مزامنة لحظية لنقاط الترتيب مع كل إجابة صحيحة',d:'تم تطوير نظام احتساب النقاط ليحفظ نقاطك ويرفعها للترتيب فور إجابتك على أي سؤال في أي نمط لعب، مع عداد حي لنقاط الأسبوع في أعلى الشاشة!'},
+    {ic:'☁️',t:'إصلاح شامل لرفع النقاط في لوحة الترتيب (Firestore Sync)',d:'تم إصلاح توافق البيانات مع قاعدة البيانات السحابية لترتفع نقاطك وترتيبك في الترتيب العام وصفك فور كل إجابة أو هدية!'},
     {ic:'🎥',t:'ركن الشرح وقراءة الكلمات بصوت مستر عبدالرحمن',d:'اسمع نطق كلمات كل وحدة بصوت المستر، راجع برشامة القاعدة، واضغط على أي كلمة في القصص والقطع لتنطق وتترجم فوراً!'},
-    {ic:'🔑',t:'كود تعويض إضافي في صندوق الهدايا (HERO2000)',d:'تقدر كمان تدخل صندوق الهدايا وتكتب كود HERO2000 أو GIFT1000 لو حابب تضاعف نقاطك وعملاتك!'}
+    {ic:'🔑',t:'أكواد تعويض إضافية في صندوق الهدايا (HERO2000 و GIFT1000)',d:'افتح صندوق الهدايا واكتب كود HERO2000 لتحصل على +2000 نقطة ترتيب إضافية و+1500 عملة، أو كود GIFT1000 لـ +1000 نقطة!'}
   ]
 };
 function checkWhatsNew(){
@@ -1978,8 +1977,19 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
     }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
   }else{
     p.then(function(){return FB.board(BT==='gr'?gId(wkKey()):wkId(wkKey()),lo,hi,pts,BN)}).then(function(d){
-      var h=d.rows.length?d.rows.map(function(x,i){return rrow(x,i+1,x.id===S.uid)}).join(''):'مفيش حد لسه. كن أول واحد!';
-      var myI=d.rows.map(function(x){return x.id}).indexOf(S.uid),rk=d.rank,gap='';
+      var rowsList=(d.rows||[]).slice();
+      var myIdx=-1;
+      for(var z=0;z<rowsList.length;z++){if(rowsList[z].id===S.uid){myIdx=z;break}}
+      if(myIdx>=0){
+        rowsList[myIdx].pts=Math.max(rowsList[myIdx].pts||0,pts);
+        rowsList[myIdx].name=effNick();
+      }else if(pts>0&&pts>=lo&&pts<hi){
+        rowsList.push({id:S.uid,name:effNick(),pts:pts});
+      }
+      rowsList.sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+      var h=rowsList.length?rowsList.map(function(x,i){return rrow(x,i+1,x.id===S.uid)}).join(''):'مفيش حد لسه. كن أول واحد!';
+      var myI=rowsList.map(function(x){return x.id}).indexOf(S.uid),rk=(myI>=0?myI+1:d.rank),tot=Math.max(d.total||0,rowsList.length),gap='';
+      d.rows=rowsList;d.total=tot;
       if(pts>0&&myI<0&&rk>BN){
         var ab=d.above.slice().reverse();
         h+='<div class="sm" style="text-align:center">• • •</div>'+ab.map(function(x,i){return rrow(x,rk-ab.length+i,false)}).join('')+rrow({name:S.nick,pts:pts},rk,true)+d.below.map(function(x,i){return rrow(x,rk+1+i,false)}).join('');
@@ -5573,11 +5583,10 @@ function installCard(){
   return '<div class="card row"><div class="sp"><div style="font-weight:900">تثبيت المنصة على جهازك 📲</div><div class="sm">افتحها كتطبيق من الشاشة الرئيسية والعب بدون إنترنت</div></div><button class="btn t" style="font-size:13px;padding:6px 12px;min-height:36px" onclick="installApp()">تثبيت</button></div>';
 }
 function setupSW(){
-  /* Browsers refuse to register a service worker from a Blob/Data URL, so the worker lives in sw.js next to this file. */
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').then(function(reg){
-      if(reg&&reg.update)setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5);
+    navigator.serviceWorker.register('sw.js?v=9.6').then(function(reg){
+      if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
 }
