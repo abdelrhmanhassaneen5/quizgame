@@ -867,6 +867,42 @@ body.dark.th-galaxy .it-tx small{color:#67E8F9}
 .ch-r .sp{flex:1}
 .ch-r.me{background:var(--teal);color:#FFE9B8}
 .ch-me{flex:none;font-family:'Cairo',sans-serif;font-weight:900;font-size:11px;background:#FFD700;color:#4A2F22;border:1.5px solid #8A5A1E;border-radius:9px;padding:2px 8px;cursor:pointer;margin-right:6px;white-space:nowrap}
+
+/* --- v11.5: مختبر الصوتيات التفاعلي (بدون حروف عربية للنطق + سرعة السلحفاة + ألعاب الدمج) --- */
+.ph-card{background:var(--card);border:2.5px solid #2A5298;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 0 rgba(42,82,152,.25)}
+.ph-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ph-pat{direction:ltr;font-family:Arial,sans-serif;font-size:24px;font-weight:900;background:linear-gradient(135deg,#1E3C72,#2A5298);color:#FFD700;padding:4px 14px;border-radius:12px;border:2px solid #FFD700;letter-spacing:1px}
+.ph-ipa{direction:ltr;font-family:Arial,sans-serif;font-size:14px;font-weight:900;background:rgba(42,82,152,.12);color:#2A5298;padding:3px 10px;border-radius:9px}
+.ph-cue{display:flex;align-items:center;gap:8px;background:rgba(47,95,90,.1);border-right:4px solid #2F6B4A;border-radius:12px;padding:8px 10px;font-size:13px;font-weight:800;line-height:1.65}
+.ph-cue .ic{font-size:26px;line-height:1;flex:none}
+.ph-wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:640px){.ph-wgrid{grid-template-columns:repeat(4,1fr)}}
+.ph-wbox{background:rgba(255,255,255,.72);border:2px solid #8A6A4A;border-radius:14px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;transition:transform .18s,border-color .18s,box-shadow .18s}
+body.dark .ph-wbox{background:rgba(0,0,0,.25);border-color:#555}
+.ph-wbox.playing{border-color:#C9973F;box-shadow:0 0 0 3px rgba(227,176,63,.45);transform:scale(1.03)}
+.ph-wtop{font-size:24px;line-height:1}
+.ph-wen{direction:ltr;font-family:Arial,sans-serif;font-size:21px;font-weight:900;color:var(--ink);letter-spacing:.5px}
+.ph-wen u{color:#B23A3A;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:4px}
+.ph-war{font-size:12px;font-weight:800;color:var(--teal)}
+.ph-segs{display:flex;gap:4px;direction:ltr;justify-content:center;flex-wrap:wrap;min-height:24px}
+.ph-seg{font-family:Arial,sans-serif;font-size:13px;font-weight:900;background:rgba(42,82,152,.12);color:var(--ink);padding:1px 7px;border-radius:7px;border:1.5px solid transparent;transition:all .2s}
+.ph-seg.hi{background:#FFD700;color:#3A2318;border-color:#7A3B3B;transform:scale(1.18)}
+.ph-wbtns{display:flex;gap:4px;width:100%}
+.ph-wbtns button{flex:1;background:var(--card);border:1.5px solid #8A6A4A;border-radius:9px;padding:4px 2px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:900;color:var(--ink);cursor:pointer;line-height:1.3}
+.ph-wbtns button:active{transform:scale(.95)}
+.ph-wbtns button.b-tr{background:#FFF8E7;border-color:#C9973F;color:#7A3B3B}
+.ph-wbtns button.b-bl{background:#E6F4F1;border-color:#2F5F5A;color:#1B3B38}
+body.dark .ph-wbtns button.b-tr{background:#3A2A14;color:#FFD700}
+body.dark .ph-wbtns button.b-bl{background:#18332E;color:#CFE3D4}
+.sl-letters{display:flex;gap:8px;direction:ltr;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.sl-ch{min-width:44px;height:52px;border-radius:14px;background:var(--card);border:2.5px solid #2A5298;box-shadow:0 4px 0 #1E3C72;font-family:Arial,sans-serif;font-size:26px;font-weight:900;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
+.sl-ch.zap{background:#B23A3A;color:#fff;border-color:#FFD700;transform:scale(.75) rotate(-12deg);opacity:.35;text-decoration:line-through}
+.sl-ch.ok-ch{background:#2F6B4A;color:#fff;border-color:#FFD700}
+.me-stage{background:linear-gradient(135deg,#2B1055,#1E3C72);color:#FFE9B8;border:3px solid #FFD700;border-radius:18px;padding:14px;text-align:center}
+.me-word{direction:ltr;font-family:Arial,sans-serif;font-size:42px;font-weight:900;letter-spacing:3px;margin:8px 0}
+.me-word .v{color:#FFD700;text-decoration:underline}
+.me-word .e{color:#FF6B6B;display:inline-block;animation:popIn .35s ease-out}
+
 </style>
 <script>
 /* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
@@ -5784,7 +5820,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=11.0').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.5').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -7740,7 +7776,8 @@ window.onFB=function(){if(_onFB9)_onFB9();setTimeout(function(){lesPull()},2500)
 
 
 /* ==========================================================================
-   v11.0 — إلغاء القلوب وقفل اللعب نهائياً + أكاديمية التأسيس والبرجراف التفاعلي
+   v11.5 — إلغاء القلوب وقفل اللعب نهائياً + أكاديمية التأسيس التفاعلي الصحيح
+   (بدون كتابة نطق إنجليزي بحروف عربية + سرعة السلحفاة + التهجئة والدمج + ٣ ألعاب تأسيس)
    ========================================================================== */
 S.dhp=3;S.hpWaitUntil=0;
 hpLocked=function(){return false};
@@ -7757,35 +7794,186 @@ applyGiftObj=function(code,g){
   _applyGiftObj10(code,g);
 };
 
-/* تحديث رسالة التحديث للإصدار الحادي عشر v11.0 */
+/* تحديث رسالة التحديث للإصدار الحادي عشر المطور v11.5 */
 APP_UPDATE={
-  ver:'v11.0',
-  title:'التحديث التاريخي (v11.0): لعب مفتوح بلا قلوب + أكاديمية التأسيس والبرجراف! 🚀🧱',
-  sub:'الإصدار الحادي عشر (v11.0) — تأسيس + شرح + لعب بلا حدود ♾️',
+  ver:'v11.5',
+  title:'التحديث الكبير (v11.5): لعب مفتوح بلا قلوب + معمل الصوتيات والبرجراف التفاعلي! 🚀🧱',
+  sub:'الإصدار الحادي عشر المطور (v11.5) — تأسيس علمي سليم + لعب بلا حدود ♾️',
   gift:1000,
   giftPts:1500,
-  intro:'أهلاً بيك يا بطل في النقلة الأكبر لمنصة «تحدّي الأصحاب» مع مستر عبدالرحمن حسنين! لغينا قفل القلوب نهائياً وضفنا لك أكاديمية تأسيس كاملة:',
+  intro:'أهلاً بيك يا بطل في النقلة الأكبر لمنصة «تحدّي الأصحاب» مع مستر عبدالرحمن حسنين! لغينا قفل القلوب نهائياً، وطورنا أكاديمية التأسيس لتعمل بالنطق التفاعلي المبطّأ والألعاب:',
   items:[
-    {ic:'♾️',t:'وداعاً لانتهاء القلوب والانتظار — لعب مفتوح بلا حدود!',d:'مفيش قفل للعبة بعد النهاردة لو غلطت! العب، جرب، واتعلم من أخطائك براحتك في كل الجولات واجمع الـ ٣ نجوم الذهبية.'},
-    {ic:'🧱',t:'أكاديمية التأسيس التفاعلي من الصفر (Phonics & Grammar)',d:'ركن جديد لتأسيس القراءة السليمة (الحروف المركبة والصامتة)، الضمائر وتكوين الجملة، وأهم الأفعال الشاذة بالنطق العادي والبطيء!'},
-    {ic:'✍️',t:'ورشة كتابة البرجراف الذكية (Paragraph Builder)',d:'اكتب برجراف كامل خطوة بخطوة في أهم موضوعات منهجك، اسمعه بصوت واضح، وانطقه بالمايك لتكسب +50 عملة و+50 نقطة!'},
-    {ic:'🎁',t:'هدية انطلاق الإصدار الحادي عشر: +1500 نقطة و+1000 عملة!',d:'اضغط على زر الاستلام بالأسفل ليضاف لرصيدك فوراً +1500 نقطة في الترتيب الأسبوعي و+1000 عملة ذهبية!'}
+    {ic:'🐢',t:'نطق تأسيسي بـ ٣ سرعات (السلحفاة 🐢 • التهجئة والدمج 🧩 • الطبيعي 🐇)',d:'اضغط على أي كلمة في قسم التأسيس لتسمعها ببطء شديد ووضوح تام، أو اضغط (تهجئة ودمج) لتسمع كل مقطع صوتي يضيء بمفرده ثم تندمج الكلمة!'},
+    {ic:'🎮',t:'٣ ألعاب صوتيات تفاعلية داخل التأسيس!',d:'العب (🎧 صائد الأصوات)، و(🔨 كاسر الحروف الصامتة بالليزر)، و(🪄 عصا الـ Magic E السحرية) لتتقن القراءة بدون حفظ ممل!'},
+    {ic:'♾️',t:'وداعاً لانتهاء القلوب — لعب مفتوح بلا حدود!',d:'مفيش قفل للعبة بعد النهاردة لو غلطت! كمل جولتك للنهاية وتعلم من الشرح واجمع الـ ٣ نجوم الذهبية.'},
+    {ic:'✍️',t:'ورشة كتابة البرجراف الذكية خطوة بخطوة',d:'كوّن برجراف كامل في أهم موضوعات منهجك واسمعه بصوت واضح واكسب +50 عملة و+50 نقطة ترتيب!'}
   ]
 };
 
-/* ---------------- بيانات أكاديمية التأسيس والبرجراف التفاعلي ---------------- */
-var FND_TAB='phonics',FND_PARA_IDX=0,FND_PARA_STEP=0,FND_PARA_DONE=false;
+/* ---------------- محرك النطق التأسيسي بـ ٣ سرعات (السلحفاة / الدمج / الطبيعي) ---------------- */
+var PH_TMR=[];
+function clearPhTmr(){while(PH_TMR.length)clearTimeout(PH_TMR.pop())}
+
+function speakRate(txt,rate){
+  clearPhTmr();
+  if(!('speechSynthesis' in window))return false;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(String(txt||''));
+    u.lang=VOICE?VOICE.lang:'en-US';
+    if(VOICE)u.voice=VOICE;
+    u.rate=rate||0.8;
+    u.pitch=1;
+    u.volume=1;
+    speechSynthesis.speak(u);
+    return true;
+  }catch(e){return false}
+}
+
+/* خريطة النطق الصوتي للمقاطع المنفردة عند الضغط على «تهجئة ودمج» حتى ينطقها المتصفح كأصوات وليس كأسماء حروف */
+var PHONEME_TTS={
+  'sh':'shh','ch':'chuh','th':'thh','ph':'fff','wh':'wuh','ck':'kuh',
+  'tion':'shun','ture':'cher','igh':'eye','kn':'nnn','wr':'rrr','mb':'mmm',
+  'a':'aah','e':'eh','i':'ih','o':'aw','u':'uh',
+  'ee':'eee','ea':'eee','ai':'ay','ay':'ay','oa':'oh','oo':'ooo','ou':'ow','ow':'ow','ar':'aar','or':'oar','er':'er','ir':'er','ur':'er'
+};
+
+function blendWord(wId,word,segs){
+  clearPhTmr();
+  var box=document.getElementById('pw_'+wId);
+  document.querySelectorAll('.ph-wbox.playing').forEach(function(x){x.classList.remove('playing')});
+  document.querySelectorAll('.ph-seg.hi').forEach(function(x){x.classList.remove('hi')});
+  if(box)box.classList.add('playing');
+  var parts=(segs&&segs.length)?segs:[word];
+  parts.forEach(function(seg,idx){
+    PH_TMR.push(setTimeout(function(){
+      document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el,j){el.classList.toggle('hi',j===idx)});
+      var k=String(seg||'').toLowerCase().replace(/[^a-z]/g,'');
+      var sayTxt=PHONEME_TTS[k]||k;
+      speakRate(sayTxt,0.5);
+    },idx*820));
+  });
+  PH_TMR.push(setTimeout(function(){
+    document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.add('hi')});
+    speakRate(word,0.55);
+  },parts.length*820+150));
+  PH_TMR.push(setTimeout(function(){
+    if(box)box.classList.remove('playing');
+    document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.remove('hi')});
+  },parts.length*820+1350));
+}
+
+function slowWord(wId,word,rate){
+  clearPhTmr();
+  document.querySelectorAll('.ph-wbox.playing').forEach(function(x){x.classList.remove('playing')});
+  var box=document.getElementById('pw_'+wId);
+  if(box){
+    box.classList.add('playing');
+    PH_TMR.push(setTimeout(function(){box.classList.remove('playing')},1100));
+  }
+  speakRate(word,rate||0.45);
+}
+
+/* ---------------- بيانات مختبر الصوتيات العلمي (بدون أي حروف نطق عربي!) ---------------- */
+var FND_TAB='phonics',PH_SUB='cards',FND_PARA_IDX=0,FND_PARA_STEP=0,FND_PARA_DONE=false;
+var PH_HUNT_I=0,PH_SIL_I=0,PH_ME_I=0,PH_ME_ON=false;
 
 var FND_PHONICS=[
-  {g:'sh = /ʃ/ (ش)',w:'ship • fish • wash • brush',ar:'الحرفان s+h ينطقان معاً مثل حرف (ش) في العربية.',ex:'She sells fresh fish in the shop.',exAr:'هي تبيع سمكاً طازجاً في المحل.'},
-  {g:'ch = /tʃ/ (تش)',w:'chair • teacher • lunch • watch',ar:'الحرفان c+h ينطقان معاً (تش) مثل كلمة كرسي أو معلم.',ex:'The teacher sat on the wooden chair.',exAr:'جلس المعلم على الكرسي الخشبي.'},
-  {g:'th = /θ/ (ث) أو /ð/ (ذ)',w:'think • three • bath  |  this • mother • brother',ar:'الحرفان t+h ينطقان (ث) في كلمات مثل think/three، وينطقان (ذ) في كلمات مثل this/mother.',ex:'My brother is three years old.',exAr:'أخي عمره ثلاث سنوات.'},
-  {g:'ph = /f/ (ف)',w:'phone • photo • elephant • dolphin',ar:'الحرفان p+h ينطقان دائماً مثل حرف (ف) F.',ex:'I took a photo of the big elephant.',exAr:'التقطت صورة للفيل الكبير.'},
-  {g:'tion = /ʃən/ (شَن)',w:'station • information • education • vacation',ar:'المقطع t-i-o-n في نهاية الكلمات ينطق (شَن).',ex:'Education is the key to a great nation.',exAr:'التعليم هو مفتاح الأمة العظيمة.'},
-  {g:'ture = /tʃər/ (تشر)',w:'picture • nature • future • adventure',ar:'المقطع t-u-r-e في نهاية الكلمات ينطق (تشَر).',ex:'We love reading adventure stories about nature.',exAr:'نحب قراءة قصص المغامرات عن الطبيعة.'},
-  {g:'Silent K & W (حروف صامتة لا تُنطق)',w:'know • knee • knife  |  write • wrong • wrist',ar:'حرف K لا ينطق إذا جاء بعده N في أول الكلمة، وحرف W لا ينطق إذا جاء بعده R!',ex:'I know how to write English sentences.',exAr:'أنا أعرف كيف أكتب جملاً إنجليزية.'},
-  {g:'Silent B & GH (حروف صامتة)',w:'climb • lamb • comb  |  night • light • high',ar:'حرف B لا ينطق بعد حرف M في آخر الكلمة، و(gh) لا تنطق في وسط/آخر كلمات مثل night و high.',ex:'The bright light shines at night.',exAr:'الضوء الساطع يشرق في الليل.'},
-  {g:'Magic E (الـ E السحرية في آخر الكلمة)',w:'hat ➔ hate  |  kit ➔ kite  |  hop ➔ hope',ar:'وجود حرف e في آخر الكلمة القصيرة يجعل الحرف المتحرك قبلها ينطق طويلاً باسمه (Long Vowel)!',ex:'I hope you fly your kite in the park.',exAr:'أتمنى أن تطير طائرتك الورقية في الحديقة.'}
+  {
+    pat:'sh',ipa:'/ʃ/',ic:'🤫',
+    cue:'صوت الهسيس والهدوء: ضع إصبعك أمام فمك وأخرج الهواء بهدوء من بين الأسنان بدون اهتزاز الحنجرة.',
+    words:[
+      {w:'ship',h:'<u>sh</u>ip',ic:'🚢',ar:'سفينة',s:['sh','i','p']},
+      {w:'fish',h:'fi<u>sh</u>',ic:'🐟',ar:'سمكة',s:['f','i','sh']},
+      {w:'shop',h:'<u>sh</u>op',ic:'🏪',ar:'متجر',s:['sh','o','p']},
+      {w:'brush',h:'bru<u>sh</u>',ic:'🖌️',ar:'فرشاة',s:['br','u','sh']}
+    ],
+    ex:'She saw a big ship and a fish.',exAr:'هي رأت سفينة كبيرة وسمكة.'
+  },
+  {
+    pat:'ch',ipa:'/tʃ/',ic:'🚂',
+    cue:'صوت القطار السريع: يبدأ بلمس طرف اللسان لسقف الفم ثم يخرج الهواء بقوة في دفعة واحدة قصيرة.',
+    words:[
+      {w:'chair',h:'<u>ch</u>air',ic:'🪑',ar:'كرسي',s:['ch','air']},
+      {w:'cheese',h:'<u>ch</u>eese',ic:'🧀',ar:'جبنة',s:['ch','ee','se']},
+      {w:'teacher',h:'tea<u>ch</u>er',ic:'👨‍🏫',ar:'معلم',s:['tea','ch','er']},
+      {w:'lunch',h:'lun<u>ch</u>',ic:'🍱',ar:'غداء',s:['l','u','n','ch']}
+    ],
+    ex:'The teacher sat on the chair.',exAr:'جلس المعلم على الكرسي.'
+  },
+  {
+    pat:'th (Unvoiced)',ipa:'/θ/',ic:'👅',
+    cue:'صوت الهواء الرقيق: أخرج طرف لسانك قليلاً بين أسنانك العلوية والسفلية وانفخ الهواء برفق.',
+    words:[
+      {w:'three',h:'<u>th</u>ree',ic:'3️⃣',ar:'ثلاثة',s:['th','r','ee']},
+      {w:'think',h:'<u>th</u>ink',ic:'🤔',ar:'يفكر',s:['th','i','nk']},
+      {w:'bath',h:'ba<u>th</u>',ic:'🛁',ar:'حمام',s:['b','a','th']},
+      {w:'teeth',h:'tee<u>th</u>',ic:'🦷',ar:'أسنان',s:['t','ee','th']}
+    ],
+    ex:'Brush your teeth three times.',exAr:'اغسل أسنانك ثلاث مرات.'
+  },
+  {
+    pat:'th (Voiced)',ipa:'/ð/',ic:'🐝',
+    cue:'نفس موضع طرف اللسان بين الأسنان، ولكن مع تشغيل الأحبال الصوتية (اهتزاز مثل صوت النحلة).',
+    words:[
+      {w:'this',h:'<u>th</u>is',ic:'👇',ar:'هذا / هذه',s:['th','i','s']},
+      {w:'mother',h:'mo<u>th</u>er',ic:'👩',ar:'أم',s:['m','o','th','er']},
+      {w:'father',h:'fa<u>th</u>er',ic:'👨',ar:'أب',s:['f','a','th','er']},
+      {w:'brother',h:'bro<u>th</u>er',ic:'👦',ar:'أخ',s:['br','o','th','er']}
+    ],
+    ex:'This is my mother and my brother.',exAr:'هذه أمي وهذا أخي.'
+  },
+  {
+    pat:'ph',ipa:'/f/',ic:'📷',
+    cue:'الحرفان p+h معاً ينطقان تماماً مثل صوت حرف F (الشفة السفلية تلامس الأسنان العلوية مع خروج الهواء).',
+    words:[
+      {w:'phone',h:'<u>ph</u>one',ic:'📱',ar:'هاتف',s:['ph','o','ne']},
+      {w:'photo',h:'<u>ph</u>oto',ic:'🖼️',ar:'صورة',s:['ph','o','to']},
+      {w:'elephant',h:'ele<u>ph</u>ant',ic:'🐘',ar:'فيل',s:['el','e','ph','ant']},
+      {w:'dolphin',h:'dol<u>ph</u>in',ic:'🐬',ar:'دولفين',s:['d','o','l','ph','in']}
+    ],
+    ex:'I took a photo of the dolphin.',exAr:'التقطت صورة للدولفين.'
+  },
+  {
+    pat:'tion / ture',ipa:'/ʃən/ • /tʃər/',ic:'🎓',
+    cue:'نهايات الكلمات الشهيرة: المقطع (tion) يُنطق ككتلة صوتية واحدة ناعمة في آخر الكلمة، وكذلك (ture).',
+    words:[
+      {w:'station',h:'sta<u>tion</u>',ic:'🚉',ar:'محطة',s:['st','a','tion']},
+      {w:'education',h:'educa<u>tion</u>',ic:'📚',ar:'تعليم',s:['ed','u','ca','tion']},
+      {w:'picture',h:'pic<u>ture</u>',ic:'🎨',ar:'صورة',s:['p','i','c','ture']},
+      {w:'nature',h:'na<u>ture</u>',ic:'🌿',ar:'طبيعة',s:['n','a','ture']}
+    ],
+    ex:'We painted a picture of nature.',exAr:'رسمنا لوحة للطبيعة.'
+  }
+];
+
+/* ألعاب الصوتيات التفاعلية الثلاث */
+var PH_HUNT_QS=[
+  {w:'ship',ic:'🚢',ar:'سفينة',mask:'__ip',o:['sh','ch','ph'],a:0},
+  {w:'chair',ic:'🪑',ar:'كرسي',mask:'__air',o:['ch','sh','th'],a:0},
+  {w:'phone',ic:'📱',ar:'هاتف',mask:'__one',o:['ph','th','ch'],a:0},
+  {w:'three',ic:'3️⃣',ar:'ثلاثة',mask:'__ree',o:['th','sh','ph'],a:0},
+  {w:'fish',ic:'🐟',ar:'سمكة',mask:'fi__',o:['sh','ch','th'],a:0},
+  {w:'station',ic:'🚉',ar:'محطة',mask:'sta____',o:['tion','ture','igh'],a:0},
+  {w:'picture',ic:'🎨',ar:'صورة',mask:'pic____',o:['ture','tion','ph'],a:0},
+  {w:'dolphin',ic:'🐬',ar:'دولفين',mask:'dol__in',o:['ph','sh','ch'],a:0}
+];
+
+var PH_SILENT_QS=[
+  {w:'know',readAs:'now',ar:'يعرف',ic:'🧠',letters:['k','n','o','w'],silIdx:0,rule:'حرف K صامت دائماً إذا جاء في أول الكلمة وبعده حرف N.'},
+  {w:'write',readAs:'rite',ar:'يكتب',ic:'✍️',letters:['w','r','i','t','e'],silIdx:0,rule:'حرف W صامت دائماً إذا جاء في أول الكلمة وبعده حرف R.'},
+  {w:'climb',readAs:'clime',ar:'يتسلق',ic:'🧗',letters:['c','l','i','m','b'],silIdx:4,rule:'حرف B صامت دائماً إذا جاء في آخر الكلمة بعد حرف M.'},
+  {w:'knee',readAs:'nee',ar:'ركبة',ic:'🦵',letters:['k','n','e','e'],silIdx:0,rule:'حرف K صامت قبل حرف N في بداية الكلمة.'},
+  {w:'lamb',readAs:'lam',ar:'حمل (خروف صغير)',ic:'🐑',letters:['l','a','m','b'],silIdx:3,rule:'حرف B صامت بعد حرف M في نهاية الكلمة.'},
+  {w:'wrist',readAs:'rist',ar:'معصم اليد',ic:'⌚',letters:['w','r','i','s','t'],silIdx:0,rule:'حرف W صامت قبل حرف R في بداية الكلمة.'}
+];
+
+var PH_MAGICE_PAIRS=[
+  {s:'hat',sIc:'🎩',sAr:'قبعة (صوت a قصير)',l:'hate',lIc:'😠',lAr:'يكره (الـ e السحرية جعلت الـ a تُنطق باسمها الكامل A!)'},
+  {s:'kit',sIc:'🧰',sAr:'حقيبة عدة (صوت i قصير)',l:'kite',lIc:'🪁',lAr:'طائرة ورقية (الـ e السحرية جعلت الـ i تُنطق باسمها الكامل I!)'},
+  {s:'hop',sIc:'🦘',sAr:'يقفز (صوت o قصير)',l:'hope',lIc:'🌟',lAr:'يأمل (الـ e السحرية جعلت الـ o تُنطق باسمها الكامل O!)'},
+  {s:'cub',sIc:'🦁',sAr:'شبل صغير (صوت u قصير)',l:'cube',lIc:'🧊',lAr:'مكعب (الـ e السحرية جعلت الـ u تُنطق باسمها الكامل U!)'},
+  {s:'tap',sIc:'🚰',sAr:'صنبور ماء (صوت a قصير)',l:'tape',lIc:'📼',lAr:'شريط لاصق (الـ e السحرية مدّت صوت الـ a!)'}
 ];
 
 var FND_SENTENCE=[
@@ -7807,7 +7995,7 @@ var FND_SENTENCE=[
 ];
 
 var FND_VERBS=[
-  ['go','went','gone','يذهب'],['see','saw','seen','يرى'],['eat','ate','eaten','يأكل'],['drink','drank','drunk','يشرب'],
+  ['go','went','gone','يذهب'],['see','saw','seen','يرى'],['eat','ate','eaten','أكل'],['drink','drank','drunk','يشرب'],
   ['write','wrote','written','يكتب'],['read','read','read','يقرأ'],['buy','bought','bought','يشتري'],['make','made','made','يصنع / يجعل'],
   ['take','took','taken','يأخذ'],['give','gave','given','يعطي'],['come','came','come','يأتي'],['know','knew','known','يعرف'],
   ['speak','spoke','spoken','يتحدث'],['build','built','built','يبني'],['win','won','won','يفوز'],['find','found','found','يجد'],
@@ -7877,6 +8065,178 @@ function markFndDone(key,coins,pts,msg){
   return false;
 }
 
+function renderPhonicsLabHtml(){
+  function subBtn(k,ic,lbl){
+    var on=(PH_SUB===k);
+    return '<button class="pwb" style="flex:1 1 22%;font-size:12px;'+(on?'background:#1E3C72;color:#FFD700;border-color:#FFD700':'')+'" onclick="PH_SUB=\''+k+'\';foundationScr(\'phonics\')">'+ic+' '+lbl+'</button>';
+  }
+  var nav='<div class="row" style="flex-wrap:wrap;gap:6px">'+
+    subBtn('cards','🐢','البطاقات الناطقة والدمج')+
+    subBtn('hunt','🎧','لعبة صائد الأصوات')+
+    subBtn('silent','🔨','كاسر الحروف الصامتة')+
+    subBtn('magice','🪄','عصا الـ Magic E')+
+  '</div>';
+
+  if(PH_SUB==='hunt'){
+    var q=PH_HUNT_QS[PH_HUNT_I%PH_HUNT_QS.length];
+    return nav+
+      '<div class="card" style="text-align:center;border-color:#2A5298;border-width:3px">'+
+        '<div class="tag g">🎧 لعبة صائد الأصوات — سؤال '+((PH_HUNT_I%PH_HUNT_QS.length)+1)+' من '+PH_HUNT_QS.length+'</div>'+
+        '<div style="font-size:52px;margin:8px 0;line-height:1">'+q.ic+'</div>'+
+        '<div style="font-size:15px;font-weight:900;color:#7A3B3B">المعنى: '+esc(q.ar)+'</div>'+
+        '<div style="direction:ltr;font-family:Arial,sans-serif;font-size:34px;font-weight:900;letter-spacing:3px;color:#1E3C72;margin:8px 0">'+esc(q.mask)+'</div>'+
+        '<div class="row" style="justify-content:center;gap:8px;margin-bottom:10px">'+
+          '<button class="btn" style="font-size:14px;min-height:40px;padding:6px 14px;background:#8A5A1E" onclick="speakRate(\''+q.w+'\',0.42)">🐢 اسمع ببطء شديد</button>'+
+          '<button class="btn t" style="font-size:14px;min-height:40px;padding:6px 14px" onclick="speakRate(\''+q.w+'\',0.8)">🐇 اسمع بالسرعة الطبيعية</button>'+
+        '</div>'+
+        '<div class="sm" style="margin-bottom:8px">اختار المقطع الصوتي الصحيح الذي سمعته في الكلمة:</div>'+
+        '<div class="row" style="gap:8px;direction:ltr">'+
+          q.o.map(function(opt,oi){
+            return '<button class="opt" style="flex:1;font-size:24px;font-family:Arial,sans-serif;font-weight:900;text-align:center" onclick="pickPhHunt('+oi+')">'+esc(opt)+'</button>';
+          }).join('')+
+        '</div>'+
+        '<div id="phGameFb" style="margin-top:8px"></div>'+
+      '</div>';
+  }
+
+  if(PH_SUB==='silent'){
+    var sq=PH_SILENT_QS[PH_SIL_I%PH_SILENT_QS.length];
+    return nav+
+      '<div class="card" style="text-align:center;border-color:#7A3B3B;border-width:3px">'+
+        '<div class="tag" style="background:#7A3B3B">🔨 لعبة كاسر الحروف الصامتة (Silent Letter Breaker) — '+((PH_SIL_I%PH_SILENT_QS.length)+1)+' / '+PH_SILENT_QS.length+'</div>'+
+        '<div style="font-size:46px;margin:8px 0;line-height:1">'+sq.ic+'</div>'+
+        '<div style="font-weight:900;font-size:16px;color:#2F5F5A">الكلمة بمعنى: « '+esc(sq.ar)+' »</div>'+
+        '<div class="row" style="justify-content:center;gap:8px;margin:8px 0">'+
+          '<button class="btn" style="font-size:14px;min-height:38px;padding:5px 14px;background:#8A5A1E" onclick="speakRate(\''+sq.w+'\',0.45)">🐢 اسمع النطق البطيء</button>'+
+          '<button class="btn t" style="font-size:14px;min-height:38px;padding:5px 14px" onclick="speakRate(\''+sq.w+'\',0.8)">🐇 اسمع النطق الطبيعي</button>'+
+        '</div>'+
+        '<div class="sm">👆 اضغط بإصبعك على <b>الحرف الصامت (الذي يُكتب ولا يُنطق)</b> لتدميره بالليزر:</div>'+
+        '<div class="sl-letters">'+
+          sq.letters.map(function(ch,ci){
+            return '<button class="sl-ch" id="slc_'+ci+'" onclick="pickSilentLetter('+ci+')">'+esc(ch)+'</button>';
+          }).join('')+
+        '</div>'+
+        '<div id="phGameFb" style="margin-top:8px"></div>'+
+      '</div>';
+  }
+
+  if(PH_SUB==='magice'){
+    var mp=PH_MAGICE_PAIRS[PH_ME_I%PH_MAGICE_PAIRS.length];
+    var curW=PH_ME_ON?mp.l:mp.s;
+    var curIc=PH_ME_ON?mp.lIc:mp.sIc;
+    var curAr=PH_ME_ON?mp.lAr:mp.sAr;
+    var wordHtml=PH_ME_ON
+      ? (mp.s.slice(0,1)+'<span class="v">'+mp.s.slice(1,2)+'</span>'+mp.s.slice(2)+'<span class="e">e ✨</span>')
+      : (mp.s.slice(0,1)+'<span class="v">'+mp.s.slice(1,2)+'</span>'+mp.s.slice(2));
+    return nav+
+      '<div class="me-stage">'+
+        '<div style="font-weight:900;font-size:15px;color:#FFD700">🪄 مختبر عصا الـ Magic E السحرية ('+((PH_ME_I%PH_MAGICE_PAIRS.length)+1)+' / '+PH_MAGICE_PAIRS.length+')</div>'+
+        '<div style="font-size:52px;margin:8px 0;line-height:1">'+curIc+'</div>'+
+        '<div class="me-word">'+wordHtml+'</div>'+
+        '<div style="font-size:14.5px;font-weight:800;color:#CFE3D4;margin-bottom:10px">'+esc(curAr)+'</div>'+
+        '<div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap">'+
+          '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFF;font-size:15px;min-height:42px" onclick="toggleMagicEWand()">'+(PH_ME_ON?'🔄 ارجع للكلمة القصيرة ('+mp.s+')':'🪄 المس الكلمة بعصا الـ Magic E!')+'</button>'+
+          '<button class="btn t" style="font-size:14px;min-height:42px" onclick="speakRate(\''+curW+'\',0.45)">🐢 اسمع ببطء</button>'+
+        '</div>'+
+        '<div class="row" style="justify-content:center;gap:8px;margin-top:10px">'+
+          '<button class="pwb" style="max-width:220px;background:rgba(255,255,255,.15);color:#fff;border-color:#FFD700" onclick="speakRate(\''+mp.s+' ... '+mp.l+'\',0.5)">🔊 قارن الصوتين معاً ('+mp.s+' ➔ '+mp.l+')</button>'+
+          '<button class="pwb" style="max-width:160px;background:#2F6B4A;color:#fff;border-color:#FFD700" onclick="PH_ME_I++;PH_ME_ON=false;foundationScr(\'phonics\');setTimeout(function(){speakRate(PH_MAGICE_PAIRS[PH_ME_I%PH_MAGICE_PAIRS.length].s,0.5)},150)">الكلمة التالية ⬅️</button>'+
+        '</div>'+
+      '</div>';
+  }
+
+  /* البطاقات التأسيسية الناطقة (كل كلمة مستقلة بـ ٣ سرعات بدون أي حروف عربية للنطق) */
+  return nav+
+    '<div class="card row" style="align-items:center">'+misterImg('c',52)+
+      '<div class="sp" style="font-size:13px;font-weight:700;line-height:1.7"><b>🎯 التأسيس الصحيح بدون حروف عربية:</b> اضغط على <b>(🐢 بطيء)</b> لسماع الكلمة الواحدة ببطء شديد، أو اضغط على <b>(🧩 دمج)</b> لتسمع كل صوت بمفرده قبل دمج الكلمة، أو <b>(🐇 طبيعي)</b> للنطق العادي!</div>'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:12px">'+
+      FND_PHONICS.map(function(p,pi){
+        var wCards=p.words.map(function(wObj,wi){
+          var wId=pi+'_'+wi;
+          var segHtml=(wObj.s||[]).map(function(sg){return '<span class="ph-seg">'+esc(sg)+'</span>'}).join('');
+          var segsJson=JSON.stringify(wObj.s||[]).replace(/"/g,"\\'");
+          return '<div class="ph-wbox" id="pw_'+wId+'">'+
+            '<div class="ph-wtop">'+wObj.ic+'</div>'+
+            '<div class="ph-wen">'+wObj.h+'</div>'+
+            '<div class="ph-segs">'+segHtml+'</div>'+
+            '<div class="ph-war">'+esc(wObj.ar)+'</div>'+
+            '<div class="ph-wbtns">'+
+              '<button class="b-tr" onclick="slowWord(\''+wId+'\',\''+wObj.w+'\',0.42)" title="نطق بطيء جداً للتأسيس">🐢 بطيء</button>'+
+              '<button class="b-bl" onclick="blendWord(\''+wId+'\',\''+wObj.w+'\','+segsJson+')" title="تهجئة الأصوات ودمجها">🧩 دمج</button>'+
+              '<button onclick="slowWord(\''+wId+'\',\''+wObj.w+'\',0.82)" title="النطق الطبيعي">🐇 طبيعي</button>'+
+            '</div>'+
+          '</div>';
+        }).join('');
+        return '<div class="ph-card">'+
+          '<div class="ph-head">'+
+            '<span class="ph-pat">'+esc(p.pat)+'</span>'+
+            '<span class="ph-ipa">IPA: '+esc(p.ipa)+'</span>'+
+            '<span class="sp"></span>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:4px 10px;font-size:12px" onclick="speakRate(\''+p.words.map(function(x){return x.w}).join(' ... ')+'\',0.5)">🐢 اسمع الـ ٤ ببطء</button>'+
+          '</div>'+
+          '<div class="ph-cue"><span class="ic">'+p.ic+'</span><span><b>مخرج الصوت الصحيح:</b> '+esc(p.cue)+'</span></div>'+
+          '<div class="ph-wgrid">'+wCards+'</div>'+
+          '<div class="cap-ex"><div class="sp"><div class="e">'+esc(p.ex)+'</div><div class="a">'+esc(p.exAr)+'</div></div>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+esc(p.ex.replace(/'/g,"\\'"))+'\',0.5)">🐢 الجملة ببطء</button>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+esc(p.ex.replace(/'/g,"\\'"))+'\',0.82)">🐇 طبيعي</button>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+    '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+      '<button class="btn" style="flex:1 1 45%;font-size:15px;background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700" onclick="PH_SUB=\'hunt\';foundationScr(\'phonics\');setTimeout(function(){speakRate(PH_HUNT_QS[PH_HUNT_I%PH_HUNT_QS.length].w,0.45)},200)">🎧 العب «صائد الأصوات»</button>'+
+      '<button class="btn" style="flex:1 1 45%;font-size:15px;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="PH_SUB=\'silent\';foundationScr(\'phonics\');setTimeout(function(){speakRate(PH_SILENT_QS[PH_SIL_I%PH_SILENT_QS.length].w,0.5)},200)">🔨 العب «كاسر الحروف الصامتة»</button>'+
+    '</div>'+
+    '<button class="btn" style="width:100%;font-size:16px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="markFndDone(\'fnd_ph\',35,35,\'🎉 أتممت مختبر الصوتيات! +35 عملة و+35 نقطة ترتيب!\');foundationScr(\'sent\')">✅ أتقنت الصوتيات! (+35 عملة وانتقل لتكوين الجملة ⬅️)</button>';
+}
+
+function pickPhHunt(oi){
+  var q=PH_HUNT_QS[PH_HUNT_I%PH_HUNT_QS.length];
+  var fb=document.getElementById('phGameFb');
+  if(oi===q.a){
+    try{sfxOk(false)}catch(e){}
+    S.coins+=10;addPts(10);save();
+    speakRate(q.w,0.6);
+    if(fb)fb.innerHTML='<div class="card" style="background:#CFE3D4;border-color:#2F6B4A;font-weight:900;color:#1B432C">🎉 ممتاز يا صائد الأصوات! الكلمة هي <b style="direction:ltr;display:inline-block">'+q.w+'</b> (+10 عملات و+10 نقاط)</div>';
+    setTimeout(function(){
+      PH_HUNT_I++;
+      if(PH_HUNT_I>=PH_HUNT_QS.length)markFndDone('fnd_hunt',30,30,'🏆 ختمت لعبة صائد الأصوات! +30 عملة و+30 نقطة!');
+      foundationScr('phonics');
+      setTimeout(function(){speakRate(PH_HUNT_QS[PH_HUNT_I%PH_HUNT_QS.length].w,0.45)},200);
+    },1200);
+  }else{
+    try{sfxBad(true)}catch(e){}
+    speakRate(q.w,0.42);
+    if(fb)fb.innerHTML='<div class="cap-sec cap-trap">👂 اسمع الكلمة ببطء مرة أخرى وركّز في أول أو آخر صوت!</div>';
+  }
+}
+
+function pickSilentLetter(ci){
+  var sq=PH_SILENT_QS[PH_SIL_I%PH_SILENT_QS.length];
+  var fb=document.getElementById('phGameFb');
+  var btn=document.getElementById('slc_'+ci);
+  if(ci===sq.silIdx){
+    if(btn)btn.classList.add('zap');
+    try{sfxShieldBreak()}catch(e){}
+    S.coins+=12;addPts(12);save();
+    setTimeout(function(){speakRate(sq.w,0.55)},250);
+    if(fb)fb.innerHTML='<div class="card" style="background:#CFE3D4;border-color:#2F6B4A;font-weight:900;color:#1B432C;line-height:1.7">💥 أصبت الحرف الصامت! (+12 عملة و+12 نقطة)<br>📌 '+esc(sq.rule)+'<br><button class="btn" style="margin-top:6px;font-size:14px;min-height:36px;padding:4px 14px;background:#2F6B4A" onclick="PH_SIL_I++;if(PH_SIL_I>=PH_SILENT_QS.length)markFndDone(\'fnd_sil\',30,30,\'🏆 ختمت لعبة الحروف الصامتة! +30 عملة!\');foundationScr(\'phonics\');setTimeout(function(){speakRate(PH_SILENT_QS[PH_SIL_I%PH_SILENT_QS.length].w,0.5)},200)">الكلمة التالية ⬅️</button></div>';
+  }else{
+    try{sfxBad(true)}catch(e){}
+    speakRate(sq.w,0.42);
+    if(fb)fb.innerHTML='<div class="cap-sec cap-trap">💡 هذا الحرف يُنطق في الكلمة! اسمع ببطء: <b>'+esc(sq.rule)+'</b></div>';
+  }
+}
+
+function toggleMagicEWand(){
+  var mp=PH_MAGICE_PAIRS[PH_ME_I%PH_MAGICE_PAIRS.length];
+  PH_ME_ON=!PH_ME_ON;
+  try{sfxChest()}catch(e){}
+  foundationScr('phonics');
+  setTimeout(function(){speakRate(PH_ME_ON?mp.l:mp.s,0.48)},120);
+}
+
 function foundationScr(tab){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   if(tab)FND_TAB=tab;
@@ -7887,34 +8247,20 @@ function foundationScr(tab){
   }
   var bodyHtml='';
   if(FND_TAB==='phonics'){
-    bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
-      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>🔤 مختبر الصوتيات والقراءة السليمة:</b> اضغط على زر السماعة في أي بطاقة لتسمع نطق الحروف المركبة والجمل بوضوح، ثم اختبر نفسك في نهاية الصفحة!</div>'+
-    '</div>'+
-    '<div style="display:flex;flex-direction:column;gap:8px">'+
-      FND_PHONICS.map(function(p,i){
-        return '<div class="card" style="border-color:#2A5298">'+
-          '<div class="row">'+
-            '<span class="tag g" style="font-size:14px;padding:4px 10px;direction:ltr">'+esc(p.g)+'</span>'+
-            '<span class="sp"></span>'+
-            '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:4px 10px;font-size:12px" onclick="speak(\''+esc(p.w.replace(/[^A-Za-z\s]/g,' '))+'\')">🔊 اسمع الكلمات</button>'+
-          '</div>'+
-          '<div style="direction:ltr;text-align:left;font-family:Arial,sans-serif;font-size:18px;font-weight:900;color:#7A3B3B;margin-top:6px">'+esc(p.w)+'</div>'+
-          '<div style="font-size:13px;font-weight:700;margin-top:4px;line-height:1.6">💡 '+esc(p.ar)+'</div>'+
-          '<div class="cap-ex" style="margin-top:6px"><div class="sp"><div class="e">'+esc(p.ex)+'</div><div class="a">'+esc(p.exAr)+'</div></div><button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 10px" onclick="speak(\''+esc(p.ex.replace(/'/g,"\\'"))+'\')">🔊 الجملة</button></div>'+
-        '</div>';
-      }).join('')+
-    '</div>'+
-    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="markFndDone(\'fnd_ph\',35,35,\'🎉 أتممت مختبر الصوتيات! +35 عملة و+35 نقطة ترتيب!\');foundationScr(\'sent\')">✅ أتقنت قواعد الصوتيات! (+35 عملة وانتقل لتكوين الجملة ⬅️)</button>';
+    bodyHtml=renderPhonicsLabHtml();
   }else if(FND_TAB==='sent'){
     bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
-      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>🏗️ معمل تكوين الجملة والضمائر:</b> افهم كيف ترتّب الجملة والسؤال بالإنجليزي بدون أخطاء، واضغط على أي مثال لسماعه!</div>'+
+      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>🏗️ معمل تكوين الجملة والضمائر:</b> افهم كيف ترتّب الجملة والسؤال بالإنجليزي بدون أخطاء، واضغط على (🐢 بطيء) أو (🐇 طبيعي) لسماع كل جملة!</div>'+
     '</div>'+
     FND_SENTENCE.map(function(sec){
       return '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
         '<div class="tag g">'+sec.t+'</div>'+
         '<div class="cap-sec cap-rule">'+sec.rule+'</div>'+
         sec.rows.map(function(r){
-          return '<div class="cap-ex"><div class="sp"><div style="font-weight:900;font-size:14px;color:#7A3B3B;direction:ltr;text-align:left">'+esc(r[0])+' ➔ '+esc(r[1])+'</div><div class="e" style="font-size:14.5px;margin-top:2px">'+esc(r[2])+'</div></div><button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 10px" onclick="speak(\''+esc(r[2].replace(/'/g,"\\'"))+'\')">🔊</button></div>';
+          return '<div class="cap-ex"><div class="sp"><div style="font-weight:900;font-size:14px;color:#7A3B3B;direction:ltr;text-align:left">'+esc(r[0])+' ➔ '+esc(r[1])+'</div><div class="e" style="font-size:14.5px;margin-top:2px">'+esc(r[2])+'</div></div>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+esc(r[2].replace(/'/g,"\\'"))+'\',0.48)">🐢 بطيء</button>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+esc(r[2].replace(/'/g,"\\'"))+'\',0.82)">🐇 طبيعي</button>'+
+          '</div>';
         }).join('')+
       '</div>';
     }).join('')+
@@ -7924,17 +8270,18 @@ function foundationScr(tab){
     '</div>';
   }else if(FND_TAB==='verbs'){
     bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
-      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>⏳ أهم ٢٠ فعلاً في اللغة الإنجليزية وتصريفاتها (Present / Past / P.P):</b> اضغط على أي فعل لتسمع تصريفاته الثلاثة بنطق واضح!</div>'+
+      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>⏳ أهم ٢٠ فعلاً في اللغة الإنجليزية وتصريفاتها (Present / Past / P.P):</b> اسمع التصريفات الثلاثة ببطء شديد 🐢 أو بالسرعة العادية 🐇!</div>'+
     '</div>'+
     '<div class="lw-list">'+
       FND_VERBS.map(function(v,idx){
-        var spkAll=v[0]+', '+v[1]+', '+v[2];
+        var spkAll=v[0]+' ... '+v[1]+' ... '+v[2];
         return '<div class="card row" style="padding:10px;border-color:#8A6A4A">'+
           '<div class="sp">'+
             '<div style="direction:ltr;text-align:left;font-family:Arial,sans-serif;font-size:17px;font-weight:900;color:var(--ink)"><span style="color:#2F6B4A">'+v[0]+'</span> ➔ <span style="color:#C2571A">'+v[1]+'</span> ➔ <span style="color:#2A5298">'+v[2]+'</span></div>'+
             '<div style="font-size:14px;font-weight:900;color:#7A3B3B;margin-top:2px">'+esc(v[3])+'</div>'+
           '</div>'+
-          '<button class="pwb" style="flex:none;width:auto;min-height:36px;padding:4px 10px;font-size:12.5px" onclick="speak(\''+spkAll+'\')">🔊 اسمع الـ ٣</button>'+
+          '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+spkAll+'\',0.45)">🐢 بطيء</button>'+
+          '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 8px;font-size:11.5px" onclick="speakRate(\''+spkAll+'\',0.8)">🐇 طبيعي</button>'+
         '</div>';
       }).join('')+
     '</div>'+
@@ -7970,10 +8317,11 @@ function foundationScr(tab){
       stepArea='<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border:3px solid #2F6B4A;text-align:center">'+
         '<div style="font-size:28px">🎉✍️🌟</div>'+
         '<div style="font-weight:900;font-size:18px;color:#2F6B4A">أحسنت! كوّنت البرجراف كاملاً بنجاح!</div>'+
-        '<div class="sm" style="margin:4px 0 8px">اضغط على أي كلمة في البرجراف بالأسفل لترجمتها، أو اسمع البرجراف كاملاً:</div>'+
-        '<div class="row" style="gap:8px">'+
-          '<button class="btn" style="flex:1;font-size:15px;background:#2F5F5A" onclick="speak(\''+esc(fullText.replace(/'/g,"\\'"))+'\')">🔊 اسمع البرجراف كاملاً</button>'+
-          '<button class="btn" style="flex:1;font-size:15px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="FND_PARA_IDX=(FND_PARA_IDX+1)%FND_PARAGRAPHS.length;FND_PARA_STEP=0;FND_PARA_DONE=false;foundationScr(\'para\')">📝 موضوع برجراف جديد ⬅️</button>'+
+        '<div class="sm" style="margin:4px 0 8px">اضغط على أي كلمة في البرجراف بالأسفل لترجمتها، أو اسمع البرجراف بالسرعة البطيئة أو العادية:</div>'+
+        '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+          '<button class="btn" style="flex:1;font-size:14px;background:#8A5A1E" onclick="speakRate(\''+esc(fullText.replace(/'/g,"\\'"))+'\',0.48)">🐢 اسمع البرجراف ببطء</button>'+
+          '<button class="btn" style="flex:1;font-size:14px;background:#2F5F5A" onclick="speakRate(\''+esc(fullText.replace(/'/g,"\\'"))+'\',0.8)">🐇 اسمع بالسرعة الطبيعية</button>'+
+          '<button class="btn" style="flex:1 1 100%;font-size:15px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="FND_PARA_IDX=(FND_PARA_IDX+1)%FND_PARAGRAPHS.length;FND_PARA_STEP=0;FND_PARA_DONE=false;foundationScr(\'para\')">📝 ابدأ موضوع برجراف جديد ⬅️</button>'+
         '</div>'+
       '</div>';
     }
@@ -7986,9 +8334,9 @@ function foundationScr(tab){
       stepArea;
   }
 
-  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700"><h1>أكاديمية التأسيس والبرجراف 🧱✍️</h1><div>تأسس في الصوتيات والجرامر والأفعال واكتب برجرافك خطوة بخطوة!</div></div>'+
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700"><h1>أكاديمية التأسيس والبرجراف 🧱✍️</h1><div>تأسيس صوتي سليم בـ ٣ سرعات • ألعاب دمج وحروف صامتة • ورشة البرجراف</div></div>'+
     '<div class="row" style="flex-wrap:wrap;gap:6px">'+
-      tBtn('phonics','🔤','الصوتيات والنطق')+
+      tBtn('phonics','🔤','معمل الصوتيات')+
       tBtn('sent','🏗️','تكوين الجملة')+
       tBtn('verbs','⏳','الأفعال الشاذة')+
       tBtn('para','✍️','ورشة البرجراف')+
@@ -8004,7 +8352,7 @@ function pickParaWord(oi){
   var fb=document.getElementById('paraFb');
   if(oi===st.a){
     try{sfxOk(false)}catch(e){}
-    speak(st.full);
+    speakRate(st.full,0.58);
     FND_PARA_STEP++;
     if(FND_PARA_STEP>=P.steps.length){
       FND_PARA_DONE=true;
