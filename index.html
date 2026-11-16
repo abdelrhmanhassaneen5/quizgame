@@ -869,6 +869,8 @@ body.dark.th-galaxy .it-tx small{color:#67E8F9}
 .ch-me{flex:none;font-family:'Cairo',sans-serif;font-weight:900;font-size:11px;background:#FFD700;color:#4A2F22;border:1.5px solid #8A5A1E;border-radius:9px;padding:2px 8px;cursor:pointer;margin-right:6px;white-space:nowrap}
 </style>
 <script>
+/* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",appId:"..."}; */
 window.FIREBASE_CONFIG = {
   apiKey: "AIzaSyDbYtTMPsf4BVa3UV0xbk_1DHHrxKnBOHk",
   authDomain: "grammoraquiz.firebaseapp.com",
@@ -1174,10 +1176,11 @@ function profCardHtml(){
   '</div>';
 }
 function statStripHtml(){
-  var dhpStars=stars(S.dhp,16).replace(/fill="[^"]+"/g,'fill="#B23A3A"').replace(/#E3C98F/g,'#CDB88A');
+  S.dhp=3;S.hpWaitUntil=0;
+  var bst=Number(S.boostRounds)||0;
   return '<div class="stat-strip">'+
     '<div class="stat-pill" onclick="store()" style="cursor:pointer"><span class="lbl">رصيد العملات</span><div class="val">'+coin()+'<span>'+S.coins+'</span></div></div>'+
-    '<div class="stat-pill"><span class="lbl">'+(S.dhp>0?'القلوب اليومية':'⏳ قلب مجاني بعد')+'</span><div class="val" style="gap:2px">'+(S.dhp>0?dhpStars:'<span class="hp-cd" style="font-size:12px">'+hpCdTxt()+'</span>')+'</div></div>'+
+    '<div class="stat-pill" onclick="foundationScr()" style="cursor:pointer"><span class="lbl">'+(bst>0?'⚡ مضاعف الطاقة ×2':'♾️ طاقة اللعب')+'</span><div class="val" style="gap:3px;font-size:13.5px;color:#2F6B4A">'+(bst>0?'🔥 '+bst+' جولات':'لعب مفتوح ♾️')+'</div></div>'+
     '<div class="stat-pill"><span class="lbl">سلسلة الأيام</span><div class="val">'+flame(18)+'<span>'+skAlive()+' يوم</span></div></div>'+
   '</div>';
 }
@@ -1232,23 +1235,25 @@ function homeTabHtml(k){
   k=homeKey(k);
   var misCnt=(S.mis||[]).length,h='';
   if(k==='learn'){
-    var nW=(S.watchedVocab||[]).length,nG=(S.studiedUnits||[]).length;
-    return '<div class="sec-head">📘 قسم الشرح — اتعلّم قبل ما تلعب<i></i></div>'+
+    var nW=(S.watchedVocab||[]).length,nG=(S.studiedUnits||[]).length,nF=(S.fndDone||[]).length;
+    return '<div class="sec-head">📘 قسم الشرح والتأسيس — افهم وتأسس صح<i></i></div>'+
       '<div class="it-list">'+
+        hmRow('foundationScr()','🧱','أكاديمية التأسيس والبرجراف التفاعلي',(nF?'أنجزت '+nF+' مهارات تأسيسية 🌟':'صوتيات ونطق • تكوين الجملة • الأفعال • كتابة البرجراف'),'جديد 🔥','main')+
         hmRow('lessonHubScr()','🎥','كلمات الوحدة بصوت المستر',(nW?'خلّصت '+nW+' وحدة • كمّل الباقي':'اسمع الكلمة وردّدها • +30 عملة لكل وحدة'),(nW?'':'ابدأ هنا'),'main')+
         hmRow('lessonHubScr()','📘','برشامات القواعد',(nG?'ذاكرت '+nG+' برشامة':'القاعدة + الكلمات الدالة + خدع الامتحان'),'')+
+        hmRow('foundationScr(\'para\')','✍️','ورشة كتابة البرجراف خطوة بخطوة','كوّن برجراف كامل بالصوت والترجمة واكسب +50 عملة','+50 🪙')+
         hmRow('startVocabCards()','🃏','بطاقات الكلمات الذكية','اقلب البطاقة واسمع النطق والمعنى','')+
         hmRow('askScr()','💬','اسأل مستر عبدالرحمن','ابعت سؤالك والمستر يرد عليك',(askNew()?'!رد جديد':''))+
       '</div>';
   }
   if(k==='test'){
     var dcDone=S.dc&&S.dc.d===cDay();
-    return '<div class="sec-head">📝 اختبر نفسك — قِس مستواك<i></i></div>'+
+    return '<div class="sec-head">📝 اختبر نفسك — قِس مستواك (لعب مفتوح بلا حدود ♾️)<i></i></div>'+
       '<div class="it-list">'+
-        hmRow('curriculum()','📚','امتحانات وتدريبات المنهج','وحدات وقصة '+gName()+' سؤال بسؤال','','main')+
+        hmRow('curriculum()','📚','امتحانات وتدريبات المنهج','وحدات وقصة '+gName()+' سؤال بسؤال (بدون قفل قلوب)','','main')+
         hmRow('dailyIntro()','🎯','اختبار اليوم (الحلبة اليومية)',(dcDone?'نتيجتك اليوم: '+S.dc.ok+'/5 • '+S.dc.pts+' نقطة':'5 أسئلة موحدة لكل الطلاب • جوائز ×2'),(dcDone?'':'جديد اليوم'))+
         hmRow('psgIntro()','🕵️‍♂️','اختبار القطعة (محقق القطعة)',(S.psgOk?'حلّيت '+S.psgOk+' قطعة':'اقرأ القطعة واستنتج الإجابة'),'')+
-        (misCnt>0?hmRow('startReview()','🛠️','صحّح أخطاءك','عندك '+misCnt+' سؤال غلطت فيه'+(revHeartReady()?' • استرجع قلب':''),'!'+misCnt):'')+
+        (misCnt>0?hmRow('startReview()','🛠️','مختبر تصحيح الأخطاء','عندك '+misCnt+' سؤال للمراجعة • صحّحها واكسب ضعف العملات ×2','!'+misCnt):'')+
         hmRow('reportScr()','📊','مستوايا وتقريري','نقاط قوتك وضعفك في كل مهارة','')+
       '</div>'+
       homeSummaryCard();
@@ -1758,7 +1763,7 @@ function start(lv){
   G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:S.dhp,mx:mx,mhp:mx,shld:shld,maxShld:shld,rage:false,earned:0,combo:0,ok:0,bad:[],left:T,done:false};
   show();
 }
-function hearts(){var r='';for(var i=1;i<=Math.max(3,G.h);i++)r+=heart(i<=G.h);return r}
+function hearts(){var s=Math.max(1,Math.min(3,G.h||3));return '<span class="chip" style="background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#C9973F;font-size:13px;padding:3px 10px" title="درع الإتقان: كلما قلت أخطاؤك زادت نجومك ومكافأتك!">درع الإتقان: '+stars(s,16)+'</span>'}
 function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var q=G.qs[G.i],isSB=(q[5]==='sb'),isBoss=(G.lv%5===0&&!G.rev&&!G.currType);
   if(isBoss&&G.mhp===1&&G.shld<=0&&!G.rage){G.rage=true;setTimeout(sfxRage,180)}
@@ -1826,12 +1831,21 @@ function pick(k){
     }
     S.coins+=gain*cm;G.earned+=gain*cm;var cr=creditPts(gain*cm);if(cr!==gain*cm)msg+=' • +'+cr+' نقطة ترتيب';if(DCH){msg+=' • 🎁 الصندوق الذهبي اليومي! +'+(DCHEST*DCH)+' عملة و+'+(DCHEST_PTS*DCH)+' نقطة ترتيب';DCH=0;setTimeout(sfxChest,350)}var mm=mCheck();if(mm)msg+=' • '+mm;if(q[5]==='ck'){var em=evTick();if(em)msg+=' • '+em}roomAdd(gain);anim('hit');sfxOk(G.combo%3===0);if(G.mhp<=0){changeBossExpression('win')}else{changeBossExpression('hit');bossExprTimer=setTimeout(function(){changeBossExpression('normal')},1200)}
   }else{
-    if((S.role==='police'||S.role==='general')&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع ضابط الشرطة صدّ أول هجمة للزعيم وحمى قلبك!';anim('atk');sfxBad();changeBossExpression('angry')}
-    else{G.h--;if(!G.rev)S.dhp=Math.max(0,S.dhp-1);G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(k<0?'الوقت خلص':'غلط')+'، الوحش هاجمك وخسرت قلب'+(G.rev?'':' من رصيدك اليومي');anim('atk');sfxBad();changeBossExpression('angry');if(G.h<=0&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=1;if(!G.rev)S.dhp++;msg+=' • الفرصة التانية رجّعت لك قلب!'}}
+    S.dhp=3;S.hpWaitUntil=0;
+    if((S.role==='police'||S.role==='general')&&!G.polShield&&G.lv%5===0){G.polShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg='👮‍♂️ درع القائد صدّ أول هجمة للزعيم وحمى نجوم إتقانك!';anim('atk');sfxBad();changeBossExpression('angry')}
+    else if((S.role==='doctor'||S.role==='nurse')&&!G.medShield){G.medShield=1;G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);msg=(S.role==='doctor'?'👨‍⚕️ مهارة الطبيب':'👩‍⚕️ مهارة الممرضة')+' حمت نجوم إتقانك من أول خطأ في الجولة!';anim('atk');sfxBad();changeBossExpression('angry')}
+    else{
+      G.wrong=(G.wrong||0)+1;
+      /* يبقى للطالب دائماً نجمة إتقان واحدة على الأقل (G.h >= 1) ولا يُطرد من الجولة أبداً */
+      G.h=Math.max(1,3-Math.floor(G.wrong/2));
+      if(G.h<3&&S.inv.sc>0&&!G.sc){S.inv.sc--;G.sc=1;G.h=Math.min(3,G.h+1);msg='🛡️ درع الفرصة التانية استعاد لك نجمة إتقان!'}
+      else msg=(k<0?'الوقت خلص! ':'إجابة غير صحيحة! ')+'اقرأ الشرح بالأسفل وكمل الجولة للنهاية لتتعلم وتفوز 💪';
+      G.combo=0;G.bad.push(q);misAdd(q);tsAdd(q,0);anim('atk');sfxBad();changeBossExpression('angry');
+    }
   }
   $('#cn').textContent=S.coins;$('#hr').innerHTML=hearts();updPw();$('#mh').style.width=(G.mhp/G.mx*100)+'%';save();
   document.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===G.ci)b.classList.add('ok');else if(j===k)b.classList.add('bad')});
-  var win=G.mhp<=0,last=win||G.h<=0||G.i>=G.n-1;
+  var win=G.mhp<=0,last=win||G.i>=G.n-1;
   if(win){msg+=' • الزعيم اتهزم!';setTimeout(sfxWin,1650)}
   $('#fb').innerHTML='<div class="card row" style="align-items:flex-start">'+misterImg(good?'c':'h',46)+'<div class="sp"><div style="font-weight:900">'+msg+'</div><div class="sm">'+(good?cheer()+' • '+q[4]:'افتكر: '+q[4])+'</div></div></div>'+(win?'<div class="sm" style="text-align:center;margin-top:12px;font-weight:900;font-size:14px">⚡ الوحش بينهار...</div>':'<button class="btn t" style="width:100%;margin-top:12px" onclick="'+(last?'endRound()':'next()')+'">'+(last?'شوف النتيجة':'التالي')+'</button>');
   /* v8: مشهد سحق الوحش (≈2.5 ثانية) ثم شاشة النتيجة تلقائياً */
@@ -2058,12 +2072,21 @@ function certShareWA(){
   }
 }
 function endRound(){if(!G||G.endDone)return;G.endDone=true;app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
-  var win=G.mhp<=0,lv=G.lv,bonus=0,revMsg='';S.nr=(S.nr||0)+1;mTick('r');if(G.mhp<=0)mTick('w');
-  var isCurr=!!G.currType;
-  if(win){bonus=20+10*G.h+(lv>20?25:0);if(isCurr)bonus+=30;S.coins+=bonus;creditPts(bonus);roomAdd(bonus);if(G.rev){var rh=revHeartGrant();revMsg=rh.msg;G.revHeart=rh.ok}else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,G.h);if(lv===S.max&&lv<40)S.max++}save()}
+  S.dhp=3;S.hpWaitUntil=0;
+  var win=(G.mhp<=0||G.ok>=Math.ceil(G.n*0.5)||G.rev),lv=G.lv,bonus=0,revMsg='';S.nr=(S.nr||0)+1;mTick('r');if(win)mTick('w');
+  var isCurr=!!G.currType,stEarned=Math.max(1,Math.min(3,G.h||3));
+  if(win){
+    bonus=20+12*stEarned+(stEarned===3?25:0)+(lv>20?25:0);
+    if(isCurr)bonus+=30;
+    if((S.boostRounds||0)>0){S.boostRounds--;bonus*=2;revMsg='⚡ مضاعف الطاقة الذهبية ضاعف مكافأة الجولة (×2)! (متبقي '+S.boostRounds+' جولة)'}
+    S.coins+=bonus;creditPts(bonus);roomAdd(bonus);
+    if(G.rev){revMsg=(revMsg?revMsg+' • ':'')+'🛠️ عاش! صحّحت أخطاءك واكتسبت خبرة مضاعفة!'}
+    else if(!isCurr){S.stars[lv]=Math.max(S.stars[lv]||0,stEarned);if(lv===S.max&&lv<40)S.max++}
+    save();
+  }
   dayRoundDone();submit();var mmsg=[mCheck(),STMSG,revMsg].filter(function(x){return x}).join(' • ');STMSG='';
-  var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">للمراجعة</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+(S.mis&&S.mis.length&&!G.rev?'<button class="btn t" style="font-size:14px;min-height:38px" onclick="startReview()">راجع أخطاءك دلوقتي ('+S.mis.length+')</button>':'')+'</div>':'';
-  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك':(isCurr?'عاش! خلصت التدريب':'الوحش اتهزم!')):(G.h<=0?'قلوبك اليومية خلصت':'الوحش هرب'))+'</h1><div>'+(win?(G.rev?(G.revHeart?'رجعت قلب لرصيدك اليومي! ':'عاش! ثبّتت المعلومة 👏 ')+'ولسه عندك '+(S.mis||[]).length+' سؤال':(isCurr?'برافو! اتدربت كويس':'عدّيت الجولة '+lv)):'جرّب الجولة تاني، هتهزمه!')+'</div></div>'+
+  var rv=G.bad.length?'<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="tag">أخطاء الجولة — صحّحها الآن لترفع إتقانك لـ ٣ نجوم ⭐</div>'+G.bad.map(function(q){return'<div><b style="direction:ltr;display:block;text-align:left">'+revTxt(q)+'</b><span class="sm">'+q[4]+'</span></div>'}).join('')+(S.mis&&S.mis.length&&!G.rev?'<button class="btn" style="font-size:15px;min-height:42px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="startReview()">🛠️ ادخل مختبر التصحيح الآن ('+S.mis.length+' سؤال) واكسب ضعف النقاط!</button>':'')+'</div>':'';
+  app.innerHTML='<div class="hd"><h1>'+(win?(G.rev?'ممتاز! صحّحت أخطاءك 🌟':(isCurr?'عاش! أتممت تدريب الدرس ('+stEarned+'/3 ⭐)':'انتصار! عدّيت الجولة '+lv+' ('+stEarned+'/3 ⭐)')):'جولة تدريبية جيدة! جربها تاني لتهزم الزعيم 💪')+'</h1><div>'+(win?(stEarned===3?'إتقان تام ٣ نجوم ذهبية! مكافأة إتقان إضافية 👑':'العب بحرية بلا حدود أو صحّح أخطاءك لتحصد الـ ٣ نجوم كاملة!'):'اللعب مفتوح بلا حدود ♾️ — راجع الشرح بالأسفل وادخل تاني فوراً!')+'</div></div>'+
   (win?'<div class="card" style="text-align:center">'+stars(G.h,36)+'</div>':'')+
   '<div class="card row">'+misterImg(win?'c':'h',50)+'<div class="sp" style="font-weight:700;font-size:14px;line-height:1.7">'+(G.rev?(win?'برافو! صحّحت أخطاءك وده أحسن طريقة للحفظ.':'ولا يهمك، الغلط بيعلّمك. جرّب جولة التصحيح تاني.'):(win?'شطور! هزمت الوحش بإجاباتك.':'ولا يهمك! راجع أخطاءك وجرّب تاني، هتهزمه.'))+'</div></div>'+(mmsg?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7">'+mmsg+'</div>':'')+'<div class="card row" style="justify-content:space-around"><div style="text-align:center"><div class="sm">عملات الجولة</div><div class="big">+'+(G.earned+bonus)+'</div></div><div style="text-align:center"><div class="sm">رصيدك</div><div class="big">'+S.coins+'</div></div></div>'+rv+
   '<div class="sp"></div>'+(G.rev?((S.mis&&S.mis.length)?'<button class="btn" style="font-size:20px" onclick="startReview()">جولة تصحيح تانية</button>':'')+'<button class="btn t" onclick="home()">الرئيسية</button>':(isCurr?'<button class="btn" style="font-size:20px" onclick="curriculum()">تدريبات أكتر</button>':(win&&lv<40?'<button class="btn" style="font-size:20px" onclick="start('+(lv+1)+')">الجولة التالية ('+(lv+1)+') ⬅️</button>':'')+(win&&(lv===20||lv===40)&&!isCurr?'<button class="btn" style="font-size:17px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="certMap()">👑 استلم شهادة ختم الخريطة ('+lv+' جولة)!</button>':''))+
@@ -5761,7 +5784,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=9.6').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.0').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -7714,6 +7737,287 @@ tPanelScr=function(){
 };
 var _onFB9=window.onFB;
 window.onFB=function(){if(_onFB9)_onFB9();setTimeout(function(){lesPull()},2500)};
+
+
+/* ==========================================================================
+   v11.0 — إلغاء القلوب وقفل اللعب نهائياً + أكاديمية التأسيس والبرجراف التفاعلي
+   ========================================================================== */
+S.dhp=3;S.hpWaitUntil=0;
+hpLocked=function(){return false};
+hpNorm=function(){S.dhp=3;S.hpWaitUntil=0};
+revHeartReady=function(){return false};
+revHeartGrant=function(){S.coins+=25;addPts(25);return {ok:1,msg:'🌟 مكافأة إتقان المراجعة: +25 عملة و+25 نقطة ترتيب!'}};
+
+/* تحويل أي مكافأة قلوب في الأكواد السرية إلى جولات طاقة مضاعفة (×2) + عملات */
+var _applyGiftObj10=applyGiftObj;
+applyGiftObj=function(code,g){
+  if(g&&g.h>0){
+    S.boostRounds=(Number(S.boostRounds)||0)+(g.h*2);
+  }
+  _applyGiftObj10(code,g);
+};
+
+/* تحديث رسالة التحديث للإصدار الحادي عشر v11.0 */
+APP_UPDATE={
+  ver:'v11.0',
+  title:'التحديث التاريخي (v11.0): لعب مفتوح بلا قلوب + أكاديمية التأسيس والبرجراف! 🚀🧱',
+  sub:'الإصدار الحادي عشر (v11.0) — تأسيس + شرح + لعب بلا حدود ♾️',
+  gift:1000,
+  giftPts:1500,
+  intro:'أهلاً بيك يا بطل في النقلة الأكبر لمنصة «تحدّي الأصحاب» مع مستر عبدالرحمن حسنين! لغينا قفل القلوب نهائياً وضفنا لك أكاديمية تأسيس كاملة:',
+  items:[
+    {ic:'♾️',t:'وداعاً لانتهاء القلوب والانتظار — لعب مفتوح بلا حدود!',d:'مفيش قفل للعبة بعد النهاردة لو غلطت! العب، جرب، واتعلم من أخطائك براحتك في كل الجولات واجمع الـ ٣ نجوم الذهبية.'},
+    {ic:'🧱',t:'أكاديمية التأسيس التفاعلي من الصفر (Phonics & Grammar)',d:'ركن جديد لتأسيس القراءة السليمة (الحروف المركبة والصامتة)، الضمائر وتكوين الجملة، وأهم الأفعال الشاذة بالنطق العادي والبطيء!'},
+    {ic:'✍️',t:'ورشة كتابة البرجراف الذكية (Paragraph Builder)',d:'اكتب برجراف كامل خطوة بخطوة في أهم موضوعات منهجك، اسمعه بصوت واضح، وانطقه بالمايك لتكسب +50 عملة و+50 نقطة!'},
+    {ic:'🎁',t:'هدية انطلاق الإصدار الحادي عشر: +1500 نقطة و+1000 عملة!',d:'اضغط على زر الاستلام بالأسفل ليضاف لرصيدك فوراً +1500 نقطة في الترتيب الأسبوعي و+1000 عملة ذهبية!'}
+  ]
+};
+
+/* ---------------- بيانات أكاديمية التأسيس والبرجراف التفاعلي ---------------- */
+var FND_TAB='phonics',FND_PARA_IDX=0,FND_PARA_STEP=0,FND_PARA_DONE=false;
+
+var FND_PHONICS=[
+  {g:'sh = /ʃ/ (ش)',w:'ship • fish • wash • brush',ar:'الحرفان s+h ينطقان معاً مثل حرف (ش) في العربية.',ex:'She sells fresh fish in the shop.',exAr:'هي تبيع سمكاً طازجاً في المحل.'},
+  {g:'ch = /tʃ/ (تش)',w:'chair • teacher • lunch • watch',ar:'الحرفان c+h ينطقان معاً (تش) مثل كلمة كرسي أو معلم.',ex:'The teacher sat on the wooden chair.',exAr:'جلس المعلم على الكرسي الخشبي.'},
+  {g:'th = /θ/ (ث) أو /ð/ (ذ)',w:'think • three • bath  |  this • mother • brother',ar:'الحرفان t+h ينطقان (ث) في كلمات مثل think/three، وينطقان (ذ) في كلمات مثل this/mother.',ex:'My brother is three years old.',exAr:'أخي عمره ثلاث سنوات.'},
+  {g:'ph = /f/ (ف)',w:'phone • photo • elephant • dolphin',ar:'الحرفان p+h ينطقان دائماً مثل حرف (ف) F.',ex:'I took a photo of the big elephant.',exAr:'التقطت صورة للفيل الكبير.'},
+  {g:'tion = /ʃən/ (شَن)',w:'station • information • education • vacation',ar:'المقطع t-i-o-n في نهاية الكلمات ينطق (شَن).',ex:'Education is the key to a great nation.',exAr:'التعليم هو مفتاح الأمة العظيمة.'},
+  {g:'ture = /tʃər/ (تشر)',w:'picture • nature • future • adventure',ar:'المقطع t-u-r-e في نهاية الكلمات ينطق (تشَر).',ex:'We love reading adventure stories about nature.',exAr:'نحب قراءة قصص المغامرات عن الطبيعة.'},
+  {g:'Silent K & W (حروف صامتة لا تُنطق)',w:'know • knee • knife  |  write • wrong • wrist',ar:'حرف K لا ينطق إذا جاء بعده N في أول الكلمة، وحرف W لا ينطق إذا جاء بعده R!',ex:'I know how to write English sentences.',exAr:'أنا أعرف كيف أكتب جملاً إنجليزية.'},
+  {g:'Silent B & GH (حروف صامتة)',w:'climb • lamb • comb  |  night • light • high',ar:'حرف B لا ينطق بعد حرف M في آخر الكلمة، و(gh) لا تنطق في وسط/آخر كلمات مثل night و high.',ex:'The bright light shines at night.',exAr:'الضوء الساطع يشرق في الليل.'},
+  {g:'Magic E (الـ E السحرية في آخر الكلمة)',w:'hat ➔ hate  |  kit ➔ kite  |  hop ➔ hope',ar:'وجود حرف e في آخر الكلمة القصيرة يجعل الحرف المتحرك قبلها ينطق طويلاً باسمه (Long Vowel)!',ex:'I hope you fly your kite in the park.',exAr:'أتمنى أن تطير طائرتك الورقية في الحديقة.'}
+];
+
+var FND_SENTENCE=[
+  {t:'١. القاعدة الذهبية لتكوين الجملة الإنجليزية',rule:'كل جملة إنجليزية تبدأ بـ <b>الفاعل (Subject)</b> ثم <b>الفعل (Verb)</b> ثم <b>المفعول أو التكملة (Object)</b>.',rows:[
+    ['I / We / You / They','am / are  |  have  |  do  |  الفعل في المصدر (play)','They play football every Friday.'],
+    ['He / She / It (المفرد)','is  |  has  |  does  |  فعل + s (plays)','He plays football every Friday.']
+  ]},
+  {t:'٢. الفعل المساعد في المضارع والماضي (Verb to Be)',rule:'نستخدم <b>am / is / are</b> في المضارع بمعنى (يكون)، وفي الماضي تتحول إلى <b>was / were</b>.',rows:[
+    ['I','am (الآن)  ➔  was (في الماضي)','I am happy today. / I was tired yesterday.'],
+    ['He / She / It','is (الآن)  ➔  was (في الماضي)','She is at school now. / She was at home.'],
+    ['We / You / They','are (الآن)  ➔  were (في الماضي)','We are friends. / They were clever students.']
+  ]},
+  {t:'٣. تكوين السؤال الصحيح في ٤ خطوات',rule:'لتكوين أي سؤال: <b>أداة الاستفهام + فعل مساعد (do/does/did/is/are/can) + الفاعل + الفعل الأصلي في المصدر</b>.',rows:[
+    ['Where (أين - للمكان)','Where + do/does/did + فاعل + مصدر؟','Where do you live? — I live in Alexandria.'],
+    ['When (متى - للزمان)','When + do/does/did + فاعل + مصدر؟','When did she visit Cairo? — Last week.'],
+    ['Why (لماذا - للسبب)','Why ...? ونرد بـ Because (لأن) + جملة','Why are you studying hard? — To succeed!'],
+    ['How many / How much','How many + اسم جمع  |  How much + كمية/سعر','How many books do you have?']
+  ]}
+];
+
+var FND_VERBS=[
+  ['go','went','gone','يذهب'],['see','saw','seen','يرى'],['eat','ate','eaten','يأكل'],['drink','drank','drunk','يشرب'],
+  ['write','wrote','written','يكتب'],['read','read','read','يقرأ'],['buy','bought','bought','يشتري'],['make','made','made','يصنع / يجعل'],
+  ['take','took','taken','يأخذ'],['give','gave','given','يعطي'],['come','came','come','يأتي'],['know','knew','known','يعرف'],
+  ['speak','spoke','spoken','يتحدث'],['build','built','built','يبني'],['win','won','won','يفوز'],['find','found','found','يجد'],
+  ['sleep','slept','slept','ينام'],['run','ran','run','يجري'],['swim','swam','swum','يسبح'],['choose','chose','chosen','يختار']
+];
+
+var FND_PARAGRAPHS=[
+  {
+    title:'A Visit to Alexandria (زيارة إلى الإسكندرية) 🌊',
+    lvl:'مناسب للابتدائي والإعدادي',
+    steps:[
+      {ar:'١. الصيف الماضي، سافرت إلى الإسكندرية مع عائلتي بالقطار.',enPre:'Last summer, I travelled to Alexandria with my ____ by train.',o:['family','table','book','pencil'],a:0,full:'Last summer, I travelled to Alexandria with my family by train.',tip:'نبدأ البرجراف دائماً بجملة افتتاحية تحدد الزمان والمكان ومع من ذهبنا.'},
+      {ar:'٢. الجو كان مشمساً وجميلاً جداً.',enPre:'The weather ____ sunny and very beautiful.',o:['was','were','are','have'],a:0,full:'The weather was sunny and very beautiful.',tip:'كلمة weather مفرد والكلام في الماضي فنستخدم was.'},
+      {ar:'٣. في الصباح، سبحنا في البحر وبنينا قلعة رملية كبيرة.',enPre:'In the morning, we ____ in the sea and built a big sandcastle.',o:['swam','swim','swimming','swims'],a:0,full:'In the morning, we swam in the sea and built a big sandcastle.',tip:'الماضي من swim هو swam لأننا نحكي عن رحلة في الماضي.'},
+      {ar:'٤. في المساء، زرنا قلعة قايتباي ومكتبة الإسكندرية.',enPre:'In the evening, we visited Qaitbay Citadel and Alexandria ____.',o:['Library','Bakery','Hospital','Farm'],a:0,full:'In the evening, we visited Qaitbay Citadel and Alexandria Library.',tip:'من أشهر معالم الإسكندرية مكتبة الإسكندرية (Alexandria Library).'},
+      {ar:'٥. تناولنا سمكاً طازجاً لذيذاً وكنا سعداء للغاية.',enPre:'We ate delicious fresh fish and we were very ____.',o:['happy','sad','angry','lazy'],a:0,full:'We ate delicious fresh fish and we were very happy.',tip:'نختم البرجراف دائماً بجملة تعبر عن مشاعرنا السعيدة في نهاية اليوم.'}
+    ]
+  },
+  {
+    title:'My School & Favourite Subject (مدرستي ومادتي المفضلة) 🏫',
+    lvl:'مناسب للابتدائي والإعدادي',
+    steps:[
+      {ar:'١. أنا أحب مدرستي كثيراً لأنها نظيفة وكبيرة.',enPre:'I love my school very much ____ it is clean and big.',o:['because','but','or','so'],a:0,full:'I love my school very much because it is clean and big.',tip:'نستخدم because لبيان السبب.'},
+      {ar:'٢. أذهب إلى المدرسة كل يوم مبكراً مع أصدقائي.',enPre:'I ____ to school early every day with my friends.',o:['go','goes','going','went'],a:0,full:'I go to school early every day with my friends.',tip:'مع الضمير I في المضارع البسيط نستخدم الفعل في المصدر (go).'},
+      {ar:'٣. مادتي المفضلة هي اللغة الإنجليزية لأنها ممتعة ومفيدة.',enPre:'My favourite ____ is English because it is fun and useful.',o:['subject','sport','color','animal'],a:0,full:'My favourite subject is English because it is fun and useful.',tip:'كلمة subject تعني مادة دراسية.'},
+      {ar:'٤. معلمونا طيبون ويساعدوننا دائماً على الفهم والنجاح.',enPre:'Our teachers are kind and always ____ us understand and succeed.',o:['help','helps','helping','helped'],a:0,full:'Our teachers are kind and always help us understand and succeed.',tip:'الفاعل جمع (Our teachers) فنختار الفعل بدون s (help).'},
+      {ar:'٥. أنا أذاكر دروسي بجد لكي أصبح طبيباً أو مهندساً في المستقبل.',enPre:'I study my lessons hard ____ become a doctor or an engineer in the future.',o:['to','for','from','off'],a:0,full:'I study my lessons hard to become a doctor or an engineer in the future.',tip:'نستخدم to + المصدر للتعبير عن الغرض والهدف (لكي).'}
+    ]
+  },
+  {
+    title:'Modern Technology & The Internet (التكنولوجيا الحديثة) 💻',
+    lvl:'مناسب للإعدادي والثانوي',
+    steps:[
+      {ar:'١. تلعب التكنولوجيا الحديثة دوراً هاماً في حياتنا اليومية.',enPre:'Modern technology ____ a vital role in our daily life.',o:['plays','play','playing','played'],a:0,full:'Modern technology plays a vital role in our daily life.',tip:'technology اسم مفرد لا يعد، فنضيف s للفعل في المضارع البسيط (plays).'},
+      {ar:'٢. نحن نستخدم الإنترنت للبحث عن المعلومات وتعلم مهارات جديدة.',enPre:'We use the internet to search for ____ and learn new skills.',o:['information','pollution','furniture','luggage'],a:0,full:'We use the internet to search for information and learn new skills.',tip:'search for information تعني يبحث عن المعلومات.'},
+      {ar:'٣. الهواتف الذكية تساعدنا على التواصل مع أصدقائنا بسهولة.',enPre:'Smartphones help us ____ with our friends easily.',o:['communicate','destroy','ignore','waste'],a:0,full:'Smartphones help us communicate with our friends easily.',tip:'communicate with تعني يتواصل مع.'},
+      {ar:'٤. ومع ذلك، ينبغي ألا نضيع وقتنا في ألعاب الفيديو لساعات طويلة.',enPre:'However, we ____ not waste our time playing video games for long hours.',o:['should','would','have','are'],a:0,full:'However, we should not waste our time playing video games for long hours.',tip:'نستخدم should not + المصدر لتقديم النصيحة.'},
+      {ar:'٥. باختصار، يجب أن نستخدم التكنولوجيا بحكمة وأمان لبناء مستقبل أفضل.',enPre:'In short, we must use technology ____ and safely to build a better future.',o:['wisely','badly','sadly','lazily'],a:0,full:'In short, we must use technology wisely and safely to build a better future.',tip:'wisely ظرف بمعنى (بحكمة) يصف الفعل use.'}
+    ]
+  },
+  {
+    title:'Healthy Food & Good Habits (الغذاء الصحي والعادات السليمة) 🍎',
+    lvl:'مناسب لجميع المراحل',
+    steps:[
+      {ar:'١. الصحة الجيدة كنز عظيم، لذلك يجب أن نعتني بأجسامنا.',enPre:'Good health is a great treasure, so we must ____ care of our bodies.',o:['take','make','do','give'],a:0,full:'Good health is a great treasure, so we must take care of our bodies.',tip:'التعبير take care of يعني يعتني بـ.'},
+      {ar:'٢. ينبغي أن نأكل الفواكه والخضروات الطازجة كل يوم لأنها غنية بالفيتامينات.',enPre:'We should eat fresh fruit and ____ every day because they are rich in vitamins.',o:['vegetables','candies','plastic','stones'],a:0,full:'We should eat fresh fruit and vegetables every day because they are rich in vitamins.',tip:'fruit and vegetables = الفواكه والخضروات.'},
+      {ar:'٣. شرب الكثير من الماء وممارسة الرياضة يمنحان الجسم طاقة ونشاطاً.',enPre:'Drinking plenty of water and doing ____ give us energy.',o:['sports','mistakes','noise','sleep'],a:0,full:'Drinking plenty of water and doing sports give us energy.',tip:'doing sports تعني ممارسة الرياضة.'},
+      {ar:'٤. يجب أن نتجنب الوجبات السريعة والمشروبات الغازية لأنها غير صحية.',enPre:'We must avoid fast food and fizzy drinks because they are ____.',o:['unhealthy','healthy','useful','helpful'],a:0,full:'We must avoid fast food and fizzy drinks because they are unhealthy.',tip:'unhealthy تعني غير صحي.'},
+      {ar:'٥. أخيراً، النوم المبكر لمدة ثماني ساعات يساعدنا على التركيز في المدرسة.',enPre:'Finally, sleeping early for eight hours helps us ____ well at school.',o:['focus','forget','lose','cry'],a:0,full:'Finally, sleeping early for eight hours helps us focus well at school.',tip:'focus تعني يركز.'}
+    ]
+  }
+];
+
+function markFndDone(key,coins,pts,msg){
+  S.fndDone=Array.isArray(S.fndDone)?S.fndDone:[];
+  if(S.fndDone.indexOf(key)<0){
+    S.fndDone.push(key);
+    S.coins+=(coins||25);
+    addPts(pts||25);
+    save();submit();
+    try{sfxChest()}catch(e){}
+    showToast(msg||('🎉 عاش يا بطل! +'+coins+' عملة و+'+pts+' نقطة ترتيب!'));
+    return true;
+  }
+  try{ding()}catch(e){}
+  showToast('👏 راجعت هذا الجزء بنجاح! كمل باقي التأسيس');
+  return false;
+}
+
+function foundationScr(tab){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(tab)FND_TAB=tab;
+  S.fndDone=Array.isArray(S.fndDone)?S.fndDone:[];
+  function tBtn(k,ic,lbl){
+    var on=(FND_TAB===k);
+    return '<button class="pwb" style="flex:1 1 22%;font-size:12px;'+(on?'background:var(--teal);color:#FFE9B8;border-color:#FFD700':'')+'" onclick="foundationScr(\''+k+'\')">'+ic+' '+lbl+'</button>';
+  }
+  var bodyHtml='';
+  if(FND_TAB==='phonics'){
+    bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
+      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>🔤 مختبر الصوتيات والقراءة السليمة:</b> اضغط على زر السماعة في أي بطاقة لتسمع نطق الحروف المركبة والجمل بوضوح، ثم اختبر نفسك في نهاية الصفحة!</div>'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+      FND_PHONICS.map(function(p,i){
+        return '<div class="card" style="border-color:#2A5298">'+
+          '<div class="row">'+
+            '<span class="tag g" style="font-size:14px;padding:4px 10px;direction:ltr">'+esc(p.g)+'</span>'+
+            '<span class="sp"></span>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:4px 10px;font-size:12px" onclick="speak(\''+esc(p.w.replace(/[^A-Za-z\s]/g,' '))+'\')">🔊 اسمع الكلمات</button>'+
+          '</div>'+
+          '<div style="direction:ltr;text-align:left;font-family:Arial,sans-serif;font-size:18px;font-weight:900;color:#7A3B3B;margin-top:6px">'+esc(p.w)+'</div>'+
+          '<div style="font-size:13px;font-weight:700;margin-top:4px;line-height:1.6">💡 '+esc(p.ar)+'</div>'+
+          '<div class="cap-ex" style="margin-top:6px"><div class="sp"><div class="e">'+esc(p.ex)+'</div><div class="a">'+esc(p.exAr)+'</div></div><button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 10px" onclick="speak(\''+esc(p.ex.replace(/'/g,"\\'"))+'\')">🔊 الجملة</button></div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="markFndDone(\'fnd_ph\',35,35,\'🎉 أتممت مختبر الصوتيات! +35 عملة و+35 نقطة ترتيب!\');foundationScr(\'sent\')">✅ أتقنت قواعد الصوتيات! (+35 عملة وانتقل لتكوين الجملة ⬅️)</button>';
+  }else if(FND_TAB==='sent'){
+    bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
+      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>🏗️ معمل تكوين الجملة والضمائر:</b> افهم كيف ترتّب الجملة والسؤال بالإنجليزي بدون أخطاء، واضغط على أي مثال لسماعه!</div>'+
+    '</div>'+
+    FND_SENTENCE.map(function(sec){
+      return '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+        '<div class="tag g">'+sec.t+'</div>'+
+        '<div class="cap-sec cap-rule">'+sec.rule+'</div>'+
+        sec.rows.map(function(r){
+          return '<div class="cap-ex"><div class="sp"><div style="font-weight:900;font-size:14px;color:#7A3B3B;direction:ltr;text-align:left">'+esc(r[0])+' ➔ '+esc(r[1])+'</div><div class="e" style="font-size:14.5px;margin-top:2px">'+esc(r[2])+'</div></div><button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 10px" onclick="speak(\''+esc(r[2].replace(/'/g,"\\'"))+'\')">🔊</button></div>';
+        }).join('')+
+      '</div>';
+    }).join('')+
+    '<div class="row" style="gap:8px">'+
+      '<button class="btn" style="flex:1;font-size:15px;background:linear-gradient(135deg,#2F6B4A,#1B432C)" onclick="markFndDone(\'fnd_snt\',35,35,\'🎉 أتممت تأسيس الجملة! +35 عملة و+35 نقطة!\');foundationScr(\'verbs\')">✅ فهمت تكوين الجملة (+35 🪙)</button>'+
+      '<button class="btn t" style="flex:1;font-size:15px" onclick="sbIntro()">🧩 طبّق في لعبة تركيب الجمل</button>'+
+    '</div>';
+  }else if(FND_TAB==='verbs'){
+    bodyHtml='<div class="card row" style="align-items:center">'+misterImg('c',52)+
+      '<div class="sp" style="font-size:13.5px;font-weight:700;line-height:1.7"><b>⏳ أهم ٢٠ فعلاً في اللغة الإنجليزية وتصريفاتها (Present / Past / P.P):</b> اضغط على أي فعل لتسمع تصريفاته الثلاثة بنطق واضح!</div>'+
+    '</div>'+
+    '<div class="lw-list">'+
+      FND_VERBS.map(function(v,idx){
+        var spkAll=v[0]+', '+v[1]+', '+v[2];
+        return '<div class="card row" style="padding:10px;border-color:#8A6A4A">'+
+          '<div class="sp">'+
+            '<div style="direction:ltr;text-align:left;font-family:Arial,sans-serif;font-size:17px;font-weight:900;color:var(--ink)"><span style="color:#2F6B4A">'+v[0]+'</span> ➔ <span style="color:#C2571A">'+v[1]+'</span> ➔ <span style="color:#2A5298">'+v[2]+'</span></div>'+
+            '<div style="font-size:14px;font-weight:900;color:#7A3B3B;margin-top:2px">'+esc(v[3])+'</div>'+
+          '</div>'+
+          '<button class="pwb" style="flex:none;width:auto;min-height:36px;padding:4px 10px;font-size:12.5px" onclick="speak(\''+spkAll+'\')">🔊 اسمع الـ ٣</button>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+    '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="markFndDone(\'fnd_vbs\',40,40,\'🎉 راجعت جدول الأفعال! +40 عملة و+40 نقطة!\');foundationScr(\'para\')">✅ حفظت تصريفات الأفعال! (+40 عملة وانتقل لورشة البرجراف ✍️)</button>';
+  }else{
+    /* ورشة كتابة البرجراف الذكية خطوة بخطوة */
+    var P=FND_PARAGRAPHS[FND_PARA_IDX]||FND_PARAGRAPHS[0];
+    var topicBtns=FND_PARAGRAPHS.map(function(tp,idx){
+      var on=(idx===FND_PARA_IDX);
+      return '<button class="pwb" style="flex:1 1 45%;font-size:12px;'+(on?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="FND_PARA_IDX='+idx+';FND_PARA_STEP=0;FND_PARA_DONE=false;foundationScr(\'para\')">📝 '+tp.title+'</button>';
+    }).join('');
+
+    var builtSentences=[];
+    for(var s=0;s<FND_PARA_STEP;s++){builtSentences.push(P.steps[s].full)}
+    if(FND_PARA_DONE)builtSentences=P.steps.map(function(st){return st.full});
+
+    var stepArea='';
+    if(!FND_PARA_DONE){
+      var curSt=P.steps[FND_PARA_STEP];
+      stepArea='<div class="card" style="border-color:#C9973F;border-width:2.5px">'+
+        '<div class="tag g">الجملة '+(FND_PARA_STEP+1)+' من '+P.steps.length+' — أكمل الكلمة المناسبة لبناء البرجراف</div>'+
+        '<div style="font-size:15px;font-weight:900;color:#7A3B3B;margin-top:8px">'+esc(curSt.ar)+'</div>'+
+        '<div class="en" style="font-size:20px;margin:8px 0">'+esc(curSt.enPre)+'</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;direction:ltr">'+
+          curSt.o.map(function(optW,oi){
+            return '<button class="opt" style="font-size:18px;padding:8px" onclick="pickParaWord('+oi+')">'+esc(optW)+'</button>';
+          }).join('')+
+        '</div>'+
+        '<div id="paraFb" style="margin-top:8px"></div>'+
+      '</div>';
+    }else{
+      var fullText=builtSentences.join(' ');
+      stepArea='<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border:3px solid #2F6B4A;text-align:center">'+
+        '<div style="font-size:28px">🎉✍️🌟</div>'+
+        '<div style="font-weight:900;font-size:18px;color:#2F6B4A">أحسنت! كوّنت البرجراف كاملاً بنجاح!</div>'+
+        '<div class="sm" style="margin:4px 0 8px">اضغط على أي كلمة في البرجراف بالأسفل لترجمتها، أو اسمع البرجراف كاملاً:</div>'+
+        '<div class="row" style="gap:8px">'+
+          '<button class="btn" style="flex:1;font-size:15px;background:#2F5F5A" onclick="speak(\''+esc(fullText.replace(/'/g,"\\'"))+'\')">🔊 اسمع البرجراف كاملاً</button>'+
+          '<button class="btn" style="flex:1;font-size:15px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="FND_PARA_IDX=(FND_PARA_IDX+1)%FND_PARAGRAPHS.length;FND_PARA_STEP=0;FND_PARA_DONE=false;foundationScr(\'para\')">📝 موضوع برجراف جديد ⬅️</button>'+
+        '</div>'+
+      '</div>';
+    }
+
+    bodyHtml='<div class="card"><div class="tag">اختار موضوع البرجراف ('+P.lvl+')</div><div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">'+topicBtns+'</div></div>'+
+      '<div class="card">'+
+        '<div class="row"><span class="tag g" style="flex:1">📓 كراسة البرجراف: '+P.title+'</span><span class="sm">'+(FND_PARA_DONE?P.steps.length:FND_PARA_STEP)+' / '+P.steps.length+' جمل</span></div>'+
+        '<div class="psg-box" style="margin-top:8px;min-height:70px">'+(builtSentences.length?builtSentences.join(' '):'<span style="color:#8A6A4A;font-size:14px">اختر الكلمة الصحيحة بالأسفل لتبدأ كتابة أول جملة في البرجراف... ✍️</span>')+'</div>'+
+      '</div>'+
+      stepArea;
+  }
+
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700"><h1>أكاديمية التأسيس والبرجراف 🧱✍️</h1><div>تأسس في الصوتيات والجرامر والأفعال واكتب برجرافك خطوة بخطوة!</div></div>'+
+    '<div class="row" style="flex-wrap:wrap;gap:6px">'+
+      tBtn('phonics','🔤','الصوتيات والنطق')+
+      tBtn('sent','🏗️','تكوين الجملة')+
+      tBtn('verbs','⏳','الأفعال الشاذة')+
+      tBtn('para','✍️','ورشة البرجراف')+
+    '</div>'+
+    bodyHtml+
+    '<button class="btn t" onclick="home()">🏠 العودة للرئيسية</button>'+
+    bnav('les');
+}
+
+function pickParaWord(oi){
+  var P=FND_PARAGRAPHS[FND_PARA_IDX]||FND_PARAGRAPHS[0];
+  var st=P.steps[FND_PARA_STEP];if(!st)return;
+  var fb=document.getElementById('paraFb');
+  if(oi===st.a){
+    try{sfxOk(false)}catch(e){}
+    speak(st.full);
+    FND_PARA_STEP++;
+    if(FND_PARA_STEP>=P.steps.length){
+      FND_PARA_DONE=true;
+      markFndDone('para_'+FND_PARA_IDX,50,50,'🎉 كتبت البرجراف كاملاً! +50 عملة ذهبية و+50 نقطة ترتيب!');
+    }else{
+      S.coins+=5;addPts(5);save();
+    }
+    foundationScr('para');
+  }else{
+    try{sfxBad(true)}catch(e){}
+    if(fb)fb.innerHTML='<div class="cap-sec cap-trap">💡 فكّر تاني يا بطل: '+esc(st.tip)+'</div>';
+  }
+}
 
 /* ==========================================================================
    v10 — بطولة السنتر: سجل حصص دائم بالتاريخ + إضافة نقاط الحصة للترتيب العام
