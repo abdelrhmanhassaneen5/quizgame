@@ -947,7 +947,7 @@ if(window.FIREBASE_CONFIG){
   window.FB={
     submit:(wk,uid,name,pts,meta)=>{
       const ref=FS.doc(db,'weeks',String(wk),'scores',uid);
-      const base={name:String(name||'بطل').slice(0,14),pts:Math.max(0,Math.min(500000,Math.round(Number(pts)||0))),t:FS.serverTimestamp()};
+      const base={name:String(name||'بطل').slice(0,14),pts:Math.max(0,Math.min(5000000,Math.round(Number(pts)||0))),t:FS.serverTimestamp()};
       return FS.setDoc(ref,base).catch((err)=>{console.warn('FB.submit error:',err);throw err});
     },
     grpSet:(id,d)=>FS.setDoc(FS.doc(db,'cgroups',String(id)),Object.assign({},d,{t:FS.serverTimestamp()})),
@@ -1846,7 +1846,8 @@ function pick(k){
     /* v8: سؤال بمساعدة (حذف إجابتين / +5ث / المرافق) = نصف العملات ونقاط الترتيب */
     if(helped)gain=Math.ceil(gain*0.5);
     statSolved(helped);if(G.rev)S.statsRevFixed=(S.statsRevFixed||0)+1;
-    if(q[5]==='sb'){S.sbOk=(S.sbOk||0)+1;if(!S.mute)setTimeout(function(){speak(q[2][0])},200)}
+    if(q[5]==='sb'){S.sbOk=(S.sbOk||0)+1;if(!S.mute)speakAfterCheer(q[2][0])}
+    else if((q[5]==='lm'||q[5]==='lw'||q[5]==='lp')&&q[7]&&!S.mute){speakAfterCheer(q[7])}
     misDel(q);tsAdd(q,1);mTick('a');if(G.rev)mTick('rv');if(q[5].charAt(0)==='l')mTick('ls');
     msg='إجابة صح! +'+(gain*cm)+' عملة'+(helped?' (نصف الدرجة لاستخدام مساعدة 💡)':'')+(G.rage?' (مكافأة سؤال الغضب ×2 🔥)':'')+(S.role==='thief'?' (مهارة السارق 🦹‍♂️)':'')+(G.rev?' (مراجعة ×2)':'');
     if(isCombo){msg+=' • كومبو! ضربة مضاعفة';mTick('k')}
@@ -2160,7 +2161,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
     var mySV=S.survBest||0;
     topInfoCard='<div class="card" style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:#D9742B;line-height:1.8;font-size:14px"><div class="tag" style="background:#B23A3A">⏱️ ترتيب أبطال النجاة (60 ثانية)</div><div style="margin-top:6px">أقوى وأسرع أبطال جاوبوا أكبر عدد من الأسئلة الصح في تحدي النجاة هذا الأسبوع!<br>أعلى رقم قياسي ليك: <b>'+mySV+' إجابة صح 🔥</b></div><button class="btn" style="width:100%;margin-top:8px;font-size:15px;min-height:40px;background:linear-gradient(135deg,#B23A3A,#6B1D1D)" onclick="survIntro()">🚀 العب تحدي النجاة واكسر رقمك!</button></div>';
   }else{
-    topInfoCard='<div class="card" style="line-height:1.9;font-size:14px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+' • <b>'+leftTxt()+'</b><br><span class="sm">📢 ملاحظة: الترتيب الأسبوعي يبدأ دورة جديدة كل يوم سبت (مع حفظ أبطال الأسبوع الماضي بالأسفل)، وكل إجابة صحيحة تزيد نقاطك فوراً!</span></div>'+
+    topInfoCard='<div class="card" style="line-height:1.9;font-size:14px"><div class="tag g">مواعيد الأسبوع</div><b>الأسبوع الحالي:</b> '+wkRange(wkKey())+' • <b>'+leftTxt()+'</b><br><span class="sm">🛡️ <b>نقاطك تراكمية ومحفوظة للأبد بدون تصفير!</b> كل نقطة تجمعها تظل في رصيدك دائماً، ويتم تكريم الأوائل بشهادات التقدير كل أسبوع!</span></div>'+
     '<div class="card"><div class="tag">جايزة أبطال الأسبوع (أول 3 مراكز)</div><div style="font-size:14px;margin-top:8px;line-height:1.7">الأول: 200 عملة + لقب البطل 🥇 • التاني: 100 🥈 • التالت: 50 🥉<br><b>+ شهادة تقدير رسمية من مستر عبدالرحمن لأول 3 أوائل للتحميل والمشاركة على واتساب!</b></div>'+(S.cert?'<button class="btn" style="width:100%;margin-top:8px;font-size:15px" onclick="certScr()">🎓 عرض وتحميل شهادة التقدير</button>':'')+'</div>'+
     '<div class="card"><div style="text-align:center;margin-bottom:8px"><span class="lg-badge" style="background:'+LG[li].c+'">'+lgIcon(li,20)+' دوريك الحالي: الدوري ال'+LG[li].n+'</span></div><div class="row">'+lgIcon(li,44)+'<div class="sp"><div class="sm">اسمك: '+esc(S.nick)+(S.crowns?' • ألقاب: '+S.crowns:'')+'</div><div style="font-weight:900">نقاطك: '+pts+' • دوري '+LG[li].n+'</div></div><button class="btn t" style="font-size:14px;padding:6px 12px;min-height:36px" onclick="nick()">غيّر الاسم</button></div><div id="mr" style="margin-top:8px;font-weight:700">ترتيبك: ...</div>'+prog+'</div>'+
     '<div class="card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border-color:#2F5F5A;font-size:13.5px;font-weight:700;line-height:1.9"><b>🚀 كل نشاط بيضيف 100% من نقاطه لترتيبك الأسبوعي!</b><br>جولات الخريطة 🗺️ • تحدي النجاة ⏱️ • الحلبة اليومية 🎯 • انطق واضرب الوحش 🎙️ • محقق القطعة 🕵️ • بناء المدينة 🏙️<br><span class="sm">والشراء من المتجر مش بينقص ولا نقطة من ترتيبك.</span></div>';
@@ -3601,7 +3602,7 @@ function pickSBOnly(good,built,target){
     var bm=bdgCheck();
     msg='تركيب ممتاز! +'+gain+' عملة'+(helped?' (نصف الدرجة لاستخدام مساعدة 💡)':'')+(bm?' • '+bm:'');
     sfxOk(G.combo%3===0);
-    if(!S.mute)setTimeout(function(){speak(target)},250);
+    if(!S.mute)speakAfterCheer(target);
   }else{
     G.combo=0;
     G.bad.push(q);
@@ -5820,7 +5821,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=11.5').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.6').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -8197,7 +8198,7 @@ function pickPhHunt(oi){
   if(oi===q.a){
     try{sfxOk(false)}catch(e){}
     S.coins+=10;addPts(10);save();
-    speakRate(q.w,0.6);
+    speakAfterCheer(q.w,0.6);
     if(fb)fb.innerHTML='<div class="card" style="background:#CFE3D4;border-color:#2F6B4A;font-weight:900;color:#1B432C">🎉 ممتاز يا صائد الأصوات! الكلمة هي <b style="direction:ltr;display:inline-block">'+q.w+'</b> (+10 عملات و+10 نقاط)</div>';
     setTimeout(function(){
       PH_HUNT_I++;
@@ -8352,7 +8353,7 @@ function pickParaWord(oi){
   var fb=document.getElementById('paraFb');
   if(oi===st.a){
     try{sfxOk(false)}catch(e){}
-    speakRate(st.full,0.58);
+    speakAfterCheer(st.full,0.58);
     FND_PARA_STEP++;
     if(FND_PARA_STEP>=P.steps.length){
       FND_PARA_DONE=true;
@@ -8366,6 +8367,123 @@ function pickParaWord(oi){
     if(fb)fb.innerHTML='<div class="cap-sec cap-trap">💡 فكّر تاني يا بطل: '+esc(st.tip)+'</div>';
   }
 }
+
+
+/* ==========================================================================
+   v11.6 — ١) فاصل صوتي ذكي بين تشجيع المستر ونطق الجملة الإنجليزية
+           ٢) حفظ النقاط تراكمياً للأبد بدون تصفير أسبوعي أو عند تغيير المرحلة
+   ========================================================================== */
+var CHEER_SPK_TMR=0;
+function speakAfterCheer(txt,rate){
+  if(S.mute||!txt)return;
+  clearTimeout(CHEER_SPK_TMR);
+  /* فحص ما إذا كان هناك ملف صوتي للتشجيع (ok.mp3 / combo.mp3) يعمل حالياً */
+  var activeAudio=null;
+  try{
+    Object.keys(VOS||{}).forEach(function(k){
+      var a=VOS[k];
+      if(a&&!a.paused&&!a.ended&&a.currentTime>0)activeAudio=a;
+    });
+  }catch(e){}
+  if(activeAudio){
+    var doneOnce=false;
+    var go=function(){
+      if(doneOnce)return;doneOnce=true;
+      clearTimeout(CHEER_SPK_TMR);
+      CHEER_SPK_TMR=setTimeout(function(){
+        if(typeof speakRate==='function'&&rate)speakRate(txt,rate);
+        else speak(txt);
+      },350);
+    };
+    activeAudio.addEventListener('ended',go,{once:true});
+    /* حد أقصى للانتظار في حال تأخر حدث ended */
+    var remMs=1600;
+    try{
+      if(activeAudio.duration&&isFinite(activeAudio.duration)){
+        remMs=Math.max(500,Math.min(3500,Math.round((activeAudio.duration-activeAudio.currentTime)*1000)+350));
+      }
+    }catch(e){}
+    CHEER_SPK_TMR=setTimeout(go,remMs);
+  }else{
+    /* إذا كان التشجيع نغمة فقط بدون ملف صوتي، ننتظر 950ms حتى تنتهي النغمة تماماً ثم ننطق الجملة */
+    CHEER_SPK_TMR=setTimeout(function(){
+      if(typeof speakRate==='function'&&rate)speakRate(txt,rate);
+      else speak(txt);
+    },950);
+  }
+}
+
+/* --- نظام النقاط التراكمية الدائمة (Permanent Cumulative Points — بلا تصفير أبداً) --- */
+function syncPermanentPts(){
+  var k=wkKey();
+  var cur=(S.wk&&Number(S.wk.p))||0;
+  var prev=(S.prevWk&&Number(S.prevWk.p))||0;
+  var lsP=(S.ls&&Number(S.ls.p))||0;
+  var tot=Number(S.totalPts)||0;
+  var otherStg=0;
+  ['prog_p','prog_m','prog_s'].forEach(function(pk){
+    if(S[pk]&&S[pk].wk&&Number(S[pk].wk.p)>0){
+      otherStg=Math.max(otherStg,Number(S[pk].wk.p));
+    }
+  });
+  /* إذا كان لدى الطالب نقاط في الأسبوع السابق وتصفرت هذا الأسبوع، نجمعها مع نقاطه الحالية! */
+  var recovered=cur;
+  if(S.wk&&S.wk.k===k&&prev>0&&!S.prevMerged){
+    recovered=cur+prev;
+    S.prevMerged=1;
+  }else if(S.wk&&S.wk.k!==k&&cur>0){
+    recovered=cur;
+  }
+  var best=Math.max(tot,recovered,prev,lsP,otherStg);
+  S.totalPts=best;
+  S.wk={k:k,p:best};
+  return best;
+}
+
+wkPts=function(){
+  return syncPermanentPts();
+};
+
+addPts=function(n){
+  n=Math.round(Number(n)||0);
+  if(!n)return;
+  var base=syncPermanentPts();
+  var nextP=Math.max(0,base+n);
+  S.totalPts=nextP;
+  S.wk={k:wkKey(),p:nextP};
+  LBD=null;LLB=0;
+  save();
+  updTopPts(n);
+  scheduleCloudSync();
+};
+
+/* عند تغيير المرحلة الدراسية (ابتدائي / إعدادي / ثانوي) يحتفظ الطالب بإجمالي نقاطه التراكمية ولا ترجع للصفر أبداً */
+var _setStage115=setStage;
+setStage=function(x){
+  var keepPts=syncPermanentPts();
+  _setStage115(x);
+  if(keepPts>0){
+    S.totalPts=Math.max(Number(S.totalPts)||0,keepPts,(S.wk&&Number(S.wk.p))||0);
+    S.wk={k:wkKey(),p:S.totalPts};
+    save();
+    updTopPts(0);
+  }
+};
+
+/* تضمين totalPts و prevWk في كود الحفظ السحابي snap() */
+var _snap115=snap;
+snap=function(){
+  try{
+    var o=JSON.parse(_snap115());
+    o.totalPts=syncPermanentPts();
+    o.prevWk=S.prevWk||null;
+    o.prevMerged=S.prevMerged||0;
+    return JSON.stringify(o);
+  }catch(e){return _snap115()}
+};
+
+/* تشغيل استرجاع وحماية النقاط فور فتح المنصة */
+try{syncPermanentPts();save();updTopPts(0)}catch(e){}
 
 /* ==========================================================================
    v10 — بطولة السنتر: سجل حصص دائم بالتاريخ + إضافة نقاط الحصة للترتيب العام
