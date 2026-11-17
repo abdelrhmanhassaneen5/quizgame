@@ -947,8 +947,22 @@ if(window.FIREBASE_CONFIG){
   window.FB={
     submit:(wk,uid,name,pts,meta)=>{
       const ref=FS.doc(db,'weeks',String(wk),'scores',uid);
-      const base={name:String(name||'بطل').slice(0,14),pts:Math.max(0,Math.min(5000000,Math.round(Number(pts)||0))),t:FS.serverTimestamp()};
+      const cleanName=String(name||'بطل').slice(0,14);
+      const cleanPts=Math.max(0,Math.min(5000000,Math.round(Number(pts)||0)));
+      const base={name:cleanName,pts:cleanPts,t:FS.serverTimestamp()};
       return FS.setDoc(ref,base).catch((err)=>{console.warn('FB.submit error:',err);throw err});
+    },
+    findByName:async(wkList,name)=>{
+      const target=String(name||'').trim();
+      if(!target)return [];
+      const found=[];
+      for(let i=0;i<wkList.length;i++){
+        try{
+          const s=await FS.getDocs(FS.query(FS.collection(db,'weeks',String(wkList[i]),'scores'),FS.where('name','==',target),FS.limit(5)));
+          s.docs.forEach(d=>found.push(Object.assign({id:d.id,wk:wkList[i]},d.data())));
+        }catch(e){}
+      }
+      return found;
     },
     grpSet:(id,d)=>FS.setDoc(FS.doc(db,'cgroups',String(id)),Object.assign({},d,{t:FS.serverTimestamp()})),
     grpDel:(id)=>FS.deleteDoc(FS.doc(db,'cgroups',String(id))),
@@ -5821,7 +5835,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=11.6').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.7').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -8482,8 +8496,7 @@ snap=function(){
   }catch(e){return _snap115()}
 };
 
-/* تشغيل استرجاع وحماية النقاط فور فتح المنصة */
-try{syncPermanentPts();save();updTopPts(0)}catch(e){}
+/* يتم تشغيل syncPermanentPts بعد load() مباشرة وليس قبلها لحماية localStorage من المسح */
 
 /* ==========================================================================
    v10 — بطولة السنتر: سجل حصص دائم بالتاريخ + إضافة نقاط الحصة للترتيب العام
@@ -8658,6 +8671,178 @@ updNet=function(){
   _updNet10();
   var el=document.getElementById('netBadge');
   if(el&&isOnline())el.innerHTML='🟢<span class="lg"> متصل</span>';
+};
+
+
+/* ==========================================================================
+   v11.7 — الحماية الثلاثية لبيانات الطالب + منع التصفير عند التحديث (Refresh)
+           + استرجاع الحساب والنقاط تلقائياً من السحابة بدون تكرار الاسم في الترتيب
+   ========================================================================== */
+var _LOAD_DONE=false;
+
+function saveIdCookie(){
+  try{
+    if(!S||!S.uid)return;
+    var mini=JSON.stringify({
+      u:S.uid,
+      n:S.nick||'',
+      st:S.stage||'',
+      gr:S.grade||0,
+      p:Math.max(Number(S.totalPts)||0,(S.wk&&Number(S.wk.p))||0),
+      c:Number(S.coins)||0,
+      mx:Number(S.max)||1,
+      rc:S.rc||''
+    });
+    document.cookie='qd_id_bak='+encodeURIComponent(mini)+';max-age=31536000;path=/;SameSite=Lax';
+  }catch(e){}
+}
+
+function readIdCookie(){
+  try{
+    var m=document.cookie.match(/(?:^|;\s*)qd_id_bak=([^;]+)/);
+    if(!m)return null;
+    return JSON.parse(decodeURIComponent(m[1]));
+  }catch(e){return null}
+}
+
+/* تعديل load() لقراءة النسخة الأساسية، أو النسخة الاحتياطية qd_v2_bak، أو كوكي الطوارئ */
+var _origLoad116=load;
+load=function(){
+  var rawMain=null,rawBak=null;
+  try{rawMain=localStorage.getItem('qd_v2')}catch(e){}
+  try{rawBak=localStorage.getItem('qd_v2_bak')}catch(e){}
+  var objMain=null,objBak=null;
+  try{if(rawMain)objMain=JSON.parse(rawMain)}catch(e){}
+  try{if(rawBak)objBak=JSON.parse(rawBak)}catch(e){}
+
+  /* لو النسخة الأساسية فاضية أو ممسوحة بالخطأ بينما النسخة الاحتياطية فيها اسم الطالب أو نقاطه، نسترجع الاحتياطية فوراً */
+  var mainScore=(objMain&&((objMain.wk&&Number(objMain.wk.p))||Number(objMain.totalPts)||0))||0;
+  var bakScore=(objBak&&((objBak.wk&&Number(objBak.wk.p))||Number(objBak.totalPts)||0))||0;
+  var useBak=false;
+  if(!objMain&&objBak)useBak=true;
+  else if(objMain&&objBak){
+    if((!objMain.stage||!objMain.nick)&&(objBak.stage&&objBak.nick))useBak=true;
+    else if(bakScore>mainScore)useBak=true;
+  }
+  if(useBak&&rawBak){
+    try{localStorage.setItem('qd_v2',rawBak)}catch(e){}
+  }
+
+  _origLoad116();
+
+  /* لو لسه مفيش بيانات، نفحص كوكي الطوارئ */
+  var ck=readIdCookie();
+  if(ck&&ck.u){
+    if(!S.stage&&ck.st){
+      S.uid=ck.u;
+      S.nick=ck.n||S.nick;
+      S.stage=ck.st;
+      S.grade=ck.gr||1;
+      S.coins=Math.max(Number(S.coins)||0,Number(ck.c)||0);
+      S.max=Math.max(Number(S.max)||1,Number(ck.mx)||1);
+      if(ck.rc&&!S.rc){S.rc=ck.rc;S.rcOk=1}
+    }
+    var ckPts=Number(ck.p)||0;
+    if(ckPts>0){
+      S.totalPts=Math.max(Number(S.totalPts)||0,ckPts);
+      S.wk={k:wkKey(),p:Math.max((S.wk&&Number(S.wk.p))||0,S.totalPts)};
+    }
+  }
+
+  _LOAD_DONE=true;
+  syncPermanentPts();
+  save();
+};
+
+/* تعديل save() لمنع أي حفظ قبل اكتمال load()، وحفظ نسخة احتياطية محمية دائماً */
+save=function(){
+  if(!_LOAD_DONE)return;
+  try{
+    var str=JSON.stringify(S);
+    localStorage.setItem('qd_v2',str);
+    /* لا نحدّث النسخة الاحتياطية إلا إذا كان الحساب مكتملاً (فيه مرحلة واسم) أو نقاطه أكبر */
+    if(S&&S.stage&&S.nick){
+      localStorage.setItem('qd_v2_bak',str);
+      saveIdCookie();
+    }
+  }catch(e){}
+};
+
+/* استرجاع تلقائي من السحابة (Cloud Auto-Recovery):
+   ١) لو عند الطالب كود حفظ سحابي S.rc ونقاطه على السحابة أعلى، يسترجعها تلقائياً.
+   ٢) لو اضطر الطالب يكتب اسمه من جديد بعد مسح المتصفح، نبحث عن اسمه في ترتيب الأسبوع الحالي والسابق،
+      ونسترجع له الـ uid القديم ونقاطه (الـ 5000+ أو الـ 20000+) عشان ميتكررش اسمه مرتين في الترتيب وميضيعش مجهوده! */
+function autoRecoverFromCloud(cb){
+  if(!window.FB||!S.nick||!S.stage){if(cb)cb(false);return}
+  var w=wkKey();
+  var stSuffix=(S.stage==='p'?'p':(S.stage==='s'?'s':''));
+  var wkList=[String(w)+stSuffix, String(w-1)+stSuffix];
+  if(S.grade){
+    wkList.push(String(w)+stSuffix+'g'+S.grade);
+    wkList.push(String(w-1)+stSuffix+'g'+S.grade);
+  }
+  if(!FB.findByName){if(cb)cb(false);return}
+  FB.findByName(wkList, S.nick.trim()).then(function(matches){
+    if(!matches||!matches.length){if(cb)cb(false);return}
+    /* نرتب النتائج حسب الأعلى نقاطاً */
+    matches.sort(function(a,b){return (Number(b.pts)||0)-(Number(a.pts)||0)});
+    var best=matches[0];
+    var cloudPts=Number(best.pts)||0;
+    var myPts=syncPermanentPts();
+    var changed=false;
+    /* لو لقينا حساب بنفس الاسم ونقاطه أعلى (أو المستخدم لسه نقاطه 0)، نربطه بنفس الـ uid القديم عشان ميعملش اسم مكرر في الترتيب ونسترجع نقاطه! */
+    if(best.id && best.id!==S.uid && (myPts===0 || cloudPts>myPts)){
+      S.uid=best.id;
+      changed=true;
+    }
+    if(cloudPts>myPts){
+      S.totalPts=cloudPts;
+      S.wk={k:w,p:cloudPts};
+      changed=true;
+    }
+    if(changed){
+      save();
+      updTopPts(0);
+      showToast('☁️ تم استرجاع حسابك ونقاطك المحفوظة ('+S.totalPts+' نقطة) بنجاح!');
+      submitP();
+    }
+    if(cb)cb(changed);
+  }).catch(function(){if(cb)cb(false)});
+}
+
+/* استدعاء الاسترجاع السحابي عند حفظ الاسم لأول مرة أو عند فتح المنصة */
+var _saveNick116=saveNick;
+saveNick=function(){
+  var v=$('#nk')?$('#nk').value.trim().replace(/\s+/g,' ').slice(0,14):'';
+  if(nickErr(v))return;
+  S.nick=v;save();
+  autoRecoverFromCloud(function(){
+    submit();
+    if(NEXT){var f=NEXT;NEXT=null;f()}else board();
+  });
+};
+
+var _saveNickReq116=saveNickReq;
+saveNickReq=function(){
+  var v=$('#nk')?$('#nk').value.trim().replace(/\s+/g,' ').slice(0,14):'',e=nickErr(v);
+  if(e){rmsg(e);return}
+  S.nick=v;if(!S.t0)S.t0=Date.now();S.regW=wkId(wkKey());save();
+  autoRecoverFromCloud(function(){
+    submit();home();
+  });
+};
+
+var _onFB116=window.onFB;
+window.onFB=function(){
+  if(_onFB116)_onFB116();
+  setTimeout(function(){
+    /* لو الطالب داخل ومعاه اسم ومرحلة، نتأكد إن نقاطه على السحابة مش أعلى من المحلي (حماية ضد أي تصفير سابق) */
+    if(S.nick&&S.stage){
+      autoRecoverFromCloud(function(rec){
+        if(rec&&$('#topPtsVal'))updTopPts(0);
+      });
+    }
+  },1200);
 };
 
 load();applyTheme();DB=daily();!S.stage?stageScr():(!S.grade?gradeScr():(!S.nick?nickReq():home()));if(RQ&&S.stage&&S.grade&&!S.rm)roomScr(RQ.toUpperCase());
