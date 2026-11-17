@@ -5835,7 +5835,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=11.7').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.8').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -7829,8 +7829,8 @@ APP_UPDATE={
 var PH_TMR=[];
 function clearPhTmr(){while(PH_TMR.length)clearTimeout(PH_TMR.pop())}
 
-function speakRate(txt,rate){
-  clearPhTmr();
+function speakRate(txt,rate,keepTimers){
+  if(!keepTimers)clearPhTmr();
   if(!('speechSynthesis' in window))return false;
   try{
     speechSynthesis.cancel();
@@ -7845,37 +7845,48 @@ function speakRate(txt,rate){
   }catch(e){return false}
 }
 
-/* خريطة النطق الصوتي للمقاطع المنفردة عند الضغط على «تهجئة ودمج» حتى ينطقها المتصفح كأصوات وليس كأسماء حروف */
+/* خريطة النطق الصوتي للمقاطع والحروف المنفردة عند الضغط على «تهجئة ودمج» حتى ينطقها المتصفح كأصوات حقيقية وليس كأسماء حروف */
 var PHONEME_TTS={
   'sh':'shh','ch':'chuh','th':'thh','ph':'fff','wh':'wuh','ck':'kuh',
   'tion':'shun','ture':'cher','igh':'eye','kn':'nnn','wr':'rrr','mb':'mmm',
-  'a':'aah','e':'eh','i':'ih','o':'aw','u':'uh',
+  'a':'ah','e':'eh','i':'ih','o':'aw','u':'uh',
+  'b':'buh','c':'kuh','d':'duh','f':'fff','g':'guh','h':'huh','j':'juh','k':'kuh','l':'lll','m':'mmm',
+  'n':'nnn','p':'puh','r':'rrr','s':'sss','t':'tuh','v':'vvv','w':'wuh','y':'yuh','z':'zzz',
+  'br':'bruh','st':'stuh','nk':'nk','air':'air','tea':'tee','se':'z','to':'too','in':'in','ca':'kuh','ed':'ed','el':'el','ant':'ant',
   'ee':'eee','ea':'eee','ai':'ay','ay':'ay','oa':'oh','oo':'ooo','ou':'ow','ow':'ow','ar':'aar','or':'oar','er':'er','ir':'er','ur':'er'
 };
 
-function blendWord(wId,word,segs){
+function blendWord(pi,wi){
   clearPhTmr();
+  var p=FND_PHONICS[pi];
+  var wObj=p&&p.words&&p.words[wi];
+  if(!wObj)return;
+  var wId=pi+'_'+wi;
+  var word=wObj.w;
+  var parts=(wObj.s&&wObj.s.length)?wObj.s:[word];
   var box=document.getElementById('pw_'+wId);
   document.querySelectorAll('.ph-wbox.playing').forEach(function(x){x.classList.remove('playing')});
   document.querySelectorAll('.ph-seg.hi').forEach(function(x){x.classList.remove('hi')});
   if(box)box.classList.add('playing');
-  var parts=(segs&&segs.length)?segs:[word];
+  try{tone(660,0,0.06,'sine',0.08)}catch(e){}
+  var stepMs=880;
   parts.forEach(function(seg,idx){
     PH_TMR.push(setTimeout(function(){
       document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el,j){el.classList.toggle('hi',j===idx)});
       var k=String(seg||'').toLowerCase().replace(/[^a-z]/g,'');
       var sayTxt=PHONEME_TTS[k]||k;
-      speakRate(sayTxt,0.5);
-    },idx*820));
+      speakRate(sayTxt,0.52,true);
+    },idx*stepMs));
   });
   PH_TMR.push(setTimeout(function(){
     document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.add('hi')});
-    speakRate(word,0.55);
-  },parts.length*820+150));
+    try{ding()}catch(e){}
+    speakRate(word,0.55,true);
+  },parts.length*stepMs+180));
   PH_TMR.push(setTimeout(function(){
     if(box)box.classList.remove('playing');
     document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.remove('hi')});
-  },parts.length*820+1350));
+  },parts.length*stepMs+1450));
 }
 
 function slowWord(wId,word,rate){
@@ -8170,7 +8181,6 @@ function renderPhonicsLabHtml(){
         var wCards=p.words.map(function(wObj,wi){
           var wId=pi+'_'+wi;
           var segHtml=(wObj.s||[]).map(function(sg){return '<span class="ph-seg">'+esc(sg)+'</span>'}).join('');
-          var segsJson=JSON.stringify(wObj.s||[]).replace(/"/g,"\\'");
           return '<div class="ph-wbox" id="pw_'+wId+'">'+
             '<div class="ph-wtop">'+wObj.ic+'</div>'+
             '<div class="ph-wen">'+wObj.h+'</div>'+
@@ -8178,7 +8188,7 @@ function renderPhonicsLabHtml(){
             '<div class="ph-war">'+esc(wObj.ar)+'</div>'+
             '<div class="ph-wbtns">'+
               '<button class="b-tr" onclick="slowWord(\''+wId+'\',\''+wObj.w+'\',0.42)" title="نطق بطيء جداً للتأسيس">🐢 بطيء</button>'+
-              '<button class="b-bl" onclick="blendWord(\''+wId+'\',\''+wObj.w+'\','+segsJson+')" title="تهجئة الأصوات ودمجها">🧩 دمج</button>'+
+              '<button class="b-bl" onclick="blendWord('+pi+','+wi+')" title="تهجئة الأصوات ودمجها">🧩 دمج</button>'+
               '<button onclick="slowWord(\''+wId+'\',\''+wObj.w+'\',0.82)" title="النطق الطبيعي">🐇 طبيعي</button>'+
             '</div>'+
           '</div>';
