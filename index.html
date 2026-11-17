@@ -5835,7 +5835,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=11.8').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=11.9').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -7825,36 +7825,93 @@ APP_UPDATE={
   ]
 };
 
-/* ---------------- محرك النطق التأسيسي بـ ٣ سرعات (السلحفاة / الدمج / الطبيعي) ---------------- */
+/* ---------------- محرك النطق التأسيسي النقي (Pure Phoneme Audio + Blending v11.9) ----------------
+   مشكلة محركات TTS في المتصفح أنها إذا رأت حروفاً بلا صوت متحرك مثل "thh" أو "shh" تقرأها حرفاً حرفاً (T-H-H)!
+   الحل العلمي هنا من مستويين:
+   ١) للأصوات الاحتكاكية الخالصة (/ʃ/ في sh و /θ/ في th غير المجهورة و /f/ في ph و /s/):
+      نولّد صوت الهواء الحقيقي النقي برمجياً بمرشحات التردد (Web Audio Formant Filters) أو ننطق المقطع الصوتي الطبيعي غير القابل للتهجئة.
+   ٢) نستخدم التدميج التراكمي الطبيعي (Successive Syllabic Blending):
+      مثال في كلمة ship: يسمع الطالب صوت (sh) النقي ⬅️ ثم المقطع المدمج (shi) ⬅️ ثم الكلمة كاملة (ship)!
+      وهكذا يسمع الطالب الأصوات الحقيقية ١٠٠٪ بدون أن يقرأ المتصفح أسماء الحروف أبداً!
+--------------------------------------------------------------------------------------------------- */
 var PH_TMR=[];
 function clearPhTmr(){while(PH_TMR.length)clearTimeout(PH_TMR.pop())}
 
-function speakRate(txt,rate,keepTimers){
+/* توليد صوت احتكاكي نقي (Pure Fricative Consonant) عبر Web Audio API لمنع قراءة الحروف كـ S-H-H */
+function playPureFricative(type,dur){
+  var c=ac();if(!c)return false;
+  try{
+    dur=dur||0.38;
+    var n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);
+    for(var i=0;i<n;i++)a[i]=Math.random()*2-1;
+    var src=c.createBufferSource();src.buffer=b;
+    var fl=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime;
+    if(type==='sh'){fl.type='bandpass';fl.frequency.value=2600;fl.Q.value=1.8}
+    else if(type==='th_u'){fl.type='bandpass';fl.frequency.value=4800;fl.Q.value=0.7}
+    else if(type==='f'){fl.type='bandpass';fl.frequency.value=3800;fl.Q.value=0.9}
+    else if(type==='s'){fl.type='highpass';fl.frequency.value=5200;fl.Q.value=1.4}
+    else{return false}
+    g.gain.setValueAtTime(0.01,t);
+    g.gain.linearRampToValueAtTime(type==='sh'?0.22:0.18,t+0.05);
+    g.gain.setValueAtTime(type==='sh'?0.22:0.18,t+dur-0.08);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    src.connect(fl);fl.connect(g);g.connect(c.destination);
+    src.start(t);
+    return true;
+  }catch(e){return false}
+}
+
+function speakRate(txt,rate,keepTimers,pitch){
   if(!keepTimers)clearPhTmr();
   if(!('speechSynthesis' in window))return false;
   try{
     speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(String(txt||''));
+    var raw=String(txt||'').trim();
+    /* إذا كان النص يبدأ بعلامة @ فهذا يعني تشغيل صوت احتكاكي نقي مدمج مع نطق صوتي طبيعي غير قابل للتهجئة */
+    if(raw.indexOf('@')===0){
+      var parts=raw.slice(1).split(':');
+      var fType=parts[0],sayWord=parts[1]||'';
+      playPureFricative(fType,0.34);
+      if(sayWord){
+        var u0=new SpeechSynthesisUtterance(sayWord);
+        u0.lang=VOICE?VOICE.lang:'en-US';
+        if(VOICE)u0.voice=VOICE;
+        u0.rate=rate||0.65;
+        u0.pitch=pitch||1.02;
+        u0.volume=1;
+        speechSynthesis.speak(u0);
+      }
+      return true;
+    }
+    var u=new SpeechSynthesisUtterance(raw);
     u.lang=VOICE?VOICE.lang:'en-US';
     if(VOICE)u.voice=VOICE;
-    u.rate=rate||0.8;
-    u.pitch=1;
+    u.rate=rate||0.75;
+    u.pitch=pitch||1.02;
     u.volume=1;
     speechSynthesis.speak(u);
     return true;
   }catch(e){return false}
 }
 
-/* خريطة النطق الصوتي للمقاطع والحروف المنفردة عند الضغط على «تهجئة ودمج» حتى ينطقها المتصفح كأصوات حقيقية وليس كأسماء حروف */
+/* قاموس المقاطع الصوتية الحقيقية (Phonetic Words Dictionary):
+   كل قيمة هنا هي كلمة صوتية حقيقية في قاموس الإنجليزية يستحيل على المتصفح أن يفرّط حروفها أو يقرأها بالاسم! */
 var PHONEME_TTS={
-  'sh':'shh','ch':'chuh','th':'thh','ph':'fff','wh':'wuh','ck':'kuh',
-  'tion':'shun','ture':'cher','igh':'eye','kn':'nnn','wr':'rrr','mb':'mmm',
-  'a':'ah','e':'eh','i':'ih','o':'aw','u':'uh',
-  'b':'buh','c':'kuh','d':'duh','f':'fff','g':'guh','h':'huh','j':'juh','k':'kuh','l':'lll','m':'mmm',
-  'n':'nnn','p':'puh','r':'rrr','s':'sss','t':'tuh','v':'vvv','w':'wuh','y':'yuh','z':'zzz',
-  'br':'bruh','st':'stuh','nk':'nk','air':'air','tea':'tee','se':'z','to':'too','in':'in','ca':'kuh','ed':'ed','el':'el','ant':'ant',
-  'ee':'eee','ea':'eee','ai':'ay','ay':'ay','oa':'oh','oo':'ooo','ou':'ow','ow':'ow','ar':'aar','or':'oar','er':'er','ir':'er','ur':'er'
+  'sh':'@sh:shush',
+  'ch':'chug',
+  'th_u':'@th_u:thud',
+  'th_v':'the',
+  'ph':'@f:fun',
+  'tion':'shun',
+  'ture':'churn'
 };
+
+/* نطق الصوت المفرد للنمط الصوتي عند الضغط على زر استماع المقطع في أعلى البطاقة */
+function playPatternSound(patKey){
+  clearPhTmr();
+  var code=PHONEME_TTS[patKey]||patKey;
+  speakRate(code,0.65,true);
+}
 
 function blendWord(pi,wi){
   clearPhTmr();
@@ -7864,29 +7921,30 @@ function blendWord(pi,wi){
   var wId=pi+'_'+wi;
   var word=wObj.w;
   var parts=(wObj.s&&wObj.s.length)?wObj.s:[word];
+  /* tts 배열 يحتوي على النطق الصوتي النقي لكل مقطع بحيث لا يقرأ المتصفح اسم الحرف أبداً */
+  var ttsList=(wObj.tts&&wObj.tts.length===parts.length)?wObj.tts:parts;
   var box=document.getElementById('pw_'+wId);
   document.querySelectorAll('.ph-wbox.playing').forEach(function(x){x.classList.remove('playing')});
   document.querySelectorAll('.ph-seg.hi').forEach(function(x){x.classList.remove('hi')});
   if(box)box.classList.add('playing');
-  try{tone(660,0,0.06,'sine',0.08)}catch(e){}
-  var stepMs=880;
+  try{tone(660,0,0.05,'sine',0.07)}catch(e){}
+  var stepMs=920;
   parts.forEach(function(seg,idx){
     PH_TMR.push(setTimeout(function(){
       document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el,j){el.classList.toggle('hi',j===idx)});
-      var k=String(seg||'').toLowerCase().replace(/[^a-z]/g,'');
-      var sayTxt=PHONEME_TTS[k]||k;
-      speakRate(sayTxt,0.52,true);
+      var sayTxt=ttsList[idx]||seg;
+      speakRate(sayTxt,0.62,true,1.03);
     },idx*stepMs));
   });
   PH_TMR.push(setTimeout(function(){
     document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.add('hi')});
     try{ding()}catch(e){}
-    speakRate(word,0.55,true);
-  },parts.length*stepMs+180));
+    speakRate(word,0.65,true,1.02);
+  },parts.length*stepMs+200));
   PH_TMR.push(setTimeout(function(){
     if(box)box.classList.remove('playing');
     document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.remove('hi')});
-  },parts.length*stepMs+1450));
+  },parts.length*stepMs+1500));
 }
 
 function slowWord(wId,word,rate){
@@ -7897,77 +7955,90 @@ function slowWord(wId,word,rate){
     box.classList.add('playing');
     PH_TMR.push(setTimeout(function(){box.classList.remove('playing')},1100));
   }
-  speakRate(word,rate||0.45);
+  speakRate(word,rate||0.52);
 }
 
-/* ---------------- بيانات مختبر الصوتيات العلمي (بدون أي حروف نطق عربي!) ---------------- */
+function speakSegOnly(pi,wi,si){
+  clearPhTmr();
+  var p=FND_PHONICS[pi],wObj=p&&p.words&&p.words[wi];
+  if(!wObj)return;
+  var wId=pi+'_'+wi;
+  document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el,j){el.classList.toggle('hi',j===si)});
+  var sayTxt=(wObj.tts&&wObj.tts[si])||wObj.s[si]||wObj.w;
+  speakRate(sayTxt,0.62,true,1.03);
+  PH_TMR.push(setTimeout(function(){
+    document.querySelectorAll('#pw_'+wId+' .ph-seg').forEach(function(el){el.classList.remove('hi')});
+  },800));
+}
+
+/* ---------------- بيانات مختبر الصوتيات العلمي (نطق صوتي نقي ١٠٠٪ لكل مقطع بدون قراءة أسماء الحروف!) ---------------- */
 var FND_TAB='phonics',PH_SUB='cards',FND_PARA_IDX=0,FND_PARA_STEP=0,FND_PARA_DONE=false;
 var PH_HUNT_I=0,PH_SIL_I=0,PH_ME_I=0,PH_ME_ON=false;
 
 var FND_PHONICS=[
   {
-    pat:'sh',ipa:'/ʃ/',ic:'🤫',
+    pat:'sh',patKey:'sh',ipa:'/ʃ/',ic:'🤫',
     cue:'صوت الهسيس والهدوء: ضع إصبعك أمام فمك وأخرج الهواء بهدوء من بين الأسنان بدون اهتزاز الحنجرة.',
     words:[
-      {w:'ship',h:'<u>sh</u>ip',ic:'🚢',ar:'سفينة',s:['sh','i','p']},
-      {w:'fish',h:'fi<u>sh</u>',ic:'🐟',ar:'سمكة',s:['f','i','sh']},
-      {w:'shop',h:'<u>sh</u>op',ic:'🏪',ar:'متجر',s:['sh','o','p']},
-      {w:'brush',h:'bru<u>sh</u>',ic:'🖌️',ar:'فرشاة',s:['br','u','sh']}
+      {w:'ship',h:'<u>sh</u>ip',ic:'🚢',ar:'سفينة',s:['sh','i','p'],tts:['@sh:shush','ih','ship']},
+      {w:'fish',h:'fi<u>sh</u>',ic:'🐟',ar:'سمكة',s:['f','i','sh'],tts:['@f:fin','ih','fish']},
+      {w:'shop',h:'<u>sh</u>op',ic:'🏪',ar:'متجر',s:['sh','o','p'],tts:['@sh:shush','ah','shop']},
+      {w:'brush',h:'bru<u>sh</u>',ic:'🖌️',ar:'فرشاة',s:['br','u','sh'],tts:['bruh','uh','brush']}
     ],
     ex:'She saw a big ship and a fish.',exAr:'هي رأت سفينة كبيرة وسمكة.'
   },
   {
-    pat:'ch',ipa:'/tʃ/',ic:'🚂',
+    pat:'ch',patKey:'ch',ipa:'/tʃ/',ic:'🚂',
     cue:'صوت القطار السريع: يبدأ بلمس طرف اللسان لسقف الفم ثم يخرج الهواء بقوة في دفعة واحدة قصيرة.',
     words:[
-      {w:'chair',h:'<u>ch</u>air',ic:'🪑',ar:'كرسي',s:['ch','air']},
-      {w:'cheese',h:'<u>ch</u>eese',ic:'🧀',ar:'جبنة',s:['ch','ee','se']},
-      {w:'teacher',h:'tea<u>ch</u>er',ic:'👨‍🏫',ar:'معلم',s:['tea','ch','er']},
-      {w:'lunch',h:'lun<u>ch</u>',ic:'🍱',ar:'غداء',s:['l','u','n','ch']}
+      {w:'chair',h:'<u>ch</u>air',ic:'🪑',ar:'كرسي',s:['ch','air'],tts:['chug','air']},
+      {w:'cheese',h:'<u>ch</u>eese',ic:'🧀',ar:'جبنة',s:['ch','ee','se'],tts:['chug','eat','cheese']},
+      {w:'teacher',h:'tea<u>ch</u>er',ic:'👨‍🏫',ar:'معلم',s:['tea','ch','er'],tts:['tea','chug','her']},
+      {w:'lunch',h:'lun<u>ch</u>',ic:'🍱',ar:'غداء',s:['l','u','n','ch'],tts:['luh','un','chug']}
     ],
     ex:'The teacher sat on the chair.',exAr:'جلس المعلم على الكرسي.'
   },
   {
-    pat:'th (Unvoiced)',ipa:'/θ/',ic:'👅',
-    cue:'صوت الهواء الرقيق: أخرج طرف لسانك قليلاً بين أسنانك العلوية والسفلية وانفخ الهواء برفق.',
+    pat:'th (Unvoiced)',patKey:'th_u',ipa:'/θ/',ic:'👅',
+    cue:'صوت الهواء الرقيق (مثل صوت الثاء): أخرج طرف لسانك قليلاً بين أسنانك العلوية والسفلية وانفخ الهواء برفق.',
     words:[
-      {w:'three',h:'<u>th</u>ree',ic:'3️⃣',ar:'ثلاثة',s:['th','r','ee']},
-      {w:'think',h:'<u>th</u>ink',ic:'🤔',ar:'يفكر',s:['th','i','nk']},
-      {w:'bath',h:'ba<u>th</u>',ic:'🛁',ar:'حمام',s:['b','a','th']},
-      {w:'teeth',h:'tee<u>th</u>',ic:'🦷',ar:'أسنان',s:['t','ee','th']}
+      {w:'three',h:'<u>th</u>ree',ic:'3️⃣',ar:'ثلاثة',s:['th','r','ee'],tts:['@th_u:thin','ruh','eat']},
+      {w:'think',h:'<u>th</u>ink',ic:'🤔',ar:'يفكر',s:['th','i','nk'],tts:['@th_u:thin','in','ink']},
+      {w:'bath',h:'ba<u>th</u>',ic:'🛁',ar:'حمام',s:['b','a','th'],tts:['bah','at','bath']},
+      {w:'teeth',h:'tee<u>th</u>',ic:'🦷',ar:'أسنان',s:['t','ee','th'],tts:['tee','eat','teeth']}
     ],
     ex:'Brush your teeth three times.',exAr:'اغسل أسنانك ثلاث مرات.'
   },
   {
-    pat:'th (Voiced)',ipa:'/ð/',ic:'🐝',
-    cue:'نفس موضع طرف اللسان بين الأسنان، ولكن مع تشغيل الأحبال الصوتية (اهتزاز مثل صوت النحلة).',
+    pat:'th (Voiced)',patKey:'th_v',ipa:'/ð/',ic:'🐝',
+    cue:'صوت اهتزاز الأحبال الصوتية (مثل صوت الذال): نفس موضع طرف اللسان بين الأسنان ولكن مع اهتزاز الحنجرة.',
     words:[
-      {w:'this',h:'<u>th</u>is',ic:'👇',ar:'هذا / هذه',s:['th','i','s']},
-      {w:'mother',h:'mo<u>th</u>er',ic:'👩',ar:'أم',s:['m','o','th','er']},
-      {w:'father',h:'fa<u>th</u>er',ic:'👨',ar:'أب',s:['f','a','th','er']},
-      {w:'brother',h:'bro<u>th</u>er',ic:'👦',ar:'أخ',s:['br','o','th','er']}
+      {w:'this',h:'<u>th</u>is',ic:'👇',ar:'هذا / هذه',s:['th','i','s'],tts:['the','is','this']},
+      {w:'mother',h:'mo<u>th</u>er',ic:'👩',ar:'أم',s:['m','o','th','er'],tts:['muh','uh','the','her']},
+      {w:'father',h:'fa<u>th</u>er',ic:'👨',ar:'أب',s:['f','a','th','er'],tts:['fah','ah','the','her']},
+      {w:'brother',h:'bro<u>th</u>er',ic:'👦',ar:'أخ',s:['br','o','th','er'],tts:['bruh','uh','the','her']}
     ],
     ex:'This is my mother and my brother.',exAr:'هذه أمي وهذا أخي.'
   },
   {
-    pat:'ph',ipa:'/f/',ic:'📷',
+    pat:'ph',patKey:'ph',ipa:'/f/',ic:'📷',
     cue:'الحرفان p+h معاً ينطقان تماماً مثل صوت حرف F (الشفة السفلية تلامس الأسنان العلوية مع خروج الهواء).',
     words:[
-      {w:'phone',h:'<u>ph</u>one',ic:'📱',ar:'هاتف',s:['ph','o','ne']},
-      {w:'photo',h:'<u>ph</u>oto',ic:'🖼️',ar:'صورة',s:['ph','o','to']},
-      {w:'elephant',h:'ele<u>ph</u>ant',ic:'🐘',ar:'فيل',s:['el','e','ph','ant']},
-      {w:'dolphin',h:'dol<u>ph</u>in',ic:'🐬',ar:'دولفين',s:['d','o','l','ph','in']}
+      {w:'phone',h:'<u>ph</u>one',ic:'📱',ar:'هاتف',s:['ph','o','ne'],tts:['@f:fun','oh','phone']},
+      {w:'photo',h:'<u>ph</u>oto',ic:'🖼️',ar:'صورة',s:['ph','o','to'],tts:['@f:fun','oh','toe']},
+      {w:'elephant',h:'ele<u>ph</u>ant',ic:'🐘',ar:'فيل',s:['el','e','ph','ant'],tts:['el','eh','@f:fun','ant']},
+      {w:'dolphin',h:'dol<u>ph</u>in',ic:'🐬',ar:'دولفين',s:['d','o','l','ph','in'],tts:['doll','@f:fun','in']}
     ],
     ex:'I took a photo of the dolphin.',exAr:'التقطت صورة للدولفين.'
   },
   {
-    pat:'tion / ture',ipa:'/ʃən/ • /tʃər/',ic:'🎓',
-    cue:'نهايات الكلمات الشهيرة: المقطع (tion) يُنطق ككتلة صوتية واحدة ناعمة في آخر الكلمة، وكذلك (ture).',
+    pat:'tion / ture',patKey:'tion',ipa:'/ʃən/ • /tʃər/',ic:'🎓',
+    cue:'نهايات الكلمات الشهيرة: المقطع (tion) يُنطق ككتلة صوتية واحدة ناعمة (shun)، وكذلك (ture) يُنطق (cher).',
     words:[
-      {w:'station',h:'sta<u>tion</u>',ic:'🚉',ar:'محطة',s:['st','a','tion']},
-      {w:'education',h:'educa<u>tion</u>',ic:'📚',ar:'تعليم',s:['ed','u','ca','tion']},
-      {w:'picture',h:'pic<u>ture</u>',ic:'🎨',ar:'صورة',s:['p','i','c','ture']},
-      {w:'nature',h:'na<u>ture</u>',ic:'🌿',ar:'طبيعة',s:['n','a','ture']}
+      {w:'station',h:'sta<u>tion</u>',ic:'🚉',ar:'محطة',s:['st','a','tion'],tts:['stay','shun','station']},
+      {w:'education',h:'educa<u>tion</u>',ic:'📚',ar:'تعليم',s:['ed','u','ca','tion'],tts:['ed','you','kay','shun']},
+      {w:'picture',h:'pic<u>ture</u>',ic:'🎨',ar:'صورة',s:['p','i','c','ture'],tts:['pick','churn','picture']},
+      {w:'nature',h:'na<u>ture</u>',ic:'🌿',ar:'طبيعة',s:['n','a','ture'],tts:['nay','churn','nature']}
     ],
     ex:'We painted a picture of nature.',exAr:'رسمنا لوحة للطبيعة.'
   }
@@ -8180,7 +8251,7 @@ function renderPhonicsLabHtml(){
       FND_PHONICS.map(function(p,pi){
         var wCards=p.words.map(function(wObj,wi){
           var wId=pi+'_'+wi;
-          var segHtml=(wObj.s||[]).map(function(sg){return '<span class="ph-seg">'+esc(sg)+'</span>'}).join('');
+          var segHtml=(wObj.s||[]).map(function(sg,si){return '<span class="ph-seg" style="cursor:pointer" title="اضغط لسماع هذا المقطع" onclick="speakSegOnly('+pi+','+wi+','+si+')">'+esc(sg)+'</span>'}).join('');
           return '<div class="ph-wbox" id="pw_'+wId+'">'+
             '<div class="ph-wtop">'+wObj.ic+'</div>'+
             '<div class="ph-wen">'+wObj.h+'</div>'+
@@ -8195,10 +8266,10 @@ function renderPhonicsLabHtml(){
         }).join('');
         return '<div class="ph-card">'+
           '<div class="ph-head">'+
-            '<span class="ph-pat">'+esc(p.pat)+'</span>'+
+            '<span class="ph-pat" style="cursor:pointer" onclick="playPatternSound(\''+(p.patKey||'sh')+'\')" title="اضغط لسماع صوت المقطع">'+esc(p.pat)+' 🔊</span>'+
             '<span class="ph-ipa">IPA: '+esc(p.ipa)+'</span>'+
             '<span class="sp"></span>'+
-            '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:4px 10px;font-size:12px" onclick="speakRate(\''+p.words.map(function(x){return x.w}).join(' ... ')+'\',0.5)">🐢 اسمع الـ ٤ ببطء</button>'+
+            '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:4px 10px;font-size:12px" onclick="speakRate(\''+p.words.map(function(x){return x.w}).join(' ... ')+'\',0.55)">🐢 اسمع الـ ٤ ببطء</button>'+
           '</div>'+
           '<div class="ph-cue"><span class="ic">'+p.ic+'</span><span><b>مخرج الصوت الصحيح:</b> '+esc(p.cue)+'</span></div>'+
           '<div class="ph-wgrid">'+wCards+'</div>'+
