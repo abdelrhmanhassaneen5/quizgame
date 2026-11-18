@@ -1905,31 +1905,325 @@ function pick(k){
 function next(){G.i++;show()}
 function share(){var t='أنا جبت '+wkPts()+' نقطة الأسبوع ده في تحدّي الأصحاب! تقدر تكسرني؟ '+location.href.split('?')[0];window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}
 var CUR_CERT=null;
+var ARABIC_ORD=['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع','الثامن','التاسع','العاشر','الحادي عشر','الثاني عشر','الثالث عشر','الرابع عشر','الخامس عشر','السادس عشر','السابع عشر','الثامن عشر','التاسع عشر','العشرون'];
+function rankArName(rk){
+  rk=Math.max(1,Number(rk)||1);
+  return ARABIC_ORD[rk-1]?('المركز '+ARABIC_ORD[rk-1]+' (#'+rk+')'):('المركز #'+rk);
+}
+function clsRankTitle(rk){
+  rk=Math.max(1,Number(rk)||1);
+  if(rk===1)return '👑 بطل الصدارة الذهبي';
+  if(rk===2)return '🥈 وصيف الأبطال المتألق';
+  if(rk===3)return '🥉 فارس المركز الثالث';
+  if(rk<=5)return '⚡ نخبة أبطال الحصة';
+  if(rk<=10)return '🌟 نجم التحدي المتفوق';
+  return '🦁 بطل الحصة المشارك';
+}
+function openClsCert(gid,rk,stName,pts,ok,ans,lastPts,sesDate){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0]|| (CLS_GAME&&CLS_GAME.grp) || {};
+  certScr({
+    mode:'cls',
+    gid:gid||g.id||'',
+    grpName:g.name||'أبطال السنتر',
+    grpCode:g.code||'',
+    rk:rk||1,
+    totalSt:(g.students&&g.students.length)||0,
+    pts:pts||0,
+    ok:ok||0,
+    ans:ans||0,
+    lastPts:lastPts||0,
+    date:sesDate||g.lastDate||dTxt(cDay()),
+    name:stName||S.nick||'بطل السنتر',
+    st:g.stage||S.stage||'m',
+    gr:g.grade||S.grade||1
+  });
+}
 function certMap(){certScr({mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick})}
 function certScr(custom){
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var c=custom||S.cert||(mapDone()?{mode:'map',stars:totStarsCount(),pts:wkPts(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade}:{rk:1,pts:wkPts(),wk:wkKey(),name:S.nick||'بطل التحدي',st:S.stage,gr:S.grade});
   CUR_CERT=c;
-  var isMap=c.mode==='map';
-  var rNames=['الأول','الثاني','الثالث'],rName=rNames[(c.rk||1)-1]||'الأول';
-  var hdTitle=isMap?'شهادة ختم الخريطة 👑':'شهادة تقدير الأوائل 🎓';
-  var hdSub=isMap?'اجتياز ٢٠ جولة بنجاح في تحدّي الأصحاب':'المركز '+rName+' في تحدّي الأصحاب';
-  app.innerHTML='<div class="hd"><h1>'+hdTitle+'</h1><div>'+hdSub+'</div></div>'+
+  var isMap=(c.mode==='map'),isCls=(c.mode==='cls');
+  var hdTitle=isCls?'شهادة وسام بطولة السنتر 🏫👑':(isMap?'شهادة ختم الخريطة 👑':'شهادة تقدير الأبطال 🎓');
+  var hdSub=isCls?(esc(c.grpName)+' • '+rankArName(c.rk)+' • '+clsRankTitle(c.rk)):(isMap?'اجتياز جولات الخريطة بنجاح في تحدّي الأصحاب':rankArName(c.rk)+' في تحدّي الأصحاب');
+  var backFn=isCls?'board(\'cls\')':(isMap?'map()':'board()');
+  var backLbl=isCls?'🏫 العودة للوحة شرف السنتر':(isMap?'🗺️ العودة للخريطة':'🏆 العودة للترتيب');
+  app.innerHTML='<div class="hd" style="'+(isCls?'background:linear-gradient(135deg,#0F2042,#1E3C72);border-color:#FFD700':'')+'"><h1>'+hdTitle+'</h1><div>'+hdSub+'</div></div>'+
     '<div class="card" style="text-align:center;padding:10px">'+
-      '<div class="sm" style="margin-bottom:6px">تقدر تعدّل اسمك اللي هيظهر في الشهادة من هنا:</div>'+
-      '<input id="certNameInp" class="inp" maxlength="22" value="'+esc(c.name||S.nick||'')+'" placeholder="اكتب اسمك الثلاثي أو لقبك" oninput="CUR_CERT.name=this.value;drawCertCanvas()" style="margin-bottom:10px;font-size:17px">'+
-      '<canvas id="certCv" width="1080" height="760" style="width:100%;height:auto;border-radius:12px;border:2px solid #C9973F;box-shadow:0 6px 18px rgba(0,0,0,0.35);background:#FFFDF7"></canvas>'+
+      '<div class="sm" style="margin-bottom:6px">✨ تقدر تعدّل اسمك الثلاثي كما تحب أن يظهر في الشهادة قبل التحميل:</div>'+
+      '<input id="certNameInp" class="inp" maxlength="26" value="'+esc(c.name||S.nick||'')+'" placeholder="اكتب اسمك الثلاثي أو لقبك" oninput="CUR_CERT.name=this.value;drawCertCanvas()" style="margin-bottom:10px;font-size:17px">'+
+      '<canvas id="certCv" width="1200" height="850" style="width:100%;height:auto;border-radius:14px;border:3px solid #FFD700;box-shadow:0 8px 24px rgba(0,0,0,0.45);background:#0B172E"></canvas>'+
     '</div>'+
-    '<button class="btn" style="font-size:18px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="certDownload()">📥 تحميل الشهادة كصورة (PNG)</button>'+
+    '<button class="btn" style="font-size:18px;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFD700;display:flex;align-items:center;justify-content:center;gap:8px" onclick="certDownload()">📥 تحميل الشهادة بجودة عالية (PNG)</button>'+
     '<button class="btn t" style="font-size:17px;background:#1E7E48;box-shadow:0 5px 0 #114B2A;display:flex;align-items:center;justify-content:center;gap:8px" onclick="certShareWA()">📲 مشاركة الشهادة على واتساب</button>'+
-    '<button class="btn t" onclick="'+(isMap?'map()':'board()')+'">'+(isMap?'العودة للخريطة':'العودة للترتيب')+'</button>'+
-    '<button class="btn t" onclick="home()">الرئيسية</button>';
+    '<button class="btn t" onclick="'+backFn+'">'+backLbl+'</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
   setTimeout(drawCertCanvas, 50);
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(drawCertCanvas, 150)})}
 }
+
+/* رسم نجمة خماسية ذهبية للزخرفة في الشهادة */
+function drawStarShape(ctx,cx,cy,spikes,outerR,innerR,fillCol,strokeCol){
+  var rot=Math.PI/2*3,x=cx,y=cy,step=Math.PI/spikes;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx,cy-outerR);
+  for(var i=0;i<spikes;i++){
+    x=cx+Math.cos(rot)*outerR;y=cy+Math.sin(rot)*outerR;ctx.lineTo(x,y);rot+=step;
+    x=cx+Math.cos(rot)*innerR;y=cy+Math.sin(rot)*innerR;ctx.lineTo(x,y);rot+=step;
+  }
+  ctx.lineTo(cx,cy-outerR);
+  ctx.closePath();
+  if(fillCol){ctx.fillStyle=fillCol;ctx.fill()}
+  if(strokeCol){ctx.strokeStyle=strokeCol;ctx.lineWidth=2;ctx.stroke()}
+  ctx.restore();
+}
+
+/* تصميم خاص وفخم ومختلف كلياً لشهادة «بطولة حصة السنتر» (Royal Midnight Navy & Gold Championship Design) */
+function drawCenterCertCanvas(cv,c){
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  ctx.direction='rtl';
+
+  /* ١. الخلفية الملكية الداكنة (Royal Midnight Blue & Deep Emerald Radial) */
+  var bg=ctx.createRadialGradient(W/2,H*0.38,60,W/2,H/2,W*0.75);
+  bg.addColorStop(0,'#1B3564');
+  bg.addColorStop(0.55,'#0F2143');
+  bg.addColorStop(1,'#081226');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  /* ٢. أشعة خلفية ذهبية ناعمة حول المنتصف */
+  ctx.save();
+  ctx.translate(W/2,H*0.42);
+  for(var r=0;r<24;r++){
+    ctx.rotate(Math.PI/12);
+    ctx.fillStyle='rgba(255,215,0,0.025)';
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(-28,-W);
+    ctx.lineTo(28,-W);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+
+  /* ٣. الإطارات الذهبية الملكية المتعددة */
+  var goldGrad=ctx.createLinearGradient(0,0,W,H);
+  goldGrad.addColorStop(0,'#FFE484');
+  goldGrad.addColorStop(0.3,'#C9973F');
+  goldGrad.addColorStop(0.5,'#FFF3B0');
+  goldGrad.addColorStop(0.7,'#B8860B');
+  goldGrad.addColorStop(1,'#FFD700');
+
+  ctx.strokeStyle=goldGrad;
+  ctx.lineWidth=14;
+  ctx.strokeRect(24,24,W-48,H-48);
+
+  ctx.strokeStyle='rgba(255,233,184,0.35)';
+  ctx.lineWidth=2;
+  ctx.strokeRect(38,38,W-76,H-76);
+
+  ctx.strokeStyle=goldGrad;
+  ctx.lineWidth=4;
+  ctx.strokeRect(48,48,W-96,H-96);
+
+  /* ٤. زخارف الأركان الهندسية الذهبية */
+  var corners=[[48,48,1,1],[W-48,48,-1,1],[48,H-48,1,-1],[W-48,H-48,-1,-1]];
+  corners.forEach(function(p){
+    ctx.save();
+    ctx.translate(p[0],p[1]);
+    ctx.scale(p[2],p[3]);
+    ctx.fillStyle=goldGrad;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(75,0);ctx.lineTo(0,75);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#0F2143';
+    ctx.beginPath();ctx.moveTo(10,10);ctx.lineTo(48,10);ctx.lineTo(10,48);ctx.closePath();ctx.fill();
+    drawStarShape(ctx,24,24,5,10,4.5,'#FFD700');
+    ctx.restore();
+  });
+
+  /* ٥. نجوم ذهبية لامعة موزعة بأناقة */
+  [[140,115,12],[W-140,115,12],[110,390,9],[W-110,390,9],[170,290,7],[W-170,290,7]].forEach(function(st){
+    drawStarShape(ctx,st[0],st[1],5,st[2],st[2]*0.45,'#FFD700');
+  });
+
+  /* ٦. الترويسة العلوية الفخمة */
+  ctx.fillStyle=goldGrad;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(W/2-380, 62, 760, 78, 39) : ctx.rect(W/2-380, 62, 760, 78);
+  ctx.fill();
+
+  ctx.fillStyle='#0A162E';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(W/2-372, 68, 744, 66, 33) : ctx.rect(W/2-372, 68, 744, 66);
+  ctx.fill();
+
+  ctx.textAlign='center';
+  ctx.fillStyle='#FFD700';
+  ctx.font='900 34px "Lemonada", "Cairo", sans-serif';
+  ctx.fillText('🏆 وسام وشهادة أبطال حصة السنتر 🏆', W/2, 114);
+
+  /* الشريط الفرعي لاسم المنصة والمجموعة */
+  var stgTxt = stgFullLbl(c.st||S.stage);
+  var grdTxt = gName(c.gr||S.grade, c.st||S.stage);
+  ctx.fillStyle='#CFE3D4';
+  ctx.font='700 22px "Cairo", sans-serif';
+  ctx.fillText('أكاديمية Grammora & EngliFocus • مجموعة: '+(c.grpName||'أبطال السنتر')+' ('+stgTxt+(grdTxt?' - الصف '+grdTxt:'')+')', W/2, 175);
+
+  /* ٧. شارة المركز واللقب التشجيعي لكل طالب شارك */
+  var rk=Math.max(1,Number(c.rk)||1);
+  var rkBadgeBg = rk===1 ? ['#FFD700','#9A6F0A','#0A162E']
+                : (rk===2 ? ['#E2E8F0','#64748B','#0F172A']
+                : (rk===3 ? ['#F6AD55','#9C4221','#FFF']
+                : ['#1E7E48','#114B2A','#FFE9B8']));
+  var rkTxt = rankArName(rk) + '  •  ' + clsRankTitle(rk);
+
+  ctx.fillStyle=rkBadgeBg[1];
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(W/2-340, 196, 680, 58, 29) : ctx.rect(W/2-340, 196, 680, 58);
+  ctx.fill();
+  ctx.strokeStyle='#FFD700';
+  ctx.lineWidth=3;
+  ctx.stroke();
+
+  ctx.fillStyle='#FFFFFF';
+  ctx.font='900 26px "Cairo", sans-serif';
+  ctx.fillText(rkTxt, W/2, 234);
+
+  /* ٨. سطر التكريم من مستر عبدالرحمن */
+  ctx.fillStyle='#FFE9B8';
+  ctx.font='900 26px "Cairo", sans-serif';
+  ctx.fillText('يتشرف مستر / عبدالرحمن حسنين بمنح هذا الوسام الشرفي للبطل(ة):', W/2, 298);
+
+  /* ٩. اللوحة الذهبية المضيئة لاسم الطالب */
+  var nameBoxGrad=ctx.createLinearGradient(W/2-410,318,W/2+410,418);
+  nameBoxGrad.addColorStop(0,'#FFFDF7');
+  nameBoxGrad.addColorStop(0.5,'#FFF5D6');
+  nameBoxGrad.addColorStop(1,'#FCE8B2');
+  ctx.fillStyle=nameBoxGrad;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(W/2-410, 318, 820, 96, 22) : ctx.rect(W/2-410, 318, 820, 96);
+  ctx.fill();
+  ctx.strokeStyle='#FFD700';
+  ctx.lineWidth=4.5;
+  ctx.stroke();
+
+  var stName=(c.name||S.nick||'بطل السنتر').trim();
+  ctx.fillStyle='#7A1C1C';
+  ctx.font='900 50px "Cairo", sans-serif';
+  ctx.fillText(stName, W/2, 383);
+
+  /* ١٠. نص الإشادة بمشاركة الطالب في الحصة */
+  ctx.fillStyle='#FFFFFF';
+  ctx.font='700 24px "Cairo", sans-serif';
+  ctx.fillText('تقديراً لحضوره المتميز، شجاعته التفاعلية، ومشاركته الفعالة في منافسات بطولة الحصة المباشرة', W/2, 456);
+
+  /* ١١. بطاقات الإحصائيات الأربع داخل الشهادة (المركز / إجمالي النقاط / الإجابات الصحيحة / تاريخ الحصة) */
+  var boxes=[
+    {lbl:'الترتيب في البطولة',val:'#'+rk+(c.totalSt?' من '+c.totalSt:''),col:'#FFD700'},
+    {lbl:'إجمالي نقاط البطل',val:(c.pts||0)+' نقطة ⭐',col:'#6EE7A8'},
+    {lbl:'التفاعل والإجابات',val:(c.ok||0)+' صح ✅'+(c.lastPts?' (اليوم +'+c.lastPts+')':''),col:'#74B9FF'},
+    {lbl:'تاريخ الحصة',val:String(c.date||dTxt(cDay())),col:'#FFE9B8'}
+  ];
+  var bw=245,bh=92,gap=18;
+  var totalW=boxes.length*bw+(boxes.length-1)*gap;
+  var startX=(W-totalW)/2;
+  boxes.forEach(function(b,idx){
+    var bx=startX+idx*(bw+gap),by=482;
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(bx,by,bw,bh,16) : ctx.rect(bx,by,bw,bh);
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,215,0,0.55)';
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    ctx.fillStyle='#CBD5E1';
+    ctx.font='700 18px "Cairo", sans-serif';
+    ctx.fillText(b.lbl, bx+bw/2, by+32);
+
+    ctx.fillStyle=b.col;
+    ctx.font='900 24px "Cairo", sans-serif';
+    ctx.fillText(b.val, bx+bw/2, by+70);
+  });
+
+  /* رسالة تحفيزية من المستر */
+  ctx.fillStyle='#FFD700';
+  ctx.font='700 21px "Cairo", sans-serif';
+  ctx.fillText('« فخور بمشاركتك واجتهادك في الحصة يا بطل.. كل خطوة بتقربك للقمة! »', W/2, 616);
+
+  /* خط فاصل ذهبي */
+  ctx.strokeStyle='rgba(255,215,0,0.35)';
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(110, 640);ctx.lineTo(W-110, 640);ctx.stroke();
+
+  /* ١٢. التوقيع الرسمي لمستر عبدالرحمن على اليمين */
+  ctx.textAlign='right';
+  ctx.fillStyle='#94A3B8';
+  ctx.font='900 22px "Cairo", sans-serif';
+  ctx.fillText('إشراف وتكريم:', W-105, 686);
+  ctx.fillStyle='#FFD700';
+  ctx.font='900 34px "Lemonada", "Cairo", sans-serif';
+  ctx.fillText('مستر عبدالرحمن حسنين', W-105, 735);
+  ctx.fillStyle='#E2E8F0';
+  ctx.font='700 20px "Cairo", sans-serif';
+  ctx.fillText('معلم اللغة الإنجليزية • مؤسس منصة Grammora & EngliFocus', W-105, 772);
+
+  /* ١٣. وسام بطولة السنتر الذهبي على اليسار */
+  var sx=195, sy=725;
+  ctx.save();
+  /* شريطا الوسام السفليان */
+  ctx.fillStyle='#B23A3A';
+  ctx.beginPath();ctx.moveTo(sx-28,sy+35);ctx.lineTo(sx-48,sy+92);ctx.lineTo(sx-22,sy+78);ctx.lineTo(sx-6,sy+94);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(sx+28,sy+35);ctx.lineTo(sx+48,sy+92);ctx.lineTo(sx+22,sy+78);ctx.lineTo(sx+6,sy+94);ctx.closePath();ctx.fill();
+
+  ctx.fillStyle=goldGrad;
+  ctx.beginPath();ctx.arc(sx, sy, 60, 0, Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#0F2143';ctx.lineWidth=4;
+  ctx.beginPath();ctx.arc(sx, sy, 51, 0, Math.PI*2);ctx.stroke();
+  ctx.textAlign='center';
+  ctx.fillStyle='#0F2143';
+  ctx.font='900 20px "Cairo", sans-serif';
+  ctx.fillText('وسام أبطال', sx, sy-8);
+  ctx.font='900 22px "Cairo", sans-serif';
+  ctx.fillText('السنتر 🏆', sx, sy+20);
+  if(c.grpCode){
+    ctx.font='900 13px Arial, sans-serif';
+    ctx.fillText(c.grpCode, sx, sy+40);
+  }
+  ctx.restore();
+
+  /* ١٤. صورة مستر عبدالرحمن في إطار ذهبي مزدوج */
+  var mrImg = new Image();
+  mrImg.onload = function(){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(365, 725, 54, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.fillStyle='#1E3C72';
+    ctx.fillRect(311, 671, 108, 108);
+    ctx.drawImage(mrImg, 311, 671, 108, 108);
+    ctx.restore();
+    ctx.strokeStyle='#FFD700';
+    ctx.lineWidth=4;
+    ctx.beginPath();
+    ctx.arc(365, 725, 54, 0, Math.PI*2);
+    ctx.stroke();
+  };
+  mrImg.src = 'mister-cheer.png';
+}
+
 function drawCertCanvas(){
   var cv=document.getElementById('certCv');if(!cv||!CUR_CERT)return;
-  var ctx=cv.getContext('2d'),c=CUR_CERT,isMap=c.mode==='map';
+  var c=CUR_CERT;
+  if(c.mode==='cls'){
+    cv.width=1200;cv.height=850;
+    drawCenterCertCanvas(cv,c);
+    return;
+  }
+  cv.width=1080;cv.height=760;
+  var ctx=cv.getContext('2d'),isMap=c.mode==='map';
   var W=cv.width,H=cv.height;
   ctx.direction='rtl';
   // Background gradient
@@ -1983,11 +2277,11 @@ function drawCertCanvas(){
 
   // Rank or Map Medal Badge
   var rk=c.rk||1;
-  var medalColors=[['#FFD700','#B8860B','المركز الأول 🥇'],['#E0E6ED','#7A8B99','المركز الثاني 🥈'],['#E6A15C','#8C4A27','المركز الثالث 🥉']][rk-1]||['#FFD700','#B8860B','المركز الأول 🥇'];
+  var medalColors=[['#FFD700','#B8860B','المركز الأول 🥇'],['#E0E6ED','#7A8B99','المركز الثاني 🥈'],['#E6A15C','#8C4A27','المركز الثالث 🥉']][rk-1]||['#2F6B4A','#1B432C',rankArName(rk)+' 🌟'];
   var badgeText = isMap ? (mapDone40()?'إمبراطور الأساطير — ختم ٤٠ جولة كاملة 👑⚡':'قاهر الزعماء — اجتياز ٢٠ جولة كاملة 👑') : ('بطل الأسبوع — ' + medalColors[2]);
   ctx.fillStyle=isMap?'#2F5F5A':medalColors[1];
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(W/2-230, 200, 460, 56, 28) : ctx.rect(W/2-230, 200, 460, 56);
+  ctx.roundRect ? ctx.roundRect(W/2-250, 200, 500, 56, 28) : ctx.rect(W/2-250, 200, 500, 56);
   ctx.fill();
   ctx.fillStyle='#FFF';
   ctx.font='900 28px "Cairo", sans-serif';
@@ -2091,21 +2385,22 @@ function certDownload(){
   try{
     var a=document.createElement('a');
     var nm=(CUR_CERT&&CUR_CERT.name?CUR_CERT.name:S.nick||'hero').replace(/\s+/g,'-');
-    var prefix=(CUR_CERT&&CUR_CERT.mode==='map')?'شهادة-ختم-الخريطة-':'شهادة-تقدير-مستر-عبدالرحمن-';
+    var prefix=(CUR_CERT&&CUR_CERT.mode==='cls')?'وسام-بطولة-السنتر-':((CUR_CERT&&CUR_CERT.mode==='map')?'شهادة-ختم-الخريطة-':'شهادة-تقدير-مستر-عبدالرحمن-');
     a.download=prefix+nm+'.png';
     a.href=cv.toDataURL('image/png');
     document.body.appendChild(a);a.click();document.body.removeChild(a);
-    rmsg('تم تحميل الشهادة بنجاح! 🎓');
+    rmsg('تم تحميل الشهادة بجودة عالية بنجاح! 🎓');
   }catch(e){rmsg('اضغط مطولاً على صورة الشهادة لحفظها')}
 }
 function certShareWA(){
   var cv=document.getElementById('certCv');
   var c=CUR_CERT||{rk:1,pts:wkPts(),name:S.nick};
-  var isMap=c.mode==='map';
-  var rNames=['الأول 🥇','الثاني 🥈','الثالث 🥉'],rName=rNames[(c.rk||1)-1]||'الأول 🥇';
-  var txt=isMap
-    ? ('الحمد لله! ختمت الـ ٢٠ جولة كاملة في خريطة لعبة "تحدّي الأصحاب" للغة الإنجليزية وهزمت كل الزعماء مع مستر عبدالرحمن حسنين! 👑🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0])
-    : ('الحمد لله! حصلت على شهادة تقدير (المركز '+rName+') برصيد '+c.pts+' نقطة في لعبة "تحدّي الأصحاب" للغة الإنجليزية مع مستر عبدالرحمن حسنين! 🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0]);
+  var isMap=(c.mode==='map'),isCls=(c.mode==='cls');
+  var txt=isCls
+    ? ('الحمد لله! حصلت على «وسام وشهادة بطولة حصة السنتر 🏆» ('+rankArName(c.rk)+' - '+clsRankTitle(c.rk)+') برصيد '+(c.pts||0)+' نقطة مع مستر عبدالرحمن حسنين في مجموعة ('+(c.grpName||'أبطال السنتر')+')! 🎓🔥\nادخل المنصة من هنا: '+location.href.split('?')[0])
+    : (isMap
+      ? ('الحمد لله! ختمت جولات خريطة لعبة "تحدّي الأصحاب" للغة الإنجليزية وهزمت كل الزعماء مع مستر عبدالرحمن حسنين! 👑🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0])
+      : ('الحمد لله! حصلت على شهادة تقدير ('+rankArName(c.rk)+') برصيد '+c.pts+' نقطة في لعبة "تحدّي الأصحاب" للغة الإنجليزية مع مستر عبدالرحمن حسنين! 🎓🔥\nتقدر تدخل التحدي من هنا: '+location.href.split('?')[0]));
   if(cv&&cv.toBlob&&navigator.canShare){
     cv.toBlob(function(blob){
       if(!blob){window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');return}
@@ -2245,7 +2540,7 @@ function board(t){app.classList.remove('fade-in');void app.offsetWidth;app.class
       else{
         var nxt=myI>0?d.rows[myI-1]:(myI<0?(d.above[0]||null):null);
         gap=nxt?'<div class="lb-chase">🎯 باقي '+(nxt.pts-pts+1)+' نقطة بس وتعدّي «'+esc(nxt.name)+'» اللي قدامك مباشرة!</div>':(rk===1?'<div class="lb-chase">👑 إنت الأول! حافظ على الصدارة</div>':'');
-        var certLiveBtn = (rk>=1 && rk<=3 && pts>0) ? '<br><button class="btn" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="certScr({rk:'+rk+',pts:'+pts+',wk:wkKey(),name:S.nick,live:1})">🎓 استلم شهادة المركز '+['الأول 🥇','الثاني 🥈','الثالث 🥉'][rk-1]+' وحمّلها</button>' : '';
+        var certLiveBtn = (pts>0) ? '<br><button class="btn" style="width:100%;margin-top:8px;font-size:14px;min-height:38px" onclick="certScr({rk:'+rk+',pts:'+pts+',wk:wkKey(),name:S.nick,live:1})">🎓 استلم شهادة تفوقك (المركز #'+rk+') وحمّلها</button>' : '';
         $('#mr').innerHTML='ترتيبك: <b>#'+rk+'</b> من '+d.total+(BT==='lg'?' في دوريك':(BT==='gr'?' في صفّك':''))+gap+certLiveBtn;
       }
     }).catch(function(){lb.textContent='مقدرناش نحمّل الترتيب، جرّب تاني.'});
@@ -4340,17 +4635,26 @@ function renderClsPublicBoard(lbEl){
       return '<button class="pwb" style="flex:1 1 42%;font-size:12px;'+(act?'background:#7A3B3B;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="CLS_CUR_GRP=\''+g.id+'\';renderClsPublicBoard($(\'#lb\'))">🏫 '+esc(g.name)+'</button>';
     }).join('')+'</div>':'';
 
-    var stList=(curG.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+    var stList=(curG.students||[]).slice().sort(function(a,b){
+      var d=(b.pts||0)-(a.pts||0);
+      if(d!==0)return d;
+      var d2=(b.ok||0)-(a.ok||0);
+      if(d2!==0)return d2;
+      return (b.ans||0)-(a.ans||0);
+    });
     var stRows=stList.map(function(st,i){
       var rk=i+1;
-      var medal=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk));
+      var medal=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':(rk<=10?'🏅 #'+rk:'⭐ #'+rk)));
       var isMe=clsIsMe(curG,st.name);
-      var certBtn=(rk<=3&&(st.pts||0)>0)?'<button class="btn" style="font-size:11px;min-height:26px;padding:2px 8px;margin-right:6px" onclick="certScr({rk:'+rk+',pts:'+(st.pts||0)+',wk:wkKey(),name:\''+esc(st.name)+'\',st:\''+(curG.stage||'m')+'\',gr:'+(curG.grade||1)+'})">🎓 شهادة</button>':'';
-      return '<div class="row'+(isMe?' me':(rk===1?' gold':''))+'" style="padding:6px 8px;border-radius:10px;border-bottom:1px dashed rgba(138,106,74,0.25)">'+
-        '<b style="min-width:32px;font-size:16px">'+medal+'</b>'+
-        '<div class="sp"><div style="font-weight:900;font-size:15px">'+esc(st.name)+'</div><div class="sm" style="font-size:11px;color:inherit">إجابات صحيحة: '+(st.ok||0)+' ✅ • مشاركات: '+(st.ans||0)+' '+(st.lastPts?'• آخر حصة: +'+st.lastPts+' نقطة':'')+'</div></div>'+
+      var participated=((st.pts||0)>0||(st.ans||0)>0||(st.ok||0)>0||(st.lastPts||0)>0||(st.roundTurns||0)>0);
+      var certBtn=participated
+        ? '<button class="btn" style="font-size:11.5px;min-height:30px;padding:3px 10px;margin-right:6px;background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFD700;white-space:nowrap" onclick="openClsCert(\''+curG.id+'\','+rk+',\''+esc(st.name).replace(/'/g,"\\'")+'\','+(st.pts||0)+','+(st.ok||0)+','+(st.ans||0)+','+(st.lastPts||0)+')">🎓 شهادة البطل</button>'
+        : '<button class="pwb" style="flex:none;width:auto;font-size:10.5px;min-height:26px;padding:2px 8px;margin-right:6px" onclick="openClsCert(\''+curG.id+'\','+rk+',\''+esc(st.name).replace(/'/g,"\\'")+'\','+(st.pts||0)+','+(st.ok||0)+','+(st.ans||0)+','+(st.lastPts||0)+')">🎓 شهادة</button>';
+      return '<div class="row'+(isMe?' me':(rk===1?' gold':''))+'" style="padding:7px 9px;border-radius:12px;border-bottom:1px dashed rgba(138,106,74,0.28);flex-wrap:wrap;gap:6px">'+
+        '<b style="min-width:42px;font-size:15px;text-align:center">'+medal+'</b>'+
+        '<div class="sp" style="min-width:130px"><div style="font-weight:900;font-size:15px">'+esc(st.name)+' <span style="font-size:11px;font-weight:800;color:#2F5F5A;background:rgba(47,95,90,0.12);padding:1px 6px;border-radius:6px">'+clsRankTitle(rk)+'</span></div><div class="sm" style="font-size:11px;color:inherit">صح: '+(st.ok||0)+' ✅ • مشاركات: '+(st.ans||0)+' '+(st.lastPts?'• آخر حصة: +'+st.lastPts+' نقطة':'')+'</div></div>'+
         certBtn+clsMeBtn(curG,st,isMe)+
-        '<b style="font-size:16px">'+(st.pts||0)+' نقطة</b>'+
+        '<b style="font-size:15px;min-width:66px;text-align:left">'+(st.pts||0)+' نقطة</b>'+
       '</div>';
     }).join('');
 
@@ -4370,15 +4674,16 @@ function shareClsBoard(){
   var curG=grps.filter(function(g){return g.id===CLS_CUR_GRP})[0]||grps[0];
   if(!curG){share();return}
   var stList=(curG.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
-  var topTxt=stList.slice(0,10).map(function(s,i){
-    var m=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':(i+1)+'-'));
-    return m+' '+s.name+' ('+(s.pts||0)+' نقطة - '+(s.ok||0)+' صح ✅'+(s.lastPts?' • آخر حصة +'+s.lastPts:'')+')';
+  var allTxt=stList.map(function(s,i){
+    var rk=i+1;
+    var m=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':(rk<=10?'🏅 '+rk+'-':'⭐ '+rk+'-')));
+    return m+' '+s.name+' ('+(s.pts||0)+' نقطة - '+(s.ok||0)+' صح ✅'+(s.lastPts?' • اليوم +'+s.lastPts:'')+')';
   }).join('\n');
-  var txt='🏆 *لوحة شرف أبطال حصة السنتر - مستر عبدالرحمن حسنين* 🏫\n'+
+  var txt='🏆 *لوحة شرف وترتيب أبطال حصة السنتر - مستر عبدالرحمن حسنين* 🏫\n'+
     '📌 المجموعة: *'+curG.name+'* ('+gName(curG.grade||1,curG.stage)+')\n'+
     '📅 آخر حصة: *'+(curG.lastDate||dTxt(cDay()))+'*\n'+
     '🔑 كود الدخول للمجموعة: *'+(curG.code||'')+'*\n\n'+
-    topTxt+'\n\n🌟 يقدر كل طالب وولي أمر يفتح المنصة ويدخل كود المجموعة ('+(curG.code||'')+') لمتابعة الترتيب الكامل وتحميل الشهادات: '+location.href.split('?')[0];
+    allTxt+'\n\n🎓 *مفاجأة لكل الأبطال:* كل طالب شارك معانا في الحصة ليه *شهادة تقدير ملكية خاصة باسمه ومركزه* جاهزة للتحميل فوراً!\nادخل المنصة واكتب كود المجموعة (*'+(curG.code||'')+'*) وحمّل شهادتك: '+location.href.split('?')[0];
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 function tPinScr(){
@@ -4870,10 +5175,11 @@ function finishClsSession(){
   });
   var sorted=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
   var rowsHtml=sorted.map(function(s,i){
-    var rk=i+1,m=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk));
-    return '<div class="row'+(rk===1?' gold':'')+'" style="padding:6px 8px;border-radius:8px;border-bottom:1px dashed rgba(138,106,74,0.25)">'+
-      '<b style="min-width:30px">'+m+'</b>'+
-      '<span class="sp" style="font-weight:900">'+esc(s.name)+' <span class="sm">(اليوم: +'+(s.lastPts||0)+' • شارك: '+(s.roundTurns||0)+')</span></span>'+
+    var rk=i+1,m=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':(rk<=10?'🏅 #'+rk:'⭐ #'+rk)));
+    return '<div class="row'+(rk===1?' gold':'')+'" style="padding:6px 8px;border-radius:8px;border-bottom:1px dashed rgba(138,106,74,0.25);flex-wrap:wrap;gap:6px">'+
+      '<b style="min-width:38px">'+m+'</b>'+
+      '<span class="sp" style="font-weight:900">'+esc(s.name)+' <span class="sm">(اليوم: +'+(s.lastPts||0)+' • صح: '+(s.ok||0)+' • مشاركة: '+(s.roundTurns||s.ans||0)+')</span></span>'+
+      '<button class="btn" style="font-size:11px;min-height:28px;padding:2px 9px;background:linear-gradient(135deg,#C9973F,#8A5A1E)" onclick="openClsCert(\''+g.id+'\','+rk+',\''+esc(s.name).replace(/'/g,"\\'")+'\','+(s.pts||0)+','+(s.ok||0)+','+(s.ans||0)+','+(s.lastPts||0)+')">🎓 شهادة</button>'+
       '<b>'+(s.pts||0)+' نقطة</b>'+
     '</div>';
   }).join('');
@@ -5835,7 +6141,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.0').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.1').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -8833,7 +9139,8 @@ function clsHistHtml(g,open){
     var rows=(s.rows||[]).slice().sort(function(a,b){return (b.p||0)-(a.p||0)});
     return '<details class="ch-ses"'+((open&&i===0)?' open':'')+'><summary><span class="d">📅 '+esc(s.date||'')+'</span><span class="sp"></span><span class="sm">'+rows.length+' طالب • '+(s.tot||0)+' نقطة ▾</span></summary>'+
       '<div class="ch-rows">'+rows.map(function(r,j){
-        return '<div class="ch-r'+(clsIsMe(g,r.n)?' me':'')+'"><b style="min-width:26px">'+(j===0?'🥇':(j===1?'🥈':(j===2?'🥉':(j+1))))+'</b><span class="sp">'+esc(r.n)+'</span><b>+'+(r.p||0)+'</b></div>';
+        var rk=j+1;
+        return '<div class="ch-r'+(clsIsMe(g,r.n)?' me':'')+'"><b style="min-width:32px">'+(rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':'#'+rk)))+'</b><span class="sp">'+esc(r.n)+'</span><button class="ch-me" style="background:linear-gradient(135deg,#1E3C72,#2A5298);color:#FFD700;border-color:#FFD700" onclick="openClsCert(\''+g.id+'\','+rk+',\''+esc(r.n).replace(/'/g,"\\'")+'\','+(r.p||0)+','+(r.ok||0)+','+(r.a||1)+','+(r.p||0)+',\''+esc(s.date||'').replace(/'/g,"\\'")+'\')">🎓 شهادة الحصة</button><b>+'+(r.p||0)+'</b></div>';
       }).join('')+
       (T_AUTH?'<button class="pwb" style="margin-top:6px;min-height:34px;font-size:12.5px" onclick="shareClsSession(\''+g.id+'\',\''+s.id+'\')">📲 إرسال تقرير هذه الحصة على واتساب</button>':'')+
       '</div></details>';
