@@ -6176,7 +6176,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.2.1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.2.2').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -9903,6 +9903,102 @@ function finishClsReadTurn(){
   rmsg('🎉 عاش يا '+(st?st.name:'بطل')+'! قرأت '+cr.okCount+' كلمة صح وكسبت +'+pts+' نقطة!');
   clsReadPickNext();
 }
+
+
+/* ==========================================================================
+   v12.2.2 — استرجاع ودمج جميع اللاعبين القدامى من الأسابيع السابقة مع الترتيب الدائم
+   حتى يظهر كل من سجل ولعب بنقاطه كاملة بدون حذف أي اسم!
+   ========================================================================== */
+(function(){
+  var ALLTIME_MERGE_CACHE={};
+
+  function getLegacyKeysFor(wkStr){
+    var m=/^alltime([ps]?)(g\d+)?$/.exec(String(wkStr||''));
+    if(!m)return null;
+    var suf=m[1]||'', gPart=m[2]||'';
+    var curW=wkKey(), keys=[wkStr];
+    /* جلب آخر 8 أسابيع سابقة + الترتيب الدائم alltime */
+    for(var d=0;d<8;d++){
+      keys.push(String(curW-d)+suf+gPart);
+    }
+    return keys;
+  }
+
+  function fetchMergedAllTime(origTop, wkStr){
+    var now=Date.now();
+    if(ALLTIME_MERGE_CACHE[wkStr] && now-ALLTIME_MERGE_CACHE[wkStr].t<45000){
+      return Promise.resolve(ALLTIME_MERGE_CACHE[wkStr].rows);
+    }
+    var keys=getLegacyKeysFor(wkStr);
+    if(!keys)return origTop(wkStr,200);
+    return Promise.all(keys.map(function(k,idx){
+      return origTop(k,idx===0?200:100).catch(function(){return []});
+    })).then(function(lists){
+      var byId={};
+      lists.forEach(function(arr){
+        (arr||[]).forEach(function(item){
+          if(!item||!item.id)return;
+          var p=Number(item.pts)||0;
+          if(!byId[item.id]){
+            byId[item.id]={id:item.id,name:item.name||'بطل',pts:p};
+          }else{
+            if(p>byId[item.id].pts){
+              byId[item.id].pts=p;
+              if(item.name)byId[item.id].name=item.name;
+            }
+          }
+        });
+      });
+      var merged=Object.keys(byId).map(function(id){return byId[id]});
+      merged.sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+      ALLTIME_MERGE_CACHE[wkStr]={t:Date.now(),rows:merged};
+      return merged;
+    });
+  }
+
+  function patchFBForAllTime(){
+    if(!window.FB||window.FB._v1222Patched)return;
+    window.FB._v1222Patched=true;
+    var origTop=window.FB.top;
+    var origBoard=window.FB.board;
+
+    window.FB.top=function(wk,n){
+      if(/^alltime[ps]?(g\d+)?$/.test(String(wk||''))){
+        return fetchMergedAllTime(origTop,wk).then(function(all){
+          return all.slice(0,n||200);
+        });
+      }
+      return origTop(wk,n);
+    };
+
+    window.FB.board=function(wk,lo,hi,mine,n){
+      if(/^alltime[ps]?(g\d+)?$/.test(String(wk||''))){
+        return fetchMergedAllTime(origTop,wk).then(function(all){
+          var filt=all.filter(function(x){return (x.pts||0)>=lo && (x.pts||0)<hi});
+          var aboveCnt=0;
+          filt.forEach(function(x){if((x.pts||0)>mine)aboveCnt++});
+          return {
+            rows:filt.slice(0,n||200),
+            total:filt.length,
+            rank:aboveCnt+1,
+            above:[],
+            below:[]
+          };
+        });
+      }
+      return origBoard(wk,lo,hi,mine,n);
+    };
+  }
+
+  /* تفعيل الدمج فور جاهزية Firebase */
+  var _prevOnFB1222=window.onFB;
+  window.onFB=function(){
+    patchFBForAllTime();
+    if(_prevOnFB1222)_prevOnFB1222();
+    try{setTimeout(loadHomeLbWidget,120)}catch(e){}
+  };
+  if(window.FB)patchFBForAllTime();
+})();
 
 </script>
 </body>
