@@ -1452,7 +1452,7 @@ function home(){app.classList.remove('fade-in');void app.offsetWidth;app.classLi
   '<button class="sec-more'+(HOME_TAB==='more'?' act':'')+'" role="tab" aria-selected="'+(HOME_TAB==='more'?'true':'false')+'" data-k="more" onclick="homeTab(\'more\')">'+((misLeft>0)?'<span class="bdot"></span>':'')+'🏫 السنتر والمهام اليومية والهدايا</button>'+
   '<div id="hPanel" class="h-panel sk-'+HOME_TAB+'" role="tabpanel">'+homeTabHtml(HOME_TAB)+'</div>'+
   '<div class="hm-lb" id="homeLbBox">'+
-    '<div class="hm-lb-hd"><b>🏆 أبطال تحدي الأصحاب</b><button class="hm-lb-all" onclick="board('all')">عرض الكل ⬅️</button></div>'+
+    '<div class="hm-lb-hd"><b>🏆 أبطال تحدي الأصحاب</b><button class="hm-lb-all" onclick="board(\'all\')">عرض الكل ⬅️</button></div>'+
     '<div id="homeLbList" class="hm-lb-list"><div class="sm" style="text-align:center;padding:6px">جاري تحميل أبطال المنصة...</div></div>'+
   '</div>'+
   (S.hmGuide?'<button class="hm-help" onclick="homeGuideShow()">❓ إزاي أستخدم المنصة؟</button>':'')+
@@ -6176,7 +6176,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.2').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.2.1').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
