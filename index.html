@@ -977,6 +977,36 @@ body.dark .sarah-cd{background:rgba(255,215,0,.14);color:#FFD700;border-color:rg
 .sarah-qbox{background:linear-gradient(135deg,#FFFDF7,#FFF0F6);border:2.5px solid #E64980;border-radius:16px;padding:12px;text-align:right;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
 body.dark .sarah-qbox{background:linear-gradient(135deg,#2A1A24,#1E1A26);border-color:#F06595;color:#FFE9B8}
 
+/* --- v12.6: التحسين البصري الشامل (خطة الـ 10 دقايق + شريط سفلي 5 أيقونات + نبذة مستر عبدالرحمن) --- */
+.bnav{grid-template-columns:repeat(5,1fr)!important}
+.plan10{background:linear-gradient(145deg,rgba(255,253,247,.96),rgba(244,249,247,.95));border:2px solid #2F5F5A;border-radius:18px;padding:12px;box-shadow:0 4px 14px rgba(47,95,90,.12);display:flex;flex-direction:column;gap:8px}
+body.dark .plan10{background:linear-gradient(145deg,rgba(28,38,42,.95),rgba(20,28,34,.95));border-color:#498A82;color:#F5F5F5}
+body.th-modern .plan10{background:rgba(255,255,255,.92);border:1.5px solid #C7D2FE;box-shadow:0 8px 22px rgba(30,41,59,.07)}
+.plan10-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.plan10-hd b{font-size:14.5px;font-weight:900;color:var(--teal);display:flex;align-items:center;gap:6px}
+.plan10-hd span{font-size:11.5px;font-weight:900;background:rgba(47,107,74,.14);color:#2F6B4A;padding:2px 8px;border-radius:10px}
+body.dark .plan10-hd span{background:rgba(110,231,168,.16);color:#6EE7A8}
+.plan10-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.p10-st{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:14px;padding:8px 5px;cursor:pointer;font-family:'Cairo',sans-serif;color:var(--ink);transition:transform .15s,border-color .2s}
+.p10-st:active{transform:scale(.96)}
+.p10-st.dn{background:linear-gradient(135deg,rgba(47,107,74,.16),rgba(47,107,74,.06));border-color:#2F6B4A}
+.p10-st .ic{font-size:21px;line-height:1}
+.p10-st b{font-size:12px;font-weight:900;line-height:1.25}
+.p10-st small{font-size:10.5px;font-weight:700;color:var(--teal);line-height:1.25}
+body.dark .p10-st{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+body.dark .p10-st.dn{background:rgba(47,107,74,.25);border-color:#6EE7A8}
+
+.mr-about-btn{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,rgba(47,95,90,.09),rgba(201,151,63,.12));border:1.5px solid rgba(201,151,63,.65);border-radius:16px;padding:9px 12px;cursor:pointer;text-align:right;font-family:'Cairo',sans-serif;color:var(--ink);transition:transform .15s}
+.mr-about-btn:active{transform:scale(.98)}
+body.dark .mr-about-btn{background:linear-gradient(135deg,rgba(47,95,90,.25),rgba(201,151,63,.14));border-color:rgba(255,215,0,.45);color:#FFE9B8}
+.mr-about-hero{background:linear-gradient(145deg,#1B3B38,#2F5F5A 55%,#0F2143);border:2.5px solid #FFD700;border-radius:20px;padding:16px 14px;color:#FFE9B8;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.mr-about-card{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:16px;padding:12px 14px;line-height:1.85;font-size:13.5px;font-weight:700}
+.mr-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,215,0,.18);border:1px solid rgba(255,215,0,.55);color:#FFD700;border-radius:12px;padding:2px 9px;font-size:11.5px;font-weight:900;margin:2px}
+
+/* تهدئة بصرية لطيفة للشاشة الرئيسية */
+.it-row{border-width:1.5px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.sec-card{border-width:2px;box-shadow:0 3px 0 var(--c)}
+
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -6243,7 +6273,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.5').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.6').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11022,6 +11052,156 @@ var _home125=home;
 home=function(){
   _home125();
   setTimeout(enhanceHomeSarah,120);
+};
+
+
+/* ==========================================================================
+   v12.6 — التحسين البصري الشامل (خطة الـ 10 دقايق + شريط سفلي 5 أيقونات)
+           + صفحة «عن مستر عبدالرحمن حسنين وقصة المنصة» للطالب وولي الأمر
+   ========================================================================== */
+
+/* ١. تبسيط الشريط السفلي إلى 5 أيقونات واضحة ومريحة للعين */
+bnav=function(active){
+  var hasCert=!!(S.cert||mapDone());
+  var tabs=[
+    ['home','🏠','الرئيسية','home()',0],
+    ['les','📘','الشرح','lessonHubScr()',0],
+    ['lb','🏆','الأبطال','board()',0],
+    ['rep','📊','مستوايا','reportScr()',hasCert],
+    ['shop','🛒','المتجر','store()',0]
+  ];
+  return '<div class="bnav-spacer"></div><nav class="bnav" aria-label="التنقل الرئيسي">'+tabs.map(function(t){
+    return '<button class="'+(active===t[0]?'act':'')+'" onclick="'+t[3]+'">'+(t[4]?'<span class="bdot"></span>':'')+'<span class="ni">'+t[1]+'</span><span>'+t[2]+'</span></button>';
+  }).join('')+'</nav>';
+};
+
+/* ٢. بطاقة «خطة الـ 10 دقايق النهاردة» لإنهاء التشتت البصري */
+function plan10Html(){
+  var d=cDay();
+  var step1Done=(Array.isArray(S.sarahDone)&&S.sarahDone.length>0 && S.sarahLastDay===d) || (Array.isArray(S.watchedVocab)&&S.watchedVocab.length>0 && S.vocabLastDay===d);
+  var step2Done=(dayState().rounds>0);
+  var step3Done=(S.repDay===d || (S.mis&&S.mis.length===0 && step2Done));
+  var doneCnt=(step1Done?1:0)+(step2Done?1:0)+(step3Done?1:0);
+  var pct=Math.round(doneCnt/3*100);
+  return '<div class="plan10" id="plan10Box">'+
+    '<div class="plan10-hd">'+
+      '<b>🎯 خطة الـ 10 دقايق النهاردة</b>'+
+      '<span>'+doneCnt+' / 3 '+(doneCnt===3?'مكتمل 🎉':'خطوات')+'</span>'+
+    '</div>'+
+    '<div class="bar" style="height:8px"><i style="width:'+pct+'%;background:#2F6B4A"></i></div>'+
+    '<div class="plan10-steps">'+
+      '<button class="p10-st'+(step1Done?' dn':'')+'" onclick="sarahDiariesScr(0)">'+
+        '<span class="ic">'+(step1Done?'✅':'🎬')+'</span>'+
+        '<b>١. افهم</b>'+
+        '<small>سارة أو الشرح</small>'+
+      '</button>'+
+      '<button class="p10-st'+(step2Done?' dn':'')+'" onclick="map()">'+
+        '<span class="ic">'+(step2Done?'✅':'🗺️')+'</span>'+
+        '<b>٢. العب</b>'+
+        '<small>جولة خريطة</small>'+
+      '</button>'+
+      '<button class="p10-st'+(step3Done?' dn':'')+'" onclick="'+(S.mis&&S.mis.length?'startReview()':'reportScr()')+'">'+
+        '<span class="ic">'+(step3Done?'✅':'📊')+'</span>'+
+        '<b>٣. اتأكد</b>'+
+        '<small>'+(S.mis&&S.mis.length?'صحّح أخطاءك':'شوف مستواك')+'</small>'+
+      '</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* تسجيل إنجاز خطوات خطة الـ 10 دقايق تلقائياً */
+var _markSarahW126=markSarahWatched;
+markSarahWatched=function(vidId){
+  S.sarahLastDay=cDay();save();
+  _markSarahW126(vidId);
+};
+var _reportScr126=reportScr;
+reportScr=function(){
+  S.repDay=cDay();save();
+  _reportScr126();
+};
+
+/* ٣. صفحة «عن مستر عبدالرحمن حسنين وقصة المنصة» للطالب وولي الأمر */
+function aboutMisterScr(){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  app.innerHTML=
+    '<div class="mr-about-hero">'+
+      '<div style="display:flex;justify-content:center;margin-bottom:8px">'+misterImg('c',86)+'</div>'+
+      '<h1 style="font-family:Lemonada,\'Cairo\',sans-serif;font-size:21px;margin:0;color:#FFD700">مستر عبدالرحمن حسنين</h1>'+
+      '<div style="font-size:13px;font-weight:700;color:#CFE3D4;margin-top:4px">معلم اللغة الإنجليزية • مؤسس منصة تحدّي الأصحاب و Grammora &amp; EngliFocus</div>'+
+      '<div style="margin-top:8px">'+
+        '<span class="mr-pill">🎓 ابتدائي • إعدادي • ثانوي</span>'+
+        '<span class="mr-pill">📍 الإسكندرية</span>'+
+        '<span class="mr-pill">💡 تعليم تفاعلي ممتع</span>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="mr-about-card">'+
+      '<div class="tag g" style="margin-bottom:8px">👋 أهلاً بأبنائي الطلاب وأولياء الأمور الكرام</div>'+
+      'أنا <b>مستر عبدالرحمن حسنين</b>، معلم لغة إنجليزية شغوف بتطوير طرق التدريس وربطها بالتكنولوجيا الحديثة. صمّمت وبرمجت منصة <b>«تحدّي الأصحاب»</b> بنفسي لتكون رفيق الطالب اليومي في البيت بعد الحصة.'+
+    '</div>'+
+
+    '<div class="mr-about-card" style="border-color:#C9973F">'+
+      '<div class="tag" style="background:#7A3B3B;margin-bottom:8px">💡 ليه عملت المنصة دي؟</div>'+
+      '١️⃣ <b>تحويل وقت الموبايل لتعلّم حقيقي:</b> بدل ما الابن يضيع وقته في ألعاب ملهاش فايدة، يلاقي لعبة ممتعة وتحديات ووحوش ومنصة تتويج — لكن كلها بتأسسه وتدرّبه على منهجه في الإنجليزي!<br>'+
+      '٢️⃣ <b>التأسيس الصحيح بدون ضغط:</b> اهتميت إن المنصة تبدأ من <b>الصوتيات والنطق السليم</b> وتكوين الجملة وكتابة البرجراف، بدون خوف من الغلط.<br>'+
+      '٣️⃣ <b>إحساس مستمر بالإنجاز:</b> كل نقطة ابنك بيجيبها في البيت أو في <b>بطولة حصة السنتر</b> محفوظة في رصيده التراكمي، وبيستلم عليها أوسمة وشهادات تقدير رسمية.<br>'+
+      '٤️⃣ <b>متابعة سهلة لولي الأمر:</b> عشان حضرتك تطمئن على مستوى ابنك في أي وقت من خلال <b>بوابة ولي الأمر</b> وتقرير المهارات المفصّل.'+
+    '</div>'+
+
+    '<div class="mr-about-card" style="background:linear-gradient(135deg,#E6F4F1,#FFE8B5);border-color:#2F6B4A;color:#3A2318">'+
+      '<div style="font-weight:900;font-size:15px;color:#1B3B38;margin-bottom:4px">⏱️ نصيحة مستر عبدالرحمن لكل ولي أمر وطالب:</div>'+
+      'مش محتاج ساعات طويلة! <b>١٠ لـ ١٥ دقيقة بس كل يوم</b> على خطة الـ ٣ خطوات (اسمع الشرح أو يوميات سارة ⬅️ العب جولة ⬅️ راجع أخطاءك) هتعمل فرق رهيب في مستوى ابنك وحبه للإنجليزي!'+
+    '</div>'+
+
+    '<div class="row" style="gap:8px">'+
+      '<button class="btn" style="flex:1;font-size:14.5px;min-height:44px;background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700" onclick="parentScr()">👨‍👩‍👧 بوابة ولي الأمر</button>'+
+      '<button class="btn t" style="flex:1;font-size:14.5px;min-height:44px" onclick="askScr()">💬 اسأل المستر</button>'+
+    '</div>'+
+    '<button class="btn t" onclick="home()">🏠 العودة للرئيسية</button>'+
+    bnav('home');
+}
+
+/* ٤. حقن «خطة الـ 10 دقايق» وبطاقة «عن مستر عبدالرحمن» في الشاشة الرئيسية وفي الإعدادات */
+var _home126=home;
+home=function(){
+  _home126();
+  try{
+    var hero=app.querySelector('.hero-play')||app.querySelector('.hp-lock');
+    if(hero && !document.getElementById('plan10Box')){
+      hero.insertAdjacentHTML('beforebegin',plan10Html());
+    }
+    var lbBox=document.getElementById('homeLbBox');
+    if(lbBox && !document.getElementById('mrAboutHomeBtn')){
+      lbBox.insertAdjacentHTML('afterend',
+        '<button id="mrAboutHomeBtn" class="mr-about-btn" onclick="aboutMisterScr()">'+
+          misterImg('a',46)+
+          '<div class="sp">'+
+            '<div style="font-weight:900;font-size:14px;color:var(--teal)">👨‍🏫 عن مستر عبدالرحمن حسنين وقصة المنصة</div>'+
+            '<div class="sm" style="font-size:11.5px">اعرف ليه عملت «تحدّي الأصحاب» وإزاي تستفيد منها في 10 دقايق يومياً</div>'+
+          '</div>'+
+          '<span style="font-size:20px;font-weight:900;opacity:.6">‹</span>'+
+        '</button>'
+      );
+    }
+  }catch(e){}
+};
+
+var _accountScr126=accountScr;
+accountScr=function(){
+  _accountScr126();
+  try{
+    var hd=app.querySelector('.hd');
+    if(hd && !document.getElementById('mrAboutAccBtn')){
+      hd.insertAdjacentHTML('afterend',
+        '<button id="mrAboutAccBtn" class="mr-about-btn" onclick="aboutMisterScr()">'+
+          misterImg('c',46)+
+          '<div class="sp"><div style="font-weight:900;font-size:14.5px;color:var(--teal)">👨‍🏫 نبذة عن مستر عبدالرحمن حسنين (مؤسس المنصة)</div><div class="sm">رسالة لولي الأمر والطالب: لماذا أنشأت منصة تحدّي الأصحاب؟</div></div>'+
+          '<span style="font-size:20px;font-weight:900;opacity:.6">‹</span>'+
+        '</button>'
+      );
+    }
+  }catch(e){}
 };
 
 </script>
