@@ -956,6 +956,27 @@ body.dark .sarah-banner{background:linear-gradient(135deg,#3A1828,#221830);borde
 body.dark .sarah-ep.act{background:linear-gradient(135deg,#3A1828,#2B2318);color:#FFE9B8;border-color:#FFD700}
 .sarah-ep-num{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#E64980,#A61E4D);color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
 
+/* --- v12.5: إعلان يوميات سارة الترحيبي (9:16 Shorts) + إشعار الحلقة الجديدة + عداد 9 مساءً + سؤال الحلقة --- */
+.sp-ov{position:fixed;inset:0;background:rgba(8,14,28,.82);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;animation:fadeIn .25s ease-out}
+.sp-box{width:100%;max-width:360px;max-height:94vh;overflow-y:auto;background:linear-gradient(160deg,#1A1025,#2B1328 55%,#12252A);border:3px solid #FFD700;border-radius:22px;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,.65);display:flex;flex-direction:column;gap:9px;color:#FFE9B8;animation:popIn .3s cubic-bezier(.2,.9,.3,1.2)}
+.sp-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sp-ttl{display:flex;align-items:center;gap:8px;font-weight:900;font-size:14.5px;color:#FFD700}
+.sp-x{background:rgba(255,255,255,.14);color:#FFE9B8;border:1.5px solid rgba(255,233,184,.5);border-radius:10px;padding:4px 10px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;cursor:pointer}
+.sp-vid{position:relative;width:100%;aspect-ratio:9/16;max-height:58vh;background:#000;border-radius:16px;overflow:hidden;border:2px solid #E64980;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.sp-vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.sp-snd{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:5;background:linear-gradient(135deg,#FFD700,#C9973F);color:#2B1B12;border:2px solid #FFF;border-radius:20px;padding:6px 16px;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);white-space:nowrap;animation:keyGlow 1.5s infinite}
+
+.sarah-notif{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#A61E4D,#E64980);color:#FFF;border:2.5px solid #FFD700;border-radius:16px;padding:10px 12px;cursor:pointer;text-align:right;font-family:'Cairo',sans-serif;box-shadow:0 6px 18px rgba(166,30,77,.35);animation:fadeIn .3s ease-out}
+.sarah-notif .ic{font-size:26px;line-height:1;animation:petBob 1.6s ease-in-out infinite;flex:none}
+.sarah-notif .tx{flex:1;min-width:0;font-size:13px;font-weight:800;line-height:1.55}
+.sarah-notif .tx b{color:#FFD700;font-size:14px}
+.sarah-notif .go{flex:none;background:#FFD700;color:#2B1B12;border-radius:10px;padding:5px 10px;font-weight:900;font-size:12px;white-space:nowrap}
+.sarah-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF2E63;border:2px solid #FFF;box-shadow:0 0 8px #FF2E63;animation:pl 1s infinite;vertical-align:middle;margin-right:4px}
+.sarah-cd{display:inline-flex;align-items:center;gap:4px;background:rgba(166,30,77,.12);color:#A61E4D;border:1px solid rgba(230,73,128,.45);border-radius:8px;padding:1px 7px;font-size:11px;font-weight:900;margin-top:4px}
+body.dark .sarah-cd{background:rgba(255,215,0,.14);color:#FFD700;border-color:rgba(255,215,0,.4)}
+.sarah-qbox{background:linear-gradient(135deg,#FFFDF7,#FFF0F6);border:2.5px solid #E64980;border-radius:16px;padding:12px;text-align:right;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+body.dark .sarah-qbox{background:linear-gradient(135deg,#2A1A24,#1E1A26);border-color:#F06595;color:#FFE9B8}
+
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -6222,7 +6243,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.4').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.5').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -10698,6 +10719,310 @@ function tSarahDel(idx){
     tSarahAdminScr();
   }
 }
+
+
+/* ==========================================================================
+   v12.5 — إعلان «يوميات سارة» الترحيبي (YouTube Shorts) + ترتيب الأحدث أولاً
+           + إشعار الحلقة الجديدة + عداد الساعة 9 مساءً + سؤال تفاعلي تحت كل حلقة
+   ========================================================================== */
+var SARAH_PROMO_ID='Mu_cABVRRrE';
+
+function sarah9pmCountdownTxt(){
+  var p=cairo(), h=p.hour||0, m=p.minute||0;
+  if(h===21 && m<30)return '🔥 الآن وقت حلقة الساعة 9 مساءً!';
+  var nowMin=h*60+m, targetMin=21*60;
+  var diff=targetMin-nowMin;
+  if(diff<=0)diff+=24*60;
+  var dh=Math.floor(diff/60), dm=diff%60;
+  if(dh===0)return '⏰ باقي '+dm+' دقيقة على حلقة 9 مساءً!';
+  return '⏰ حلقة جديدة 9 مساءً (باقي '+dh+' س و '+dm+' د)';
+}
+
+function sortSarahNewest(arr){
+  return (arr||[]).slice().map(function(v,idx){
+    return {v:v, idx:idx};
+  }).sort(function(a,b){
+    var d=(Number(b.v.at)||0)-(Number(a.v.at)||0);
+    if(d!==0)return d;
+    return b.idx-a.idx;
+  }).map(function(x){return x.v});
+}
+
+/* ١. إعلان الفيديو الترحيبي (مرة واحدة لكل طالب + متاح للإعادة من داخل يوميات سارة) */
+function showSarahPromoModal(force){
+  if(document.getElementById('sarahPromoOv'))return;
+  if(!force && (document.getElementById('wnModal') || S.sarahPromoSeen===SARAH_PROMO_ID))return;
+  var ov=document.createElement('div');
+  ov.id='sarahPromoOv';
+  ov.className='sp-ov';
+  var src='https://www.youtube.com/embed/'+SARAH_PROMO_ID+'?autoplay=1&mute=1&playsinline=1&rel=0';
+  ov.innerHTML='<div class="sp-box">'+
+    '<div class="sp-top">'+
+      '<div class="sp-ttl"><img src="sarah.png" alt="سارة" style="width:32px;height:32px;border-radius:50%;border:2px solid #FFD700;object-fit:cover" onerror="this.style.display=\'none\'"><span>🎬 إعلان يوميات سارة — 9 مساءً!</span></div>'+
+      '<button class="sp-x" onclick="closeSarahPromo(0)">تخطي ⏭️</button>'+
+    '</div>'+
+    '<div class="sp-vid">'+
+      '<iframe id="sarahPromoFrame" src="'+src+'" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'+
+      '<button id="sarahUnmuteBtn" class="sp-snd" onclick="sarahPromoUnmute()">🔊 اضغط هنا لتشغيل الصوت</button>'+
+    '</div>'+
+    '<div style="font-size:12.5px;text-align:center;line-height:1.6;color:#CFE3D4;font-weight:700">شاهد • تعلّم • تدرّب مع سارة كل يوم الساعة <b>9 مساءً</b> على قناة جرامورا والمنصة! ✨</div>'+
+    '<div class="row" style="gap:8px">'+
+      '<button class="btn" style="flex:2;font-size:14.5px;min-height:42px;padding:6px;background:linear-gradient(135deg,#E64980,#A61E4D);border-color:#FFD700" onclick="closeSarahPromo(1)">🎬 ادخل يوميات سارة الآن</button>'+
+      '<button class="btn t" style="flex:1;font-size:13px;min-height:42px;padding:6px" onclick="closeSarahPromo(0)">ابدأ اللعب ▶</button>'+
+    '</div>'+
+  '</div>';
+  document.body.appendChild(ov);
+}
+
+function sarahPromoUnmute(){
+  var fr=document.getElementById('sarahPromoFrame');
+  var btn=document.getElementById('sarahUnmuteBtn');
+  if(fr){
+    fr.src='https://www.youtube.com/embed/'+SARAH_PROMO_ID+'?autoplay=1&mute=0&playsinline=1&rel=0';
+  }
+  if(btn)btn.style.display='none';
+}
+
+function closeSarahPromo(goSarah){
+  S.sarahPromoSeen=SARAH_PROMO_ID;
+  save();
+  var el=document.getElementById('sarahPromoOv');
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+  if(goSarah)sarahDiariesScr(0);
+}
+
+/* ٢. تحديث شاشة «يوميات سارة»: الأحدث أولاً + زر الإعلان + سؤال سريع اختياري على الحلقة */
+var SARAH_CUR_Q_OPTS=[];
+sarahDiariesScr=function(epIdx){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(epIdx!==undefined)SARAH_CUR_IDX=epIdx;
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#A61E4D,#E64980);border-color:#FFD700">'+
+      '<div class="row" style="justify-content:center;gap:12px">'+
+        '<img class="sarah-av" src="sarah.png" alt="سارة" style="width:62px;height:62px;border-color:#FFD700" onerror="this.style.display=\'none\'">'+
+        '<div style="text-align:right"><h1 style="font-size:22px">🎬 يوميات سارة</h1><div>'+sarah9pmCountdownTxt()+'</div></div>'+
+      '</div>'+
+      '<button class="pwb" style="margin-top:8px;min-height:32px;padding:3px 12px;font-size:12px;background:rgba(255,215,0,.22);color:#FFE9B8;border-color:#FFD700;width:auto;display:inline-block" onclick="showSarahPromoModal(true)">▶️ شاهد إعلان يوميات سارة (35ث)</button>'+
+    '</div>'+
+    '<div id="sarahBody" class="card" style="text-align:center;font-weight:700">جاري تحميل أحدث حلقات يوميات سارة... 🎬✨</div>'+
+    '<div class="sp"></div>'+
+    (T_AUTH?'<button class="btn" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;font-size:15px" onclick="tSarahAdminScr()">⚙️ إضافة / تعديل حلقات يوميات سارة (لوحة المستر)</button>':'')+
+    '<button class="btn t" onclick="home()">🏠 العودة للرئيسية</button>'+
+    bnav('les');
+
+  loadSarahVids(function(rawVids){
+    var body=document.getElementById('sarahBody');
+    if(!body)return;
+    var vids=sortSarahNewest(rawVids||[]);
+    if(!vids.length){
+      body.innerHTML='<div style="padding:14px;line-height:1.9">'+
+        '<img src="sarah.png" alt="سارة" style="width:90px;height:90px;border-radius:50%;border:3px solid #E64980;margin-bottom:6px" onerror="this.style.display=\'none\'"><br>'+
+        '<b style="font-size:17px;color:#A61E4D">قريباً أول حلقة من «يوميات سارة» الساعة 9 مساءً! 🎬💖</b><br>'+
+        '<span class="sm">مستر عبدالرحمن بيجهزلكم حلقات ممتعة جداً مع سارة هتنزل هنا أول بأول!</span>'+
+      '</div>';
+      return;
+    }
+    /* تسجيل أن الطالب اطلع على أحدث حلقة لإخفاء إشعار الشاشة الرئيسية */
+    if(vids[0]&&vids[0].id&&S.sarahSeenLatest!==vids[0].id){
+      S.sarahSeenLatest=vids[0].id;
+      save();
+    }
+    if(SARAH_CUR_IDX>=vids.length)SARAH_CUR_IDX=0;
+    var cur=vids[SARAH_CUR_IDX];
+    S.sarahDone=Array.isArray(S.sarahDone)?S.sarahDone:[];
+    var isWatched=(S.sarahDone.indexOf(cur.id)>=0);
+    var hasQuiz=!!(cur.q && Array.isArray(cur.opts) && cur.opts.length>=2);
+
+    var playerHtml='<div class="yt-dock" style="position:static;border-color:#E64980;margin-bottom:10px">'+
+      '<div class="yt-cap" style="background:linear-gradient(135deg,#A61E4D,#E64980)"><span>'+(SARAH_CUR_IDX===0?'🔥 الأحدث: ':'🎬 ')+esc(cur.title)+'</span><span class="sp"></span><span>'+(SARAH_CUR_IDX+1)+' / '+vids.length+'</span></div>'+
+      '<div class="yt-fr"><iframe src="https://www.youtube.com/embed/'+esc(cur.id)+'?rel=0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>'+
+    '</div>'+
+    (cur.desc?'<div class="card" style="background:#FFF0F6;border-color:#E64980;font-size:13.5px;font-weight:700;text-align:right;margin-bottom:8px;color:#4A2F22">💡 '+esc(cur.desc)+'</div>':'');
+
+    var actionHtml='';
+    if(isWatched){
+      actionHtml='<div class="card" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border-color:#FFD700;text-align:center;font-weight:900;margin-bottom:12px">✅ أتممت مشاهدة هذه الحلقة وحصلت على المكافأة! 🌟</div>';
+    }else if(hasQuiz){
+      SARAH_CUR_Q_OPTS=shuffle(cur.opts.map(function(txt,idx){return {txt:txt,ok:(idx===0)}}));
+      actionHtml='<div class="sarah-qbox" id="sarahQBox">'+
+        '<div class="tag" style="background:#A61E4D">🧠 سؤال الحلقة السريع (جاوب صح واكسب +15 عملة و+15 نقطة!)</div>'+
+        '<div style="font-weight:900;font-size:16px;line-height:1.6">'+esc(cur.q)+'</div>'+
+        SARAH_CUR_Q_OPTS.map(function(o,oi){
+          return '<button class="opt" style="font-size:16px;min-height:42px" onclick="sarahAnsQ('+oi+',\''+esc(cur.id)+'\')">'+esc(o.txt)+'</button>';
+        }).join('')+
+        '<div id="sarahQFb" class="sm" style="text-align:center"></div>'+
+      '</div>';
+    }else{
+      actionHtml='<button class="btn" style="width:100%;margin-bottom:12px;font-size:15px;min-height:42px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="markSarahWatched(\''+esc(cur.id)+'\')">🎉 أتممت مشاهدة الحلقة! (+15 عملة و+15 نقطة)</button>';
+    }
+
+    var listHtml='<div class="tag" style="background:#A61E4D;margin-bottom:8px">📺 جميع حلقات يوميات سارة — الأحدث أولاً ('+vids.length+' حلقة)</div>'+
+      '<div style="display:flex;flex-direction:column;gap:8px">'+
+      vids.map(function(v,idx){
+        var act=(idx===SARAH_CUR_IDX), dn=(S.sarahDone.indexOf(v.id)>=0);
+        return '<button class="sarah-ep'+(act?' act':'')+'" onclick="sarahDiariesScr('+idx+')">'+
+          '<div class="sarah-ep-num">'+(vids.length-idx)+'</div>'+
+          '<div class="sp"><div style="font-weight:900;font-size:14.5px">'+esc(v.title)+(idx===0?' <span class="it-bdg r" style="margin-right:4px">الأحدث 🔥</span>':'')+'</div>'+(v.desc?'<div class="sm" style="font-size:11.5px">'+esc(v.desc)+'</div>':'')+'</div>'+
+          '<span style="font-size:13px;font-weight:900">'+(dn?'✅':(act?'▶️ الآن':'▶️'))+'</span>'+
+        '</button>';
+      }).join('')+
+      '</div>';
+
+    body.outerHTML='<div id="sarahBody">'+playerHtml+actionHtml+listHtml+'</div>';
+  });
+};
+
+function sarahAnsQ(oi,vidId){
+  var chosen=SARAH_CUR_Q_OPTS[oi];
+  if(!chosen)return;
+  var box=document.getElementById('sarahQBox');
+  var fb=document.getElementById('sarahQFb');
+  if(chosen.ok){
+    if(box)box.querySelectorAll('.opt').forEach(function(b,j){b.disabled=true;if(j===oi)b.classList.add('ok')});
+    sfxOk(true);
+    setTimeout(function(){markSarahWatched(vidId)},450);
+  }else{
+    sfxBad(true);
+    if(box){
+      var btns=box.querySelectorAll('.opt');
+      if(btns[oi]){btns[oi].classList.add('bad');btns[oi].disabled=true}
+    }
+    if(fb)fb.innerHTML='<span style="color:#B23A3A">إجابة غير دقيقة! ركّز في الفيديو وجرّب اختيار تاني 💪</span>';
+  }
+}
+
+/* ٣. تحديث لوحة إدارة يوميات سارة للمستر (إضافة سؤال اختياري + عرض الأحدث أولاً + حذف دقيق بالـ ID) */
+tSarahAdminScr=function(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#A61E4D,#E64980);border-color:#FFD700"><h1>🎬 إدارة يوميات سارة</h1><div>الحلقات تظهر للطلاب بالأحدث أولاً + إشعار تلقائي لكل طالب ☁️</div></div>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="tag" style="background:#A61E4D">➕ نشر حلقة جديدة (تظهر الأولى فوراً)</div>'+
+      '<input id="srTitle" class="inp" placeholder="عنوان الحلقة (مثال: الحلقة ١ — سارة في المدرسة 🎒)" style="font-size:15px">'+
+      '<input id="srUrl" class="inp" placeholder="رابط فيديو اليوتيوب (youtube.com أو youtu.be أو shorts)" style="direction:ltr;font-size:14px">'+
+      '<input id="srDesc" class="inp" placeholder="وصف قصير اختياري (مثال: كلمات أدوات المدرسة)" style="font-size:14px">'+
+      '<div style="border-top:1.5px dashed rgba(138,106,74,.35);padding-top:8px;margin-top:2px">'+
+        '<div class="sm" style="margin-bottom:6px">🧠 سؤال سريع على الحلقة (اختياري — لو سيبته فاضي هيظهر زر المشاهدة العادي):</div>'+
+        '<input id="srQ" class="inp" placeholder="السؤال (مثال: ماذا نسيت سارة في البيت؟)" style="font-size:13.5px;margin-bottom:6px">'+
+        '<input id="srA1" class="inp" placeholder="✅ الإجابة الصحيحة" style="font-size:13.5px;margin-bottom:6px;border-color:#2F6B4A">'+
+        '<div class="row" style="gap:6px">'+
+          '<input id="srA2" class="inp" placeholder="❌ اختيار خطأ ١" style="font-size:13px">'+
+          '<input id="srA3" class="inp" placeholder="❌ اختيار خطأ ٢" style="font-size:13px">'+
+        '</div>'+
+      '</div>'+
+      '<button class="btn" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:16px" onclick="tSarahAdd()">☁️ نشر الحلقة وإرسال إشعار للطلاب</button>'+
+    '</div>'+
+    '<div class="card" id="tSarahList">جاري تحميل الحلقات الحالية...</div>'+
+    '<button class="btn t" onclick="sarahDiariesScr(0)">👁️ معاينة شاشة «يوميات سارة» كطالب</button>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة تحكم المستر</button>';
+
+  loadSarahVids(function(rawVids){
+    var box=document.getElementById('tSarahList');
+    if(!box)return;
+    var vids=sortSarahNewest(rawVids||[]);
+    if(!vids.length){
+      box.innerHTML='<div class="sm" style="text-align:center">لا توجد حلقات منشورة بعد. أضف أول حلقة من الأعلى 👆</div>';
+      return;
+    }
+    box.innerHTML='<div class="tag g" style="margin-bottom:8px">الحلقات المنشورة — الأحدث أولاً ('+vids.length+')</div>'+
+      vids.map(function(v,idx){
+        return '<div class="row" style="padding:7px 6px;border-bottom:1px dashed rgba(138,106,74,.3);gap:8px">'+
+          '<b>#'+(vids.length-idx)+'</b>'+
+          '<div class="sp"><div style="font-weight:900;font-size:14px">'+esc(v.title)+(idx===0?' <span class="it-bdg r">الأحدث</span>':'')+(v.q?' <span class="it-bdg">🧠 بسؤال</span>':'')+'</div><div class="sm" style="direction:ltr;text-align:right;font-size:11px">youtu.be/'+esc(v.id)+'</div></div>'+
+          '<button class="pwb" style="flex:none;width:auto;min-height:32px;padding:2px 10px;background:#8B2E2E;color:#fff" onclick="tSarahDelById(\''+esc(v.id)+'\','+(v.at||0)+')">🗑️ حذف</button>'+
+        '</div>';
+      }).join('');
+  });
+};
+
+tSarahAdd=function(){
+  var title=($('#srTitle')&&$('#srTitle').value||'').trim();
+  var url=($('#srUrl')&&$('#srUrl').value||'').trim();
+  var desc=($('#srDesc')&&$('#srDesc').value||'').trim();
+  var qTxt=($('#srQ')&&$('#srQ').value||'').trim();
+  var a1=($('#srA1')&&$('#srA1').value||'').trim();
+  var a2=($('#srA2')&&$('#srA2').value||'').trim();
+  var a3=($('#srA3')&&$('#srA3').value||'').trim();
+  var vidId=extractYtId(url);
+  if(!title){rmsg('اكتب عنوان الحلقة الأول!');return}
+  if(!vidId){rmsg('رابط اليوتيوب غير صحيح! انسخ الرابط كامل من يوتيوب');return}
+  var item={id:vidId,title:title,desc:desc,at:Date.now()};
+  if(qTxt && a1 && a2){
+    item.q=qTxt;
+    item.opts=a3?[a1,a2,a3]:[a1,a2];
+  }
+  var list=(SARAH_VIDS_CACHE||S.sarahVids||[]).slice();
+  list.unshift(item);
+  S.sarahVids=list;SARAH_VIDS_CACHE=list;save();
+  if(window.FB&&FB.ytSet){
+    rmsg('جاري نشر الحلقة وإشعار الطلاب...');
+    FB.ytSet('sarah_diaries',list).then(function(){
+      sfxWin();rmsg('✅ تم نشر «'+title+'» وستظهر الأولى مع إشعار لكل الطلاب!');
+      tSarahAdminScr();
+    }).catch(function(){rmsg('تم الحفظ محلياً، تأكد من الإنترنت للمزامنة')});
+  }else{
+    rmsg('✅ تم حفظ الحلقة!');tSarahAdminScr();
+  }
+};
+
+function tSarahDelById(vidId,atTs){
+  if(!confirm('هل تريد حذف هذه الحلقة من يوميات سارة؟'))return;
+  var list=(SARAH_VIDS_CACHE||S.sarahVids||[]).slice().filter(function(v){
+    return !(v.id===vidId && (!atTs || Number(v.at||0)===Number(atTs)));
+  });
+  S.sarahVids=list;SARAH_VIDS_CACHE=list;save();
+  if(window.FB&&FB.ytSet){
+    FB.ytSet('sarah_diaries',list).then(function(){
+      rmsg('تم حذف الحلقة بنجاح');tSarahAdminScr();
+    }).catch(function(){tSarahAdminScr()});
+  }else{
+    tSarahAdminScr();
+  }
+}
+
+/* ٤. تحديث الشاشة الرئيسية: عداد 9 مساءً + إشعار الحلقة الجديدة + تشغيل الإعلان مرة واحدة */
+function enhanceHomeSarah(){
+  var sb=app.querySelector('.sarah-banner');
+  if(!sb)return;
+  /* إضافة عداد الساعة 9 مساءً على بانر سارة */
+  if(!sb.querySelector('.sarah-cd')){
+    var sp=sb.querySelector('.sp');
+    if(sp)sp.insertAdjacentHTML('beforeend','<div><span class="sarah-cd">'+sarah9pmCountdownTxt()+'</span></div>');
+  }
+  /* التحقق من وجود حلقة جديدة لم يرها الطالب بعد */
+  loadSarahVids(function(rawVids){
+    var vids=sortSarahNewest(rawVids||[]);
+    if(!vids.length)return;
+    var latest=vids[0];
+    S.sarahDone=Array.isArray(S.sarahDone)?S.sarahDone:[];
+    var isUnseen=(latest && latest.id && S.sarahSeenLatest!==latest.id && S.sarahDone.indexOf(latest.id)<0);
+    if(isUnseen && !document.getElementById('sarahNewNotif')){
+      var curSb=app.querySelector('.sarah-banner');
+      if(curSb){
+        curSb.insertAdjacentHTML('beforebegin',
+          '<button id="sarahNewNotif" class="sarah-notif" onclick="sarahDiariesScr(0)">'+
+            '<span class="ic">🔔</span>'+
+            '<span class="tx"><b>حلقة جديدة من يوميات سارة نزلت دلوقتي! 🎬</b><br>«'+esc(latest.title)+'» — ادخل شوفها واكسب +15 عملة!</span>'+
+            '<span class="go">شاهد الآن ▶</span>'+
+          '</button>'
+        );
+        var bdg=curSb.querySelector('.it-bdg');
+        if(bdg && !curSb.querySelector('.sarah-dot')){
+          bdg.insertAdjacentHTML('afterend','<span class="sarah-dot"></span>');
+        }
+      }
+    }
+  });
+  /* تشغيل إعلان الفيديو الترحيبي مرة واحدة فقط إذا لم يظهر من قبل */
+  if(S.stage && S.grade && S.nick && S.sarahPromoSeen!==SARAH_PROMO_ID){
+    setTimeout(function(){showSarahPromoModal(false)},900);
+  }
+}
+
+var _home125=home;
+home=function(){
+  _home125();
+  setTimeout(enhanceHomeSarah,120);
+};
 
 </script>
 </body>
