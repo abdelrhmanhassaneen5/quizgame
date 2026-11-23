@@ -1118,6 +1118,45 @@ body.dark .card{border-color:rgba(255,255,255,.1)!important;box-shadow:0 6px 18p
 /* --- v13.2: نافذة إدارة وحذف أكواد الهدايا السحابية في Firestore --- */
 .adm-g-row{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
 .adm-g-code{direction:ltr;background:linear-gradient(135deg,#2B1055,#7A3B3B);color:#FFD700;border:1.5px solid #FFD700;border-radius:10px;padding:4px 9px;font-family:Arial,sans-serif;font-weight:900;font-size:13px;white-space:nowrap}
+/* --- v13.4: ملخص إحصائيات الحصص والطلاب داخل لوحة الأدمن --- */
+.adm-stats-card{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.adm-st-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:640px){.adm-st-grid{grid-template-columns:repeat(4,1fr)}}
+.adm-st-box{background:rgba(47,95,90,.08);border:1px solid rgba(138,106,74,.25);border-radius:14px;padding:8px 6px;text-align:center}
+body.dark .adm-st-box{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.adm-st-box b{display:block;font-size:17px;font-weight:900;color:var(--teal);line-height:1.25}
+.adm-st-box span{display:block;font-size:11px;font-weight:700;opacity:.88;margin-top:2px}
+.adm-top-st{display:flex;align-items:center;gap:8px;background:rgba(255,215,0,.14);border:1px dashed #C9973F;border-radius:12px;padding:7px 10px;font-size:12.5px;font-weight:800}
+/* --- v13.5: أداة تعديل رسالة التنبيه السريعة للطلاب في لوحة الأدمن --- */
+.adm-al-box{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.adm-al-prev{background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px dashed #C9973F;border-radius:12px;padding:8px 10px;font-size:13px;font-weight:900;color:#4A2F22;line-height:1.65;text-align:center}
+body.dark .adm-al-prev{background:linear-gradient(135deg,#2E2618,#221C12);color:#FFE9B8}
+/* --- v13.7: تحدي المستر السريع (سؤال البونص) + عداد تنبيهات لوحة الأدمن --- */
+.adm-tile{position:relative}
+.adm-tile-bdg{position:absolute;top:8px;left:8px;min-width:22px;height:22px;padding:0 6px;border-radius:12px;background:#DC2626;color:#FFF;border:2px solid #FFF;font-size:11px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(220,38,38,.45);animation:pl 1.2s infinite}
+.adm-tile-bdg.ok{background:#15803D;animation:none}
+.bq-banner{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#2B1055,#6B21A8 58%,#B45309);color:#FFF8DC;border:2.5px solid #FFD700;border-radius:18px;padding:10px 12px;cursor:pointer;text-align:right;font-family:'Cairo',sans-serif;box-shadow:0 6px 18px rgba(43,16,85,.32);transition:transform .16s}
+.bq-banner:active{transform:scale(.97)}
+.bq-banner .ic{font-size:28px;line-height:1;flex:none;animation:petBob 1.8s ease-in-out infinite}
+.bq-banner .tx{flex:1;min-width:0}
+.bq-banner .tx b{display:block;font-size:14px;font-weight:900;color:#FFD700;line-height:1.35}
+.bq-banner .tx small{display:block;font-size:11.5px;font-weight:700;color:#F8FAFC;opacity:.95;line-height:1.45}
+.bq-banner .go{flex:none;background:#FFD700;color:#2B1B12;border-radius:11px;padding:6px 10px;font-weight:900;font-size:12px;white-space:nowrap}
+/* --- v13.8: تطوير إدارة مجموعات السنتر (نقاط يدوية + Excel CSV + نسخة احتياطية JSON) --- */
+.adm-mp-row{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.adm-mp-btns{display:flex;flex-wrap:wrap;gap:5px}
+.adm-mp-btns button{flex:1 1 auto;min-height:34px;padding:4px 8px;border-radius:10px;border:1.5px solid rgba(138,106,74,.45);font-family:'Cairo',sans-serif;font-weight:900;font-size:12px;cursor:pointer;background:var(--paper);color:var(--ink)}
+.adm-mp-btns button.pos{background:#ECFDF5;border-color:#10B981;color:#065F46}
+.adm-mp-btns button.neg{background:#FEF2F2;border-color:#EF4444;color:#991B1B}
+body.dark .adm-mp-btns button.pos{background:#123226;color:#6EE7A8}
+body.dark .adm-mp-btns button.neg{background:#3A1616;color:#FCA5A5}
+/* --- v13.9: أدوات الأمان ومراقبة النقاط والبحث السريع عن طالب --- */
+.adm-log-row{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.adm-log-row.sus{border-color:#DC2626;background:linear-gradient(135deg,rgba(254,226,226,.55),var(--card))}
+body.dark .adm-log-row.sus{background:linear-gradient(135deg,rgba(127,29,29,.45),var(--card))}
+.adm-sus-tag{background:#DC2626;color:#FFF;border-radius:8px;padding:1px 7px;font-size:10.5px;font-weight:900}
+.adm-ok-tag{background:#15803D;color:#FFF;border-radius:8px;padding:1px 7px;font-size:10.5px;font-weight:900}
+.adm-sr-card{background:var(--card);border:1.5px solid rgba(47,95,90,.45);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -1211,6 +1250,13 @@ if(window.FIREBASE_CONFIG){
     saveGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'saves',c));return x.exists()?x.data():null},
     saveSet:(c,d)=>FS.setDoc(FS.doc(db,'saves',c),Object.assign({},d,{t:FS.serverTimestamp()})),
     adjGet:async(u)=>{const x=await FS.getDoc(FS.doc(db,'adj',u));return x.exists()?x.data():null},
+    adjSet:async(uid,d)=>{
+      await FS.setDoc(FS.doc(db,'adj',String(uid)),Object.assign({},d,{t:FS.serverTimestamp()}));
+    },
+    logsGet:async(n)=>{
+      const s=await FS.getDocs(FS.query(FS.collection(db,'logs'),FS.orderBy('t','desc'),FS.limit(n||40)));
+      return s.docs.map(d=>Object.assign({id:d.id},d.data()));
+    },
     askAdd:(d)=>FS.addDoc(FS.collection(db,'askq'),Object.assign({a:''},d,{t:FS.serverTimestamp()})).then((r)=>r.id),
     askGet:async(id)=>{const x=await FS.getDoc(FS.doc(db,'askq',id));return x.exists()?x.data():null},
     askList:async()=>{
@@ -1239,6 +1285,21 @@ if(window.FIREBASE_CONFIG){
     },
     ytSet:(k,d)=>FS.setDoc(FS.doc(db,'cfg','yt'),{[k]:d||null,t:FS.serverTimestamp()},{merge:true}),
     ytGet:async()=>{const x=await FS.getDoc(FS.doc(db,'cfg','yt'));return x.exists()?x.data():null},
+    alertSet:async(msg)=>{
+      const clean=String(msg||'').trim().slice(0,240);
+      await FS.setDoc(FS.doc(db,'cfg','alert'),{msg:clean,t:FS.serverTimestamp()},{merge:true});
+    },
+    alertGet:async()=>{
+      const x=await FS.getDoc(FS.doc(db,'cfg','alert'));
+      return x.exists()?x.data():null;
+    },
+    bonusSet:async(d)=>{
+      await FS.setDoc(FS.doc(db,'cfg','bonus'),Object.assign({},d,{t:FS.serverTimestamp()}));
+    },
+    bonusGet:async()=>{
+      const x=await FS.getDoc(FS.doc(db,'cfg','bonus'));
+      return x.exists()?x.data():null;
+    },
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
     beat:(uid)=>FS.setDoc(FS.doc(db,'visitors',uid),{last:FS.serverTimestamp()},{merge:true}),
     board:async(wk,lo,hi,mine,n)=>{
@@ -6418,7 +6479,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=13.2').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=13.9').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -12233,6 +12294,1179 @@ var _admQuickGiftModal132=admQuickGiftModal;
 admQuickGiftModal=function(){
   if(!T_AUTH){tPinScr();return}
   admGiftsScr();
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.3 — تصدير نتائج مجموعات السنتر كملف نصي (.txt) ومشاركتها بسرعة
+           لمستر عبدالرحمن حسنين (Grammora & EngliFocus)
+   ========================================================================== */
+
+function buildGrpExportText(g){
+  if(!g)return '';
+  var stgName=gName(g.grade||1,g.stage);
+  var stList=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+  var lines=[
+    '========================================',
+    'نتائج بطولة حصة السنتر — مستر عبدالرحمن حسنين',
+    'Grammora & EngliFocus',
+    '========================================',
+    'المجموعة : '+(g.name||'مجموعة السنتر'),
+    'الصف     : '+stgLbl(g.stage)+' - '+stgName,
+    'كود الدخول: '+(g.code||'-'),
+    'آخر تحديث: '+(g.lastDate||dTxt(cDay())),
+    'عدد الطلاب: '+stList.length,
+    '----------------------------------------',
+    'الترتيب العام للطلاب:'
+  ];
+  if(!stList.length){
+    lines.push('لا يوجد طلاب مسجلون في هذه المجموعة بعد.');
+  }else{
+    stList.forEach(function(st,i){
+      var rk=i+1;
+      var medal=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':rk+'.'));
+      var pts=Number(st.pts)||0;
+      var ok=Number(st.ok)||0;
+      var ans=Number(st.ans)||0;
+      var todayP=Number(st.lastPts)||0;
+      lines.push(medal+' '+(st.name||'طالب')+' — '+pts+' نقطة (صح: '+ok+(ans>0?('/'+ans):'')+(todayP>0?(' | اليوم: +'+todayP):'')+')');
+    });
+  }
+  lines.push('========================================');
+  return lines.join('\n');
+}
+
+function admExportGrpTxt(gid){
+  if(!T_AUTH){tPinScr();return}
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g){rmsg('المجموعة غير موجودة');return}
+  var txt=buildGrpExportText(g);
+  var safeName=String(g.name||'center-group').replace(/[^a-zA-Z0-9\u0600-\u06FF_-]+/g,'-').slice(0,40)||'center-group';
+  try{
+    var blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='نتائج-'+safeName+'.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},1500);
+    ding();
+    rmsg('📄 تم تصدير ملف نتائج «'+g.name+'» بنجاح!');
+  }catch(e){
+    admCopyGrpSummary(gid);
+  }
+}
+
+function admCopyGrpSummary(gid){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g)return;
+  var txt=buildGrpExportText(g);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){
+      ding();
+      rmsg('📋 تم نسخ ملخص نتائج «'+g.name+'»!');
+    }).catch(function(){rmsg('تعذر النسخ التلقائي')});
+  }else{
+    rmsg('تعذر النسخ التلقائي');
+  }
+}
+
+function admQuickShareGrp(gid){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g)return;
+  var stList=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+  var topLines=stList.slice(0,15).map(function(st,i){
+    var m=i===0?'🥇':(i===1?'🥈':(i===2?'🥉':(i+1)+'-'));
+    return m+' *'+esc(st.name)+'* — '+(st.pts||0)+' نقطة ✅'+(st.lastPts?' (+'+st.lastPts+' اليوم)':'');
+  }).join('\n');
+  var waTxt='🏆 *نتائج بطولة السنتر — مستر عبدالرحمن حسنين* 🏫\n'+
+    '📌 المجموعة: *'+(g.name||'')+'* ('+gName(g.grade||1,g.stage)+')\n'+
+    '🔑 كود المجموعة: `'+(g.code||'')+'`\n'+
+    '📅 التاريخ: '+(g.lastDate||dTxt(cDay()))+'\n\n'+
+    (topLines||'لا توجد نتائج مسجلة بعد.')+'\n\n'+
+    '🌟 منصة تحدّي الأصحاب: '+location.href.split('?')[0];
+
+  if(navigator.share){
+    navigator.share({
+      title:'نتائج مجموعة '+(g.name||'السنتر'),
+      text:waTxt
+    }).catch(function(){
+      window.open('https://wa.me/?text='+encodeURIComponent(waTxt),'_blank');
+    });
+  }else{
+    window.open('https://wa.me/?text='+encodeURIComponent(waTxt),'_blank');
+  }
+}
+
+/* إضافة أزرار التصدير النصي والمشاركة السريعة على كل بطاقة مجموعة في لوحة الأدمن */
+var _tPanel133=tPanelScr;
+tPanelScr=function(){
+  _tPanel133();
+  try{
+    if(!T_AUTH)return;
+    var grps=S.cgrps||[];
+    var cards=app.querySelectorAll('.card');
+    var grpIdx=0;
+    for(var i=0;i<cards.length && grpIdx<grps.length;i++){
+      var c=cards[i];
+      var btns=c.querySelectorAll('button');
+      var hasArena=false;
+      for(var b=0;b<btns.length;b++){
+        if((btns[b].textContent||'').indexOf('ابدأ بطولة الحصة الآن')>=0){hasArena=true;break}
+      }
+      if(hasArena){
+        var g=grps[grpIdx++];
+        if(g && !c.querySelector('.adm-exp-bar')){
+          var bar=document.createElement('div');
+          bar.className='row adm-exp-bar';
+          bar.style.marginTop='6px';
+          bar.style.gap='6px';
+          bar.innerHTML=
+            '<button class="pwb" style="flex:1;font-size:12px;min-height:34px;padding:4px 6px;background:#FFF8E7;border-color:#C9973F;color:#4A2F22" onclick="admExportGrpTxt(\''+g.id+'\')">📄 تصدير TXT</button>'+
+            '<button class="pwb" style="flex:1;font-size:12px;min-height:34px;padding:4px 6px;background:#E6F4F1;border-color:#2F6B4A;color:#1B3B38" onclick="admCopyGrpSummary(\''+g.id+'\')">📋 نسخ التقرير</button>'+
+            '<button class="pwb" style="flex:1;font-size:12px;min-height:34px;padding:4px 6px;background:#1E7E48;border-color:#FFD700;color:#FFF" onclick="admQuickShareGrp(\''+g.id+'\')">📲 مشاركة سريعة</button>';
+          c.appendChild(bar);
+        }
+      }
+    }
+  }catch(e){}
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.4 — ملخص إحصائيات الحصص والطلاب داخل لوحة الأدمن
+           حساب إجمالي الحصص المسجلة، نسبة دقة إجابات الطلاب،
+           نقاط اليوم/الإجمالي، وأعلى طالب تفاعلاً في السنتر
+   ========================================================================== */
+
+function computeAdminStatsSummary(){
+  var grps=S.cgrps||[];
+  var totGroups=grps.length;
+  var totStudents=0;
+  var totSessions=0;
+  var totOk=0;
+  var totAns=0;
+  var totPts=0;
+  var topStudent=null;
+
+  grps.forEach(function(g){
+    if(!g)return;
+    totSessions+=((g.hist&&g.hist.length)||0);
+    (g.students||[]).forEach(function(st){
+      if(!st)return;
+      totStudents++;
+      var sOk=Number(st.ok)||0;
+      var sAns=Number(st.ans)||0;
+      var sPts=Number(st.pts)||0;
+      totOk+=sOk;
+      totAns+=sAns;
+      totPts+=sPts;
+      if(!topStudent || sPts>(topStudent.pts||0)){
+        topStudent={name:st.name||'طالب',pts:sPts,ok:sOk,grp:g.name||''};
+      }
+    });
+  });
+
+  var accPct=totAns>0?Math.round((totOk/totAns)*100):0;
+  return {
+    totGroups:totGroups,
+    totStudents:totStudents,
+    totSessions:totSessions,
+    totOk:totOk,
+    totAns:totAns,
+    totPts:totPts,
+    accPct:accPct,
+    topStudent:topStudent
+  };
+}
+
+function admStatsSummaryHtml(){
+  var m=computeAdminStatsSummary();
+  var topHtml='';
+  if(m.topStudent && m.topStudent.pts>0){
+    topHtml='<div class="adm-top-st">'+
+      '<span style="font-size:20px;line-height:1">👑</span>'+
+      '<div class="sp">أعلى طالب في السنتر: <b>'+esc(m.topStudent.name)+'</b> ('+m.topStudent.pts+' نقطة • '+m.topStudent.ok+' صح ✅)</div>'+
+      '<span class="sm">'+esc(m.topStudent.grp)+'</span>'+
+    '</div>';
+  }
+  return '<div id="admStatsSummary" class="adm-stats-card">'+
+    '<div class="adm-sec-tt"><span>📊 ملخص إحصائيات الحصص والطلاب</span><span class="sm">إجمالي '+m.totPts+' نقطة</span></div>'+
+    '<div class="adm-st-grid">'+
+      '<div class="adm-st-box"><b>'+m.totSessions+'</b><span>حصص مسجلة</span></div>'+
+      '<div class="adm-st-box"><b>'+m.totStudents+'</b><span>إجمالي الطلاب</span></div>'+
+      '<div class="adm-st-box"><b>'+m.accPct+'%</b><span>دقة الإجابات ('+m.totOk+'/'+(m.totAns||0)+')</span></div>'+
+      '<div class="adm-st-box"><b>'+m.totGroups+'</b><span>مجموعات نشطة</span></div>'+
+    '</div>'+
+    topHtml+
+  '</div>';
+}
+
+/* إدراج ملخص إحصائيات الحصص والطلاب داخل لوحة الأدمن بعد بطاقة التوثيق */
+var _tPanel134=tPanelScr;
+tPanelScr=function(){
+  _tPanel134();
+  try{
+    if(!T_AUTH)return;
+    if(!document.getElementById('admStatsSummary')){
+      var authCard=document.getElementById('adminAuthCard');
+      if(authCard){
+        authCard.insertAdjacentHTML('afterend',admStatsSummaryHtml());
+      }else{
+        var hero=app.querySelector('.adm-hero');
+        if(hero)hero.insertAdjacentHTML('afterend',admStatsSummaryHtml());
+      }
+    }
+  }catch(e){}
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.5 — أداة تعديل رسالة التنبيه السريعة للطلاب داخل لوحة الأدمن
+           حفظ محلي وسحابي (cfg/alert) + مزامنة تلقائية للطلاب عند فتح المنصة
+   ========================================================================== */
+var ADM_CLOUD_ALERT='';
+var ALERT_PULLED=false;
+
+function pullCloudAlert(force){
+  if(ALERT_PULLED&&!force)return;
+  if(!window.FB||!FB.alertGet)return;
+  ALERT_PULLED=true;
+  FB.alertGet().then(function(d){
+    var m=(d&&typeof d.msg==='string')?d.msg.trim().slice(0,240):'';
+    ADM_CLOUD_ALERT=m;
+    if(m && S.lastAlertMsg!==m){
+      S.lastAlertMsg=m;
+      S.cm=m;
+      save();
+      var inp=document.getElementById('admAlertInp');
+      var prev=document.getElementById('admAlertPrevTx');
+      if(inp && document.activeElement!==inp)inp.value=m;
+      if(prev)prev.textContent=m;
+      if(document.getElementById('hPanel')||document.getElementById('homeLbBox')){try{home()}catch(e){}}
+    }else if(!m && S.lastAlertMsg){
+      S.lastAlertMsg='';
+      if(S.cm){S.cm=null}
+      save();
+      var prev2=document.getElementById('admAlertPrevTx');
+      if(prev2)prev2.textContent='لا توجد رسالة تنبيه سريعة مفعّلة حالياً.';
+    }
+  }).catch(function(){});
+}
+
+function admAlertCardHtml(){
+  var cur=(S.cm||ADM_CLOUD_ALERT||'');
+  return '<div id="admAlertCard" class="adm-al-box">'+
+    '<div class="adm-sec-tt"><span>📢 رسالة التنبيه السريعة للطلاب</span><span class="sm">يظهر أعلى الرئيسية</span></div>'+
+    '<div class="adm-al-prev"><span id="admAlertPrevTx">'+(cur?esc(cur):'لا توجد رسالة تنبيه سريعة مفعّلة حالياً.')+'</span></div>'+
+    '<input id="admAlertInp" class="inp" maxlength="240" placeholder="اكتب تنبيهاً سريعاً للطلاب (مثال: مراجعة الوحدة الأولى غداً الساعة 5)" value="'+esc(cur)+'" style="font-size:14px;text-align:right">'+
+    '<div class="row" style="gap:6px">'+
+      '<button class="btn" style="flex:2;font-size:13.5px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="admSaveQuickAlert()">💾 حفظ ونشر التنبيه</button>'+
+      '<button class="btn t" style="flex:1;font-size:12.5px;min-height:38px;padding:6px;background:#8B2E2E" onclick="admClearQuickAlert()">🗑️ مسح</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function admSaveQuickAlert(){
+  if(!T_AUTH){tPinScr();return}
+  var inp=document.getElementById('admAlertInp');
+  var msg=(inp?inp.value:'').trim().slice(0,240);
+  if(!msg){rmsg('اكتب نص رسالة التنبيه أولاً يا مستر!');return}
+  S.cm=msg;
+  S.lastAlertMsg=msg;
+  ADM_CLOUD_ALERT=msg;
+  save();
+  var prev=document.getElementById('admAlertPrevTx');
+  if(prev)prev.textContent=msg;
+  ding();
+  if(window.FB&&FB.alertSet&&isCloudAdmin()){
+    FB.alertSet(msg).then(function(){
+      rmsg('☁️ تم حفظ ونشر رسالة التنبيه للطلاب على السحابة!');
+    }).catch(function(){
+      rmsg('✅ تم حفظ التنبيه محلياً (تأكد من صلاحيات cfg في Firebase)');
+    });
+  }else if(window.FB&&FB.alertSet&&!isCloudAdmin()){
+    rmsg('✅ تم حفظ التنبيه محلياً (سجّل دخول Google لنشره على السحابة)');
+  }else{
+    rmsg('✅ تم حفظ رسالة التنبيه السريعة!');
+  }
+}
+
+function admClearQuickAlert(){
+  if(!T_AUTH){tPinScr();return}
+  S.cm=null;
+  S.lastAlertMsg='';
+  ADM_CLOUD_ALERT='';
+  save();
+  var inp=document.getElementById('admAlertInp');
+  var prev=document.getElementById('admAlertPrevTx');
+  if(inp)inp.value='';
+  if(prev)prev.textContent='لا توجد رسالة تنبيه سريعة مفعّلة حالياً.';
+  if(window.FB&&FB.alertSet&&isCloudAdmin()){
+    FB.alertSet('').then(function(){rmsg('🗑️ تم مسح رسالة التنبيه من السحابة')}).catch(function(){});
+  }else{
+    rmsg('🗑️ تم مسح رسالة التنبيه السريعة');
+  }
+}
+
+/* إدراج بطاقة تعديل رسالة التنبيه السريعة داخل لوحة الأدمن */
+var _tPanel135=tPanelScr;
+tPanelScr=function(){
+  _tPanel135();
+  try{
+    if(!T_AUTH)return;
+    if(!document.getElementById('admAlertCard')){
+      var statsCard=document.getElementById('admStatsSummary');
+      if(statsCard){
+        statsCard.insertAdjacentHTML('afterend',admAlertCardHtml());
+      }else{
+        var authCard=document.getElementById('adminAuthCard');
+        if(authCard)authCard.insertAdjacentHTML('afterend',admAlertCardHtml());
+      }
+    }
+    pullCloudAlert(true);
+  }catch(e){}
+};
+
+var _onFB135=window.onFB;
+window.onFB=function(){
+  if(_onFB135)_onFB135();
+  setTimeout(function(){try{pullCloudAlert(false)}catch(e){}},2000);
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.6 — تضمين سجل الحصص السابقة (hist) بالكامل داخل ملف التصدير النصي (.txt)
+           + دعم ترميز UTF-8 BOM للفتح السليم على جميع الأجهزة
+           + زر تصدير مباشر داخل شاشة «سجل حصص المجموعة»
+   ========================================================================== */
+
+var _buildGrpExportText136=buildGrpExportText;
+buildGrpExportText=function(g,includeHist){
+  if(!g)return '';
+  var base=_buildGrpExportText136(g);
+  if(includeHist===false)return base;
+  var H=Array.isArray(g.hist)?g.hist:[];
+  var lines=[base];
+  lines.push('');
+  lines.push('📅 سجل الحصص السابقة بالتاريخ ('+H.length+' حصة):');
+  lines.push('----------------------------------------');
+  if(!H.length){
+    lines.push('لا توجد حصص مسجلة في السجل حتى الآن.');
+  }else{
+    H.forEach(function(s,idx){
+      var rows=(s&&Array.isArray(s.rows)?s.rows:[]).slice().sort(function(a,b){return (b.p||0)-(a.p||0)});
+      var sesTot=(s&&Number(s.tot))||rows.reduce(function(acc,r){return acc+(Number(r.p)||0)},0);
+      lines.push((idx+1)+') حصة: '+(s&&s.date?s.date:'غير مؤرخة')+' — '+rows.length+' طالب — إجمالي '+sesTot+' نقطة');
+      rows.forEach(function(r,j){
+        var rk=j+1;
+        var med=rk===1?'🥇':(rk===2?'🥈':(rk===3?'🥉':rk+'.'));
+        var rPts=Number(r.p)||0;
+        var rOk=Number(r.ok)||0;
+        var rAns=Number(r.a)||0;
+        lines.push('   '+med+' '+(r.n||'طالب')+' : +'+rPts+' نقطة'+(rOk||rAns?(' (صح: '+rOk+(rAns>0?('/'+rAns):'')+')'):''));
+      });
+      lines.push('----------------------------------------');
+    });
+  }
+  return lines.join('\n');
+};
+
+/* تحديث التصدير النصي لإضافة BOM لضمان ظهور العربية بشكل سليم في Windows Notepad */
+admExportGrpTxt=function(gid){
+  if(!T_AUTH){tPinScr();return}
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g){rmsg('المجموعة غير موجودة');return}
+  var txt=buildGrpExportText(g,true);
+  var safeName=String(g.name||'center-group').replace(/[^a-zA-Z0-9\u0600-\u06FF_-]+/g,'-').slice(0,40)||'center-group';
+  try{
+    var blob=new Blob(['\uFEFF'+txt],{type:'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='نتائج-وسجل-'+safeName+'.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},1500);
+    ding();
+    var hCnt=(g.hist&&g.hist.length)||0;
+    rmsg('📄 تم تصدير نتائج «'+g.name+'» شاملة '+hCnt+' حصة سابقة!');
+  }catch(e){
+    admCopyGrpSummary(gid);
+  }
+};
+
+/* إضافة زر تصدير السجل الكامل داخل شاشة سجل حصص المجموعة */
+var _tClsHistScr136=tClsHistScr;
+tClsHistScr=function(gid){
+  _tClsHistScr136(gid);
+  try{
+    if(!T_AUTH)return;
+    var hd=app.querySelector('.hd');
+    if(hd && !document.getElementById('tHistExpBar')){
+      hd.insertAdjacentHTML('afterend',
+        '<div id="tHistExpBar" class="row" style="gap:6px">'+
+          '<button class="btn" style="flex:2;font-size:14px;min-height:40px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="admExportGrpTxt(\''+gid+'\')">📄 تصدير الترتيب + كل الحصص (TXT)</button>'+
+          '<button class="btn t" style="flex:1;font-size:13px;min-height:40px;padding:6px" onclick="admCopyGrpSummary(\''+gid+'\')">📋 نسخ الكل</button>'+
+        '</div>'
+      );
+    }
+  }catch(e){}
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.7 — تحدي المستر السريع (سؤال البونص السحابي في cfg/bonus)
+           + عداد تنبيهات موحّد للأسئلة غير المُجاب عليها داخل لوحة الأدمن
+   ========================================================================== */
+var BONUS_Q_CACHE=null;
+var BONUS_PULLED=false;
+var ADM_UNANS_ASK=0;
+
+function getActiveBonusQ(){
+  var b=BONUS_Q_CACHE||S.bonusCache||null;
+  if(!b||!b.active||!b.id||!b.q||!Array.isArray(b.o)||b.o.length<2)return null;
+  return b;
+}
+
+function isBonusDone(bid){
+  return !!(S.bonusDone&&bid&&S.bonusDone[bid]);
+}
+
+function pullCloudBonus(force,cb){
+  if(BONUS_PULLED&&!force){if(cb)cb(getActiveBonusQ());return}
+  if(!window.FB||!FB.bonusGet){if(cb)cb(getActiveBonusQ());return}
+  BONUS_PULLED=true;
+  FB.bonusGet().then(function(d){
+    if(d&&d.active&&d.q&&Array.isArray(d.o)&&d.o.length>=2){
+      BONUS_Q_CACHE=d;
+      S.bonusCache=d;
+      save();
+      injectBonusHomeBanner();
+    }else{
+      BONUS_Q_CACHE=null;
+      S.bonusCache=null;
+      save();
+      var old=document.getElementById('bonusQBanner');
+      if(old&&old.parentNode)old.parentNode.removeChild(old);
+    }
+    updBonusAdminTile();
+    if(cb)cb(getActiveBonusQ());
+  }).catch(function(){if(cb)cb(getActiveBonusQ())});
+}
+
+function bonusBannerHtml(){
+  var b=getActiveBonusQ();
+  if(!b||isBonusDone(b.id))return '';
+  var cR=Number(b.c)||0, pR=Number(b.p)||0;
+  var rw=[];
+  if(cR>0)rw.push('+'+cR+' عملة 🪙');
+  if(pR>0)rw.push('+'+pR+' نقطة 🏆');
+  return '<button id="bonusQBanner" class="bq-banner" onclick="openBonusQModal()">'+
+    '<span class="ic">⚡</span>'+
+    '<div class="tx">'+
+      '<b>تحدي مستر عبدالرحمن السريع! 🎁</b>'+
+      '<small>جاوب سؤال البونص الآن واكسب '+(rw.join(' و ')||'مكافأة خاصة')+'</small>'+
+    '</div>'+
+    '<span class="go">جاوب الآن 🚀</span>'+
+  '</button>';
+}
+
+function injectBonusHomeBanner(){
+  var lbBox=document.getElementById('homeLbBox');
+  if(!lbBox)return;
+  var old=document.getElementById('bonusQBanner');
+  var html=bonusBannerHtml();
+  if(!html){
+    if(old&&old.parentNode)old.parentNode.removeChild(old);
+    return;
+  }
+  if(old){old.outerHTML=html}
+  else{lbBox.insertAdjacentHTML('beforebegin',html)}
+}
+
+function openBonusQModal(){
+  var b=getActiveBonusQ();
+  if(!b){rmsg('لا يوجد سؤال بونص نشط حالياً');return}
+  if(isBonusDone(b.id)){rmsg('أجبت على هذا التحدي بالفعل يا بطل! ✅');return}
+  var old=document.getElementById('bonusQOv');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var cR=Number(b.c)||0, pR=Number(b.p)||0;
+  var optsHtml=b.o.map(function(txt,idx){
+    var isAr=/[\u0600-\u06FF]/.test(txt);
+    return '<button class="opt bq-opt" style="width:100%;'+(isAr?'direction:rtl':'')+'" onclick="pickBonusQ('+idx+')">'+esc(txt)+'</button>';
+  }).join('');
+  var ov=document.createElement('div');
+  ov.id='bonusQOv';
+  ov.className='orb-ov';
+  ov.setAttribute('onclick','if(event.target===this)this.remove()');
+  ov.innerHTML='<div class="orb-sheet" style="padding-top:20px">'+
+    '<div class="orb-sheet-top"><b>⚡ تحدي مستر عبدالرحمن السريع</b><button class="orb-close" onclick="var e=document.getElementById(\'bonusQOv\');if(e)e.remove()">✕</button></div>'+
+    '<div class="orb-body">'+
+      '<div class="card" style="background:linear-gradient(135deg,#FFFDF7,#FFE8B5);border-color:#C9973F;text-align:center">'+
+        '<div class="sm" style="margin-bottom:4px">🎁 المكافأة: '+(cR>0?'+'+cR+' عملة 🪙 ':'')+(pR>0?'+'+pR+' نقطة 🏆':'')+' • محاولة واحدة!</div>'+
+        '<div class="en" style="text-align:center;font-size:20px;color:#7A3B3B">'+esc(b.q)+'</div>'+
+        (b.ar?'<div class="ar" style="text-align:center;font-size:14px">'+esc(b.ar)+'</div>':'')+
+      '</div>'+
+      '<div id="bqOptsBox" style="display:flex;flex-direction:column;gap:8px">'+optsHtml+'</div>'+
+      '<div id="bqFb"></div>'+
+    '</div>'+
+  '</div>';
+  document.body.appendChild(ov);
+}
+
+function pickBonusQ(idx){
+  var b=getActiveBonusQ();
+  if(!b||isBonusDone(b.id))return;
+  var okIdx=Number(b.a)||0;
+  var good=(idx===okIdx);
+  S.bonusDone=(S.bonusDone&&typeof S.bonusDone==='object')?S.bonusDone:{};
+  S.bonusDone[b.id]={ok:good?1:0,at:Date.now()};
+  var btns=document.querySelectorAll('#bqOptsBox .bq-opt');
+  btns.forEach(function(btn,j){
+    btn.disabled=true;
+    if(j===okIdx)btn.classList.add('ok');
+    else if(j===idx)btn.classList.add('bad');
+  });
+  var fb=document.getElementById('bqFb');
+  if(good){
+    var cR=Number(b.c)||0, pR=Number(b.p)||0;
+    if(cR>0)S.coins+=cR;
+    if(pR>0)addPts(pR);
+    save();submit();
+    try{sfxChest()}catch(e){}
+    if(fb){
+      fb.innerHTML='<div class="card" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);color:#FFE9B8;border-color:#FFD700;text-align:center;font-weight:900;line-height:1.7">'+
+        '🎉 عاش يا بطل! إجابتك صحيحة!<br>كسبت '+(cR>0?'+'+cR+' عملة 🪙 ':'')+(pR>0?'و +'+pR+' نقطة ترتيب 🏆':'')+
+      '</div>'+
+      '<button class="btn t" style="width:100%;margin-top:8px" onclick="var e=document.getElementById(\'bonusQOv\');if(e)e.remove();home()">تمام يا بطل ✅</button>';
+    }
+  }else{
+    save();
+    try{sfxBad(true)}catch(e){}
+    if(fb){
+      fb.innerHTML='<div class="card" style="border-color:#8B2E2E;text-align:center;font-weight:800;line-height:1.7">'+
+        '❌ إجابة غير صحيحة! الإجابة الصح هي: <b style="color:#2F6B4A;direction:ltr;display:inline-block">'+esc(b.o[okIdx]||'')+'</b><br>'+
+        '<span class="sm">استعد لتحدي المستر القادم! 💪</span>'+
+      '</div>'+
+      '<button class="btn t" style="width:100%;margin-top:8px" onclick="var e=document.getElementById(\'bonusQOv\');if(e)e.remove();home()">إغلاق</button>';
+    }
+  }
+  var ban=document.getElementById('bonusQBanner');
+  if(ban&&ban.parentNode)ban.parentNode.removeChild(ban);
+}
+
+/* شاشة إدارة سؤال البونص السريع داخل لوحة الأدمن */
+function admBonusScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var b=getActiveBonusQ();
+  var o0=(b&&b.o&&b.o[0])||'', o1=(b&&b.o&&b.o[1])||'', o2=(b&&b.o&&b.o[2])||'', o3=(b&&b.o&&b.o[3])||'';
+  var ansIdx=(b&&typeof b.a==='number')?b.a:0;
+
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#2B1055,#6B21A8);border-color:#FFD700">'+
+      '<h1>⚡ تحدي المستر السريع (سؤال البونص)</h1>'+
+      '<div>انشر سؤالاً فورياً بمكافأة يظهر لكل الطلاب في الرئيسية 🎁</div>'+
+    '</div>'+
+    adminAuthCardHtml()+
+    (b?'<div class="card" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border-color:#10B981;font-size:13px;font-weight:800;line-height:1.7">'+
+        '<div style="color:#065F46;font-weight:900">🟢 يوجد سؤال بونص نشط حالياً للطلاب:</div>'+
+        '<div style="direction:ltr;text-align:left;margin-top:4px;color:#111827">'+esc(b.q)+'</div>'+
+        '<div class="sm">الإجابة الصح: <b>'+esc((b.o&&b.o[b.a])||'')+'</b> • المكافأة: +'+(b.c||0)+' عملة • +'+(b.p||0)+' نقطة</div>'+
+        '<button class="btn t" style="width:100%;margin-top:8px;min-height:36px;font-size:13px;background:#8B2E2E" onclick="admDisableBonusQ()">⏹️ إيقاف وإخفاء السؤال الحالي</button>'+
+      '</div>':'<div class="card" style="text-align:center;font-weight:800;font-size:13px">لا يوجد سؤال بونص نشط حالياً. اكتب سؤالاً جديداً بالأسفل لنشره فوراً 👇</div>')+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="tag" style="background:#6B21A8">✍️ إعداد سؤال البونص الجديد</div>'+
+      '<div class="sm">نص السؤال (إنجليزي أو عربي):</div>'+
+      '<input id="bqQInp" class="inp" maxlength="220" placeholder="مثال: She ____ to school every day." value="'+esc((b&&b.q)||'')+'" style="direction:ltr;font-size:15px">'+
+      '<div class="sm">ترجمة أو تلميح اختياري بالعربي:</div>'+
+      '<input id="bqArInp" class="inp" maxlength="160" placeholder="مثال: اختار الفعل الصح في المضارع البسيط" value="'+esc((b&&b.ar)||'')+'" style="font-size:13.5px">'+
+      '<div class="sm">الاختيارات الأربعة:</div>'+
+      '<input id="bqO0" class="inp" maxlength="80" placeholder="الاختيار 1" value="'+esc(o0)+'" style="direction:ltr;font-size:14px">'+
+      '<input id="bqO1" class="inp" maxlength="80" placeholder="الاختيار 2" value="'+esc(o1)+'" style="direction:ltr;font-size:14px">'+
+      '<input id="bqO2" class="inp" maxlength="80" placeholder="الاختيار 3" value="'+esc(o2)+'" style="direction:ltr;font-size:14px">'+
+      '<input id="bqO3" class="inp" maxlength="80" placeholder="الاختيار 4" value="'+esc(o3)+'" style="direction:ltr;font-size:14px">'+
+      '<div class="sm">رقم الإجابة الصحيحة:</div>'+
+      '<select id="bqAnsSel" class="inp" style="font-size:14px">'+
+        '<option value="0"'+(ansIdx===0?' selected':'')+'>الاختيار 1</option>'+
+        '<option value="1"'+(ansIdx===1?' selected':'')+'>الاختيار 2</option>'+
+        '<option value="2"'+(ansIdx===2?' selected':'')+'>الاختيار 3</option>'+
+        '<option value="3"'+(ansIdx===3?' selected':'')+'>الاختيار 4</option>'+
+      '</select>'+
+      '<div class="row" style="gap:8px">'+
+        '<div class="sp"><div class="sm">مكافأة العملات:</div><input id="bqCoinsInp" type="number" class="inp" value="'+((b&&b.c)||100)+'" min="0" max="10000" style="font-size:15px"></div>'+
+        '<div class="sp"><div class="sm">مكافأة النقاط:</div><input id="bqPtsInp" type="number" class="inp" value="'+((b&&b.p)||100)+'" min="0" max="10000" style="font-size:15px"></div>'+
+      '</div>'+
+      '<button class="btn" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:16px" onclick="admPublishBonusQ()">🚀 نشر سؤال البونص لكل الطلاب الآن</button>'+
+    '</div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+}
+
+function admPublishBonusQ(){
+  if(!T_AUTH){tPinScr();return}
+  var q=((document.getElementById('bqQInp')&&document.getElementById('bqQInp').value)||'').trim().slice(0,220);
+  var ar=((document.getElementById('bqArInp')&&document.getElementById('bqArInp').value)||'').trim().slice(0,160);
+  var o=[0,1,2,3].map(function(i){return ((document.getElementById('bqO'+i)&&document.getElementById('bqO'+i).value)||'').trim().slice(0,80)}).filter(function(x){return x.length>0});
+  var a=Math.max(0,Math.min(o.length-1,Number((document.getElementById('bqAnsSel')&&document.getElementById('bqAnsSel').value)||0)));
+  var c=Math.max(0,Math.min(10000,Math.round(Number((document.getElementById('bqCoinsInp')&&document.getElementById('bqCoinsInp').value)||0))));
+  var p=Math.max(0,Math.min(10000,Math.round(Number((document.getElementById('bqPtsInp')&&document.getElementById('bqPtsInp').value)||0))));
+  if(q.length<3){rmsg('اكتب نص السؤال أولاً');return}
+  if(o.length<2){rmsg('اكتب اختيارين على الأقل');return}
+  var payload={id:'bq_'+Date.now().toString(36),q:q,ar:ar,o:o,a:a,c:c,p:p,active:true};
+  BONUS_Q_CACHE=payload;
+  S.bonusCache=payload;
+  save();
+  if(window.FB&&FB.bonusSet&&isCloudAdmin()){
+    rmsg('☁️ جاري نشر سؤال البونص في Firestore...');
+    FB.bonusSet(payload).then(function(){
+      sfxWin();
+      rmsg('⚡ تم نشر سؤال البونص بنجاح! سيظهر الآن لكل الطلاب في الرئيسية');
+      admBonusScr();
+    }).catch(function(){
+      rmsg('✅ تم الحفظ محلياً (تأكد من صلاحيات cfg في Firebase)');
+      admBonusScr();
+    });
+  }else if(window.FB&&FB.bonusSet&&!isCloudAdmin()){
+    ding();
+    rmsg('✅ تم الحفظ محلياً (سجّل دخول Google بالأدمن لنشره لكل الطلاب)');
+    admBonusScr();
+  }else{
+    ding();
+    rmsg('✅ تم حفظ سؤال البونص!');
+    admBonusScr();
+  }
+}
+
+function admDisableBonusQ(){
+  if(!T_AUTH){tPinScr();return}
+  BONUS_Q_CACHE=null;
+  S.bonusCache=null;
+  save();
+  if(window.FB&&FB.bonusSet&&isCloudAdmin()){
+    FB.bonusSet({active:false,id:''}).then(function(){
+      rmsg('⏹️ تم إيقاف سؤال البونص وإخفاؤه من عند الطلاب');
+      admBonusScr();
+    }).catch(function(){admBonusScr()});
+  }else{
+    rmsg('⏹️ تم إيقاف سؤال البونص');
+    admBonusScr();
+  }
+}
+
+/* عداد تنبيهات موحّد على بطاقة «أسئلة الطلاب» وبطاقة «سؤال البونص» داخل لوحة الأدمن */
+function admRefreshAskBadge(){
+  var tile=document.getElementById('admAskTile');
+  if(!tile||!window.FB||!FB.askList)return;
+  FB.askList().then(function(list){
+    var arr=Array.isArray(list)?list:[];
+    var unans=arr.filter(function(x){return !x.a||!String(x.a).trim()}).length;
+    ADM_UNANS_ASK=unans;
+    var oldB=tile.querySelector('.adm-tile-bdg');
+    if(oldB&&oldB.parentNode)oldB.parentNode.removeChild(oldB);
+    var sm=tile.querySelector('small');
+    if(unans>0){
+      tile.insertAdjacentHTML('afterbegin','<span class="adm-tile-bdg">'+unans+'</span>');
+      if(sm)sm.textContent=unans+' سؤال بانتظار الرد';
+    }else{
+      tile.insertAdjacentHTML('afterbegin','<span class="adm-tile-bdg ok">✓</span>');
+      if(sm)sm.textContent='كل الأسئلة مُجاب عليها';
+    }
+  }).catch(function(){});
+}
+
+function updBonusAdminTile(){
+  var tile=document.getElementById('admBonusTile');
+  if(!tile)return;
+  var b=getActiveBonusQ();
+  var oldB=tile.querySelector('.adm-tile-bdg');
+  if(oldB&&oldB.parentNode)oldB.parentNode.removeChild(oldB);
+  var sm=tile.querySelector('small');
+  if(b){
+    tile.insertAdjacentHTML('afterbegin','<span class="adm-tile-bdg ok">نشط</span>');
+    if(sm)sm.textContent='سؤال نشط (+'+(b.c||0)+'🪙)';
+  }else{
+    if(sm)sm.textContent='سؤال فوري بمكافأة';
+  }
+}
+
+/* ربط v13.7 مع tPanelScr و home و onFB */
+var _tPanel137=tPanelScr;
+tPanelScr=function(){
+  _tPanel137();
+  try{
+    if(!T_AUTH)return;
+    var grid=app.querySelector('.adm-grid');
+    if(grid && !document.getElementById('admBonusTile')){
+      grid.insertAdjacentHTML('beforeend',
+        '<button id="admBonusTile" class="adm-tile" onclick="admBonusScr()"><span class="ic">⚡</span><b>سؤال البونص</b><small>سؤال فوري بمكافأة</small></button>'
+      );
+    }
+    updBonusAdminTile();
+    pullCloudBonus(true);
+    admRefreshAskBadge();
+  }catch(e){}
+};
+
+var _home137=home;
+home=function(){
+  _home137();
+  try{injectBonusHomeBanner()}catch(e){}
+};
+
+var _onFB137=window.onFB;
+window.onFB=function(){
+  if(_onFB137)_onFB137();
+  setTimeout(function(){try{pullCloudBonus(false)}catch(e){}},2200);
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.8 — تطوير إدارة مجموعات السنتر:
+           1) تعديل نقاط الطلاب يدوياً (+/-) داخل المجموعة
+           2) تصدير كشف الدرجات لـ Excel (CSV) شاملاً الحصص
+           3) نسخة احتياطية شاملة (Backup & Restore JSON)
+   ========================================================================== */
+
+/* ١. شاشة تعديل نقاط طلاب المجموعة يدوياً (+ / -) */
+function admManualPtsScr(gid){
+  if(!T_AUTH){tPinScr();return}
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g){tPanelScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+
+  var list=(g.students||[]).map(function(st,idx){return {st:st,idx:idx}})
+    .sort(function(a,b){return (b.st.pts||0)-(a.st.pts||0)});
+
+  var rowsHtml=list.length ? list.map(function(item,rankIdx){
+    var st=item.st, idx=item.idx, pts=Number(st.pts)||0;
+    var med=rankIdx===0?'🥇':(rankIdx===1?'🥈':(rankIdx===2?'🥉':'#'+(rankIdx+1)));
+    return '<div class="adm-mp-row">'+
+      '<div class="row">'+
+        '<b style="min-width:30px">'+med+'</b>'+
+        '<div class="sp" style="min-width:0">'+
+          '<div style="font-weight:900;font-size:15px">'+esc(st.name)+'</div>'+
+          '<div class="sm">إجمالي النقاط: <b id="mpPts_'+idx+'">'+pts+'</b> • صح: '+(Number(st.ok)||0)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-mp-btns">'+
+        '<button class="neg" onclick="admAdjStudentPts(\''+gid+'\','+idx+',-10)">-10</button>'+
+        '<button class="pos" onclick="admAdjStudentPts(\''+gid+'\','+idx+',10)">+10</button>'+
+        '<button class="pos" onclick="admAdjStudentPts(\''+gid+'\','+idx+',25)">+25</button>'+
+        '<button class="pos" onclick="admAdjStudentPts(\''+gid+'\','+idx+',50)">+50</button>'+
+        '<button onclick="admAdjStudentCustom(\''+gid+'\','+idx+')">✏️ رقم مخصص</button>'+
+      '</div>'+
+    '</div>';
+  }).join('') : '<div class="card" style="text-align:center;font-weight:800">لا يوجد طلاب في هذه المجموعة بعد.</div>';
+
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2F5F5A);border-color:#FFD700">'+
+      '<h1>⚡ تعديل النقاط يدوياً (+/-)</h1>'+
+      '<div>'+esc(g.name)+' • '+gName(g.grade||1,g.stage)+' • بونص واجب/حضور/تسميع</div>'+
+    '</div>'+
+    '<div class="card" style="font-size:13px;font-weight:700;line-height:1.7">'+
+      '💡 اضغط على أي زر لإضافة أو خصم نقاط فورية للطالب، ويتم الحفظ والمزامنة تلقائياً مع السحابة.'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+rowsHtml+'</div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>';
+}
+
+function admAdjStudentPts(gid,stIdx,delta){
+  if(!T_AUTH)return;
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g||!g.students||!g.students[stIdx])return;
+  var st=g.students[stIdx];
+  var oldP=Number(st.pts)||0;
+  var newP=Math.max(0,oldP+Number(delta||0));
+  st.pts=newP;
+  st.lastPts=(Number(st.lastPts)||0)+Number(delta||0);
+  g.lastDate=dTxt(cDay());
+  save();
+  if(delta>0)ding();else sfxBad(true);
+  var el=document.getElementById('mpPts_'+stIdx);
+  if(el)el.textContent=newP;
+  rmsg((delta>0?'✅ +'+delta:'⚠️ '+delta)+' نقطة لـ «'+st.name+'» (الإجمالي: '+newP+')');
+  saveGrpToCloud(g);
+}
+
+function admAdjStudentCustom(gid,stIdx){
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g||!g.students||!g.students[stIdx])return;
+  var st=g.students[stIdx];
+  var val=prompt('أدخل عدد النقاط لإضافتها لـ «'+st.name+'» (استخدم علامة سالب للخصم مثل -15):','20');
+  if(val===null)return;
+  var num=Math.round(Number(val));
+  if(!num||isNaN(num)){rmsg('اكتب رقماً صحيحاً غير الصفر');return}
+  num=Math.max(-5000,Math.min(5000,num));
+  admAdjStudentPts(gid,stIdx,num);
+}
+
+/* ٢. تصدير كشف الدرجات لـ Excel (CSV) بترميز UTF-8 BOM */
+function csvCell(v){
+  var s=String(v===undefined||v===null?'':v);
+  if(s.indexOf('"')>=0||s.indexOf(',')>=0||s.indexOf('\n')>=0||s.indexOf('\r')>=0)return '"'+s.split('"').join('""')+'"';
+  return s;
+}
+
+function admExportGrpCsv(gid){
+  if(!T_AUTH){tPinScr();return}
+  var g=(S.cgrps||[]).filter(function(x){return x.id===gid})[0];
+  if(!g){rmsg('المجموعة غير موجودة');return}
+  var stList=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+  var H=Array.isArray(g.hist)?g.hist:[];
+
+  var headers=['الترتيب','اسم الطالب','إجمالي النقاط','الإجابات الصحيحة','إجمالي المحاولات','نسبة الدقة %'];
+  H.forEach(function(s,idx){
+    headers.push('حصة '+(idx+1)+' ('+(s&&s.date?s.date:'-')+')');
+  });
+
+  var rows=[headers.map(csvCell).join(',')];
+  stList.forEach(function(st,i){
+    var pts=Number(st.pts)||0;
+    var ok=Number(st.ok)||0;
+    var ans=Number(st.ans)||0;
+    var acc=ans>0?Math.round((ok/ans)*100):0;
+    var line=[i+1,st.name||'طالب',pts,ok,ans,acc+'%'];
+    H.forEach(function(s){
+      var found=(s&&Array.isArray(s.rows)?s.rows:[]).filter(function(r){return String(r.n||'').trim()===String(st.name||'').trim()})[0];
+      line.push(found?(Number(found.p)||0):0);
+    });
+    rows.push(line.map(csvCell).join(','));
+  });
+
+  var csvText='\uFEFF'+rows.join('\r\n');
+  var safeName=String(g.name||'center-group').replace(/[^a-zA-Z0-9\u0600-\u06FF_-]+/g,'-').slice(0,40)||'center-group';
+  try{
+    var blob=new Blob([csvText],{type:'text/csv;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='كشف-درجات-'+safeName+'.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},1500);
+    ding();
+    rmsg('📊 تم تصدير كشف Excel (CSV) لـ «'+g.name+'» بنجاح!');
+  }catch(e){
+    rmsg('⚠️ تعذر تصدير ملف CSV على هذا المتصفح');
+  }
+}
+
+/* ٣. النسخة الاحتياطية الشاملة (Backup & Restore JSON) */
+function admBackupScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var grpCnt=(S.cgrps||[]).length;
+  var ytCnt=Object.keys(S.ytLinks||{}).length;
+  var sarahCnt=((SARAH_VIDS_CACHE&&SARAH_VIDS_CACHE.length)||(S.sarahVids&&S.sarahVids.length)||0);
+
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#132A2E,#2F5F5A);border-color:#FFD700">'+
+      '<h1>💾 النسخة الاحتياطية والاسترجاع</h1>'+
+      '<div>احفظ نسخة كاملة من مجموعات السنتر والروابط واسترجعها في أي وقت</div>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.85;font-size:13.5px;font-weight:700">'+
+      '<div class="tag g" style="margin-bottom:8px">📦 محتوى النسخة الاحتياطية الحالية</div>'+
+      '• مجموعات السنتر وسجلات الحصص: <b>'+grpCnt+' مجموعة</b><br>'+
+      '• روابط فيديوهات شرح الوحدات (YouTube): <b>'+ytCnt+' رابط</b><br>'+
+      '• حلقات يوميات سارة المحفوظة: <b>'+sarahCnt+' حلقة</b><br>'+
+      '<button class="btn" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:16px" onclick="admDownloadBackupJson()">📥 تحميل النسخة الاحتياطية الآن (JSON)</button>'+
+    '</div>'+
+    '<div class="card" style="line-height:1.85;font-size:13.5px;font-weight:700">'+
+      '<div class="tag" style="background:#7A3B3B;margin-bottom:8px">📤 استرجاع من ملف نسخة احتياطية</div>'+
+      'اختر ملف النسخة الاحتياطية (<code>.json</code>) الذي قمت بتحميله مسبقاً لاستعادة جميع المجموعات والروابط:'+
+      '<input id="admBackupFile" type="file" accept=".json,application/json" class="inp" style="margin-top:8px;font-size:13px;padding:8px" onchange="admRestoreBackupJson(this)">'+
+    '</div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>';
+}
+
+function admDownloadBackupJson(){
+  if(!T_AUTH)return;
+  var payload={
+    app:'tahadi-alashab-admin-backup',
+    version:'v13.8',
+    exportedAt:new Date().toISOString(),
+    cgrps:S.cgrps||[],
+    ytLinks:S.ytLinks||{},
+    sarahVids:(SARAH_VIDS_CACHE&&SARAH_VIDS_CACHE.length)?SARAH_VIDS_CACHE:(S.sarahVids||[])
+  };
+  var d=new Date();
+  var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  try{
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='grammora-admin-backup-'+ds+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},1500);
+    ding();
+    rmsg('💾 تم تحميل النسخة الاحتياطية الشاملة بنجاح!');
+  }catch(e){
+    rmsg('⚠️ تعذر تحميل ملف النسخة الاحتياطية');
+  }
+}
+
+function admRestoreBackupJson(inputEl){
+  if(!T_AUTH||!inputEl||!inputEl.files||!inputEl.files[0])return;
+  var file=inputEl.files[0];
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(!data||!Array.isArray(data.cgrps)){
+        sfxBad(true);
+        rmsg('⚠️ ملف النسخة الاحتياطية غير صالح!');
+        return;
+      }
+      var gCnt=data.cgrps.length;
+      if(!confirm('سيتم استرجاع '+gCnt+' مجموعة سنتر وروابط الشرح من النسخة الاحتياطية. هل تريد المتابعة؟'))return;
+      S.cgrps=data.cgrps;
+      if(data.ytLinks&&typeof data.ytLinks==='object')S.ytLinks=data.ytLinks;
+      if(Array.isArray(data.sarahVids)&&data.sarahVids.length){
+        S.sarahVids=data.sarahVids;
+        if(typeof SARAH_VIDS_CACHE!=='undefined')SARAH_VIDS_CACHE=data.sarahVids;
+      }
+      save();
+      if(window.FB&&FB.grpSet&&isCloudAdmin()){
+        S.cgrps.forEach(function(g){try{saveGrpToCloud(g)}catch(e){}});
+      }
+      sfxWin();
+      rmsg('✅ تم استرجاع '+gCnt+' مجموعة وبيانات المنصة بنجاح!');
+      tPanelScr();
+    }catch(err){
+      sfxBad(true);
+      rmsg('⚠️ تعذر قراءة ملف JSON، تأكد من اختيار الملف الصحيح');
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+/* ربط أزرار v13.8 في لوحة الأدمن وعلى كل بطاقة مجموعة */
+var _tPanel138=tPanelScr;
+tPanelScr=function(){
+  _tPanel138();
+  try{
+    if(!T_AUTH)return;
+    var grid=app.querySelector('.adm-grid');
+    if(grid && !document.getElementById('admBackupTile')){
+      grid.insertAdjacentHTML('beforeend',
+        '<button id="admBackupTile" class="adm-tile" onclick="admBackupScr()"><span class="ic">💾</span><b>نسخة احتياطية</b><small>حفظ واسترجاع JSON</small></button>'
+      );
+    }
+    var grps=S.cgrps||[];
+    var expBars=app.querySelectorAll('.adm-exp-bar');
+    for(var i=0;i<expBars.length && i<grps.length;i++){
+      var g=grps[i], bar=expBars[i];
+      if(!bar.parentNode.querySelector('.adm-pro-bar')){
+        var bar2=document.createElement('div');
+        bar2.className='row adm-pro-bar';
+        bar2.style.marginTop='6px';
+        bar2.style.gap='6px';
+        bar2.innerHTML=
+          '<button class="pwb" style="flex:1;font-size:12px;min-height:34px;padding:4px 6px;background:#EEF2FF;border-color:#4F46E5;color:#312E81" onclick="admManualPtsScr(\''+g.id+'\')">⚡ نقاط يدوية (+/-)</button>'+
+          '<button class="pwb" style="flex:1;font-size:12px;min-height:34px;padding:4px 6px;background:#ECFDF5;border-color:#059669;color:#065F46" onclick="admExportGrpCsv(\''+g.id+'\')">📊 Excel (CSV)</button>';
+        bar.parentNode.appendChild(bar2);
+      }
+    }
+  }catch(e){}
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.9 — الأمان ومراقبة النقاط (Anti-Cheat: logs + adj)
+           + البحث السريع عن أي طالب (مجموعات السنتر + الترتيب العام)
+   ========================================================================== */
+
+/* ١. شاشة مراقبة النقاط والأمان */
+function admSecurityScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#7A1C1C,#3A0E0E);border-color:#FFD700">'+
+      '<h1>🛡️ مراقبة النقاط والأمان</h1>'+
+      '<div>رصد آخر الزيادات السريعة + تعويض أو تصفير فوري</div>'+
+    '</div>'+
+    adminAuthCardHtml()+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="tag">ضبط يدوي سريع بمعرّف الطالب (UID)</div>'+
+      '<input id="adjUidInp" class="inp" placeholder="UID الطالب" style="direction:ltr;font-size:15px">'+
+      '<div class="row" style="gap:6px">'+
+        '<button class="btn" style="flex:1;font-size:13px;min-height:40px;background:#15803D" onclick="admAdjAction(document.getElementById(\'adjUidInp\').value,\'bonus\')">🎁 منح تعويض</button>'+
+        '<button class="btn" style="flex:1;font-size:13px;min-height:40px;background:#B91C1C" onclick="admAdjAction(document.getElementById(\'adjUidInp\').value,\'reset\')">⛔ تصفير/ضبط</button>'+
+      '</div>'+
+    '</div>'+
+    '<div id="admLogsBox" class="card" style="text-align:center;font-weight:800">جاري تحميل آخر سجلات النقاط... ⏳</div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>';
+
+  if(!window.FB||!FB.logsGet){
+    var b=document.getElementById('admLogsBox');
+    if(b)b.textContent='ميزة السجلات تتطلب الاتصال بـ Firebase.';
+    return;
+  }
+  FB.logsGet(40).then(function(list){
+    var box=document.getElementById('admLogsBox');if(!box)return;
+    if(!list||!list.length){box.textContent='لا توجد سجلات نقاط حديثة حتى الآن.';return}
+    box.style.background='transparent';box.style.border='0';box.style.padding='0';
+    box.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+list.map(function(x){
+      var g=Number(x.g)||0,sec=Math.max(1,Number(x.sec)||1),rate=Math.round(g/sec);
+      var isSus=(g>=1500)||(g>=400&&rate>=25);
+      var dt=x.t&&x.t.toDate?x.t.toDate().toLocaleString('ar-EG',{hour:'numeric',minute:'2-digit',day:'numeric',month:'numeric'}):'—';
+      return '<div class="adm-log-row'+(isSus?' sus':'')+'">'+
+        '<div class="row" style="justify-content:space-between;flex-wrap:wrap">'+
+          '<b>👤 '+esc(x.n||'طالب')+'</b>'+
+          '<span class="'+(isSus?'adm-sus-tag':'adm-ok-tag')+'">'+(isSus?'⚠️ زيادة عالية':'✓ طبيعي')+' ('+(g>=0?'+':'')+g+' نقطة)</span>'+
+        '</div>'+
+        '<div class="sm" style="text-align:right">المدة: '+sec+'ث • الجولات: '+(x.r||0)+' • الأسبوع: '+esc(x.w||'')+' • '+dt+'</div>'+
+        '<div class="row" style="gap:6px;margin-top:2px">'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px" onclick="admAdjAction(\''+esc(x.u||'')+'\',\'bonus\',\''+esc(x.w||'')+'\')">🎁 تعويض</button>'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px;color:#B91C1C;border-color:#EF4444" onclick="admAdjAction(\''+esc(x.u||'')+'\',\'reset\',\''+esc(x.w||'')+'\')">⛔ تصفير/ضبط</button>'+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>';
+  }).catch(function(){
+    var b=document.getElementById('admLogsBox');
+    if(b)b.textContent='تعذر تحميل السجلات. تأكد من تسجيل الدخول بحساب الأدمن وصلاحيات logs في Firestore.';
+  });
+}
+
+function admAdjAction(uid,mode,wkOverride){
+  if(!T_AUTH){tPinScr();return}
+  uid=String(uid||'').trim();
+  if(!uid){rmsg('اكتب معرّف الطالب (UID) أولاً');return}
+  if(!window.FB||!FB.adjSet){rmsg('Firebase غير متصل');return}
+  var w=wkOverride||wkId(wkKey());
+  if(mode==='bonus'){
+    var v=prompt('كم نقطة تعويض تريد إضافتها للطالب؟','200');
+    if(v===null)return;
+    var pts=Math.round(Number(v)||0);
+    if(pts<=0){rmsg('اكتب رقماً أكبر من الصفر');return}
+    FB.adjSet(uid,{w:w,bonusPts:pts,forceReset:false}).then(function(){
+      ding();
+      rmsg('✅ تم إرسال +'+pts+' نقطة تعويض (ستُضاف فور فتح الطالب للمنصة)');
+    }).catch(function(){sfxBad(true);rmsg('❌ فشل الحفظ — تأكد من صلاحيات adj للأدمن')});
+  }else{
+    var v2=prompt('اكتب الحد الأقصى الجديد لنقاط الطالب (مثلاً 0 لتصفير الحساب):','0');
+    if(v2===null)return;
+    var cap=Math.max(0,Math.round(Number(v2)||0));
+    if(!confirm('تأكيد ضبط/تصفير نقاط الطالب على '+cap+' نقطة؟'))return;
+    FB.adjSet(uid,{w:w,p:cap,forceReset:true,bonusPts:0}).then(function(){
+      ding();
+      rmsg('⛔ تم ضبط نقاط الطالب على '+cap+' نقطة بنجاح');
+    }).catch(function(){sfxBad(true);rmsg('❌ فشل التنفيذ — تأكد من صلاحيات adj للأدمن')});
+  }
+}
+
+/* ٢. شاشة البحث السريع عن أي طالب */
+function admSearchScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700">'+
+      '<h1>🔎 البحث السريع عن طالب</h1>'+
+      '<div>ابحث بالاسم في مجموعات السنتر ولوحة الترتيب العام</div>'+
+    '</div>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<input id="admSrInp" class="inp" placeholder="اكتب اسم الطالب أو جزء منه..." onkeydown="if(event.key===\'Enter\')admRunSearch()">'+
+      '<button class="btn" style="width:100%" onclick="admRunSearch()">🔎 ابحث الآن</button>'+
+    '</div>'+
+    '<div id="admSrRes" style="display:flex;flex-direction:column;gap:8px"></div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>';
+}
+
+function admRunSearch(){
+  var inp=document.getElementById('admSrInp');
+  var q=((inp&&inp.value)||'').trim();
+  var box=document.getElementById('admSrRes');
+  if(!q){rmsg('اكتب اسم الطالب للبحث');return}
+  var qLow=q.toLowerCase(),html='';
+
+  var grpHits=[];
+  (S.cgrps||[]).forEach(function(g){
+    var sorted=(g.students||[]).slice().sort(function(a,b){return (b.pts||0)-(a.pts||0)});
+    sorted.forEach(function(st,idx){
+      if(String(st.name||'').toLowerCase().indexOf(qLow)>=0){
+        grpHits.push({g:g,st:st,rk:idx+1});
+      }
+    });
+  });
+  html+='<div class="tag g">🏫 نتائج مجموعات السنتر ('+grpHits.length+')</div>';
+  if(!grpHits.length){
+    html+='<div class="card sm" style="text-align:center">لا يوجد طالب بهذا الاسم في مجموعات السنتر.</div>';
+  }else{
+    html+=grpHits.map(function(h){
+      return '<div class="adm-sr-card">'+
+        '<div class="row"><b>'+esc(h.st.name)+'</b><span class="sp"></span><b>⭐ '+(h.st.pts||0)+' نقطة (#'+h.rk+')</b></div>'+
+        '<div class="sm">المجموعة: '+esc(h.g.name)+' • صح: '+(h.st.ok||0)+' من '+(h.st.ans||0)+'</div>'+
+        '<div class="row" style="gap:6px">'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px" onclick="openClsCert(\''+esc(h.g.id)+'\','+h.rk+',\''+esc(h.st.name)+'\','+(h.st.pts||0)+','+(h.st.ok||0)+','+(h.st.ans||0)+',0,\''+esc(h.g.lastDate||'')+'\')">🎓 شهادة السنتر</button>'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px" onclick="admManualPtsScr(\''+esc(h.g.id)+'\')">⚡ تعديل نقاطه</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+  html+='<div class="tag">🏆 نتائج الترتيب العام السحابي</div><div id="admSrCloud" class="card sm" style="text-align:center">جاري البحث في السحابة... ⏳</div>';
+  box.innerHTML=html;
+
+  if(!window.FB||!FB.findByName){
+    var cl=document.getElementById('admSrCloud');if(cl)cl.textContent='البحث السحابي غير متاح حالياً.';
+    return;
+  }
+  var wk=wkKey(),wkList=[String(wk),String(wk)+'p',String(wk)+'s'];
+  FB.findByName(wkList,q).then(function(res){
+    var cl=document.getElementById('admSrCloud');if(!cl)return;
+    if(!res||!res.length){cl.textContent='لا يوجد تطابق تام لهذا الاسم في الترتيب العام (ابحث بالاسم المستعار الكامل).';return}
+    cl.style.background='transparent';cl.style.border='0';cl.style.padding='0';
+    cl.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+res.map(function(r){
+      return '<div class="adm-sr-card">'+
+        '<div class="row"><b>👤 '+esc(r.name)+'</b><span class="sp"></span><b>🏆 '+r.pts+' نقطة</b></div>'+
+        '<div class="sm" style="direction:ltr;text-align:right">UID: '+esc(r.id)+' • Week: '+esc(r.wk)+'</div>'+
+        '<div class="row" style="gap:6px">'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px" onclick="admAdjAction(\''+esc(r.id)+'\',\'bonus\',\''+esc(r.wk)+'\')">🎁 تعويض</button>'+
+          '<button class="pwb" style="flex:1;min-height:34px;font-size:12px;color:#B91C1C;border-color:#EF4444" onclick="admAdjAction(\''+esc(r.id)+'\',\'reset\',\''+esc(r.wk)+'\')">⛔ تصفير/ضبط</button>'+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>';
+  }).catch(function(){
+    var cl=document.getElementById('admSrCloud');if(cl)cl.textContent='تعذر البحث السحابي، تأكد من الاتصال.';
+  });
+}
+
+/* ربط بطاقات v13.9 داخل لوحة الأدمن */
+var _tPanel139=tPanelScr;
+tPanelScr=function(){
+  _tPanel139();
+  try{
+    if(!T_AUTH)return;
+    var grid=app.querySelector('.adm-grid');
+    if(grid && !document.getElementById('admSecTile')){
+      grid.insertAdjacentHTML('beforeend',
+        '<button id="admSecTile" class="adm-tile" onclick="admSecurityScr()"><span class="ic">🛡️</span><b>مراقبة النقاط</b><small>سجلات الأمان والتعويض</small></button>'+
+        '<button id="admSrTile" class="adm-tile" onclick="admSearchScr()"><span class="ic">🔎</span><b>بحث عن طالب</b><small>السنتر والترتيب العام</small></button>'
+      );
+    }
+  }catch(e){}
 };
 
 if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
