@@ -6355,7 +6355,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.8').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.8.1').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11530,6 +11530,142 @@ home=function(){
 
 /* إعادة تطبيق الشاشة الرئيسية فوراً */
 if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v12.8.1 — إصلاح المزامنة السحابية لحلقات «يوميات سارة» لتظهر على كل الموبايلات
+             عبر مجموعة saves المضمونة (SARAH22999) + زر مزامنة فورية للحلقات المحلية
+   ========================================================================== */
+var SARAH_CLOUD_KEY='SARAH22999';
+var SARAH_CLOUD_OK=false;
+
+function saveSarahCloud(list){
+  if(!window.FB)return Promise.reject(new Error('no_fb'));
+  var payload={d:JSON.stringify({v:1,sarah:list||[]}),u:'mister_sarah_v1'};
+  var p1=(FB.saveSet)?FB.saveSet(SARAH_CLOUD_KEY,payload):Promise.reject(new Error('no_saveSet'));
+  if(FB.ytSet){try{FB.ytSet('sarah_diaries',list).catch(function(){})}catch(e){}}
+  return p1.then(function(){
+    SARAH_CLOUD_OK=true;
+    return true;
+  }).catch(function(err){
+    if(FB.ytSet){
+      return FB.ytSet('sarah_diaries',list).then(function(){SARAH_CLOUD_OK=true;return true});
+    }
+    throw err;
+  });
+}
+
+loadSarahVids=function(cb){
+  var local=Array.isArray(S.sarahVids)?S.sarahVids:[];
+  if(!window.FB){
+    SARAH_VIDS_CACHE=local;
+    if(cb)cb(local);
+    return;
+  }
+  var pSave=(FB.saveGet)?FB.saveGet(SARAH_CLOUD_KEY).catch(function(){return null}):Promise.resolve(null);
+  pSave.then(function(r){
+    if(r&&r.d){
+      try{
+        var o=JSON.parse(r.d);
+        if(o&&Array.isArray(o.sarah)){
+          SARAH_CLOUD_OK=true;
+          SARAH_VIDS_CACHE=o.sarah;
+          S.sarahVids=o.sarah;
+          save();
+          if(cb)cb(o.sarah);
+          return;
+        }
+      }catch(e){}
+    }
+    if(FB.ytGet){
+      FB.ytGet().then(function(d){
+        var arr=(d&&Array.isArray(d.sarah_diaries))?d.sarah_diaries:local;
+        if(d&&Array.isArray(d.sarah_diaries))SARAH_CLOUD_OK=true;
+        SARAH_VIDS_CACHE=arr;
+        S.sarahVids=arr;
+        save();
+        if(cb)cb(arr);
+      }).catch(function(){
+        SARAH_VIDS_CACHE=local;
+        if(cb)cb(local);
+      });
+    }else{
+      SARAH_VIDS_CACHE=local;
+      if(cb)cb(local);
+    }
+  });
+};
+
+tSarahAdd=function(){
+  var title=($('#srTitle')&&$('#srTitle').value||'').trim();
+  var url=($('#srUrl')&&$('#srUrl').value||'').trim();
+  var desc=($('#srDesc')&&$('#srDesc').value||'').trim();
+  var qTxt=($('#srQ')&&$('#srQ').value||'').trim();
+  var a1=($('#srA1')&&$('#srA1').value||'').trim();
+  var a2=($('#srA2')&&$('#srA2').value||'').trim();
+  var a3=($('#srA3')&&$('#srA3').value||'').trim();
+  var vidId=extractYtId(url);
+  if(!title){rmsg('اكتب عنوان الحلقة الأول!');return}
+  if(!vidId){rmsg('رابط اليوتيوب غير صحيح! انسخ الرابط كامل من يوتيوب');return}
+  var item={id:vidId,title:title,desc:desc,at:Date.now()};
+  if(qTxt && a1 && a2){
+    item.q=qTxt;
+    item.opts=a3?[a1,a2,a3]:[a1,a2];
+  }
+  var list=(SARAH_VIDS_CACHE||S.sarahVids||[]).slice();
+  list.unshift(item);
+  S.sarahVids=list;SARAH_VIDS_CACHE=list;save();
+  rmsg('☁️ جاري رفع الحلقة على السحابة لكل الطلاب...');
+  saveSarahCloud(list).then(function(){
+    sfxWin();
+    rmsg('✅ تم نشر «'+title+'» على السحابة وستظهر فوراً لكل الطلاب!');
+    tSarahAdminScr();
+  }).catch(function(){
+    rmsg('⚠️ تم الحفظ على جهازك فقط — تأكد من الإنترنت وجرّب زر المزامنة');
+    tSarahAdminScr();
+  });
+};
+
+tSarahDelById=function(vidId,atTs){
+  if(!confirm('هل تريد حذف هذه الحلقة من يوميات سارة؟'))return;
+  var list=(SARAH_VIDS_CACHE||S.sarahVids||[]).slice().filter(function(v){
+    return !(v.id===vidId && (!atTs || Number(v.at||0)===Number(atTs)));
+  });
+  S.sarahVids=list;SARAH_VIDS_CACHE=list;save();
+  saveSarahCloud(list).then(function(){
+    rmsg('✅ تم حذف الحلقة وتحديث السحابة لكل الطلاب');
+    tSarahAdminScr();
+  }).catch(function(){
+    tSarahAdminScr();
+  });
+};
+
+function tSarahSyncNow(){
+  var list=(SARAH_VIDS_CACHE||S.sarahVids||[]).slice();
+  if(!list.length){rmsg('لا توجد حلقات محلية لرفعها!');return}
+  rmsg('☁️ جاري رفع '+list.length+' حلقة على السحابة لكل الطلاب...');
+  saveSarahCloud(list).then(function(){
+    sfxWin();
+    rmsg('✅ تمت المزامنة! كل الـ '+list.length+' حلقات ظاهرة الآن لكل الطلاب على كل الموبايلات!');
+    tSarahAdminScr();
+  }).catch(function(){
+    rmsg('⚠️ تعذر الاتصال بالسحابة — تأكد من الإنترنت وحاول مرة أخرى');
+  });
+}
+
+var _tSarahAdmin1281=tSarahAdminScr;
+tSarahAdminScr=function(){
+  _tSarahAdmin1281();
+  var listEl=document.getElementById('tSarahList');
+  if(listEl && !document.getElementById('tSarahSyncBtn')){
+    listEl.insertAdjacentHTML('beforebegin',
+      '<button id="tSarahSyncBtn" class="btn" style="background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700;font-size:14.5px;min-height:42px;padding:8px" onclick="tSarahSyncNow()">☁️ مزامنة ورفع الحلقات الحالية لكل الموبايلات الآن</button>'
+    );
+  }
+};
+
+/* تحديث فوري لإشعار سارة على الرئيسية */
+if(S.stage&&S.grade&&S.nick&&!RQ){try{setTimeout(checkSarahOrbNotif,200)}catch(e){}}
 
 </script>
 </body>
