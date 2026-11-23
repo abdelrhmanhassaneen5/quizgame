@@ -1007,6 +1007,53 @@ body.dark .mr-about-btn{background:linear-gradient(135deg,rgba(47,95,90,.25),rgb
 .it-row{border-width:1.5px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
 .sec-card{border-width:2px;box-shadow:0 3px 0 var(--c)}
 
+/* --- v12.7: الشاشة الرئيسية الفائقة البساطة (3 كرات طائرة بأسلوب ماسنجر + نافذة منبثقة سلسة) --- */
+.hm-mini{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#1B3B38,#2F5F5A);border:2px solid var(--gold);border-radius:18px;padding:8px 11px;color:#FFE9B8;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+body.th-modern .hm-mini{background:linear-gradient(135deg,#4F46E5,#0EA5A4);border:0;color:#fff}
+body.dark.th-galaxy .hm-mini{background:linear-gradient(135deg,#1E1B4B,#0E7490);border-color:#FBBF24}
+.hm-mini-tx{flex:1;min-width:0}
+.hm-mini-tx b{display:block;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFD700}
+.hm-mini-tx small{display:block;font-size:11px;font-weight:700;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-mini-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.24);border:1.5px solid rgba(255,215,0,.6);color:#FFE9B8;border-radius:14px;padding:4px 9px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.hm-mini-gear{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,233,184,.5);color:#FFE9B8;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+
+.orb-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0 4px}
+.orb-prompt{font-family:Lemonada,'Cairo',sans-serif;font-size:clamp(15px,4.2vw,19px);font-weight:700;color:var(--ink);text-align:center;line-height:1.5}
+.orb-stage{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:440px;align-items:start;padding:12px 2px 4px}
+.orb-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.orb-col.mid{margin-top:-10px}
+.orb-btn{position:relative;width:clamp(88px,26vw,116px);height:clamp(88px,26vw,116px);border-radius:50%;border:3px solid rgba(255,255,255,.85);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#fff;font-family:'Cairo',sans-serif;padding:6px;box-sizing:border-box;animation:orbFloat 3.4s ease-in-out infinite;transition:transform .18s cubic-bezier(.2,.9,.3,1.3),box-shadow .2s;-webkit-tap-highlight-color:transparent;user-select:none}
+.orb-btn::before{content:"";position:absolute;top:7px;left:16%;width:42%;height:24%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.58),rgba(255,255,255,0));pointer-events:none}
+.orb-btn .o-ic{font-size:clamp(30px,8.5vw,40px);line-height:1;filter:drop-shadow(0 3px 5px rgba(0,0,0,.28))}
+.orb-btn .o-tt{font-size:clamp(12px,3.3vw,15px);font-weight:900;line-height:1.15;text-shadow:0 2px 5px rgba(0,0,0,.35)}
+.orb-btn.o-learn{background:radial-gradient(circle at 30% 25%,#60A5FA,#2563EB 58%,#1E3A8A);box-shadow:0 10px 22px rgba(37,99,235,.42),inset 0 -6px 12px rgba(0,0,0,.22);animation-delay:0s}
+.orb-btn.o-games{background:radial-gradient(circle at 30% 25%,#FDBA74,#EA580C 58%,#9A3412);box-shadow:0 12px 26px rgba(234,88,12,.45),inset 0 -6px 12px rgba(0,0,0,.22);animation-delay:-1.1s}
+.orb-btn.o-test{background:radial-gradient(circle at 30% 25%,#C084FC,#7C3AED 58%,#4C1D95);box-shadow:0 10px 22px rgba(124,58,237,.42),inset 0 -6px 12px rgba(0,0,0,.22);animation-delay:-2.2s}
+.orb-btn:active{transform:scale(.91)!important}
+@media(hover:hover) and (pointer:fine){.orb-btn:hover{transform:scale(1.08) translateY(-4px)}}
+@keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.orb-sub{font-size:11px;font-weight:800;color:var(--teal);text-align:center;line-height:1.3}
+body.dark.th-galaxy .orb-sub{color:#67E8F9}
+.orb-badge{position:absolute;top:-2px;left:-2px;min-width:20px;height:20px;padding:0 5px;border-radius:12px;background:#FF2E63;color:#fff;border:2.5px solid #fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(255,46,99,.55);animation:pl 1.1s infinite;z-index:2}
+
+/* النافذة المنبثقة بأسلوب ماسنجر (Chat-Head Popup Sheet) */
+.orb-ov{position:fixed;inset:0;background:rgba(10,16,28,.64);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:9400;display:flex;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box;animation:fadeIn .2s ease-out}
+@media(min-width:768px){.orb-ov{align-items:center}}
+.orb-sheet{position:relative;width:100%;max-width:460px;max-height:84vh;background:var(--paper);border:2.5px solid var(--gold);border-radius:26px;padding:34px 14px 16px;box-sizing:border-box;box-shadow:0 18px 46px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:10px;animation:orbPop .28s cubic-bezier(.2,.95,.3,1.18)}
+@keyframes orbPop{from{opacity:0;transform:translateY(36px) scale(.92)}to{opacity:1;transform:none}}
+.orb-head-pin{position:absolute;top:-28px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.orb-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1.5px dashed rgba(138,106,74,.35)}
+.orb-sheet-top b{font-family:Lemonada,'Cairo',sans-serif;font-size:17px;font-weight:700;color:var(--ink)}
+.orb-close{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.1);border:0;color:var(--ink);font-size:17px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}
+body.dark .orb-close{background:rgba(255,255,255,.14);color:#fff}
+.orb-body{overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:2px 2px 6px;-webkit-overflow-scrolling:touch}
+
+/* سطر الأزرار السفلي المبسّط أسفل قاعة الأبطال */
+.hm-foot-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hm-foot-btn{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card);border:1.5px solid rgba(138,106,74,.5);border-radius:14px;padding:9px 8px;font-family:'Cairo',sans-serif;font-weight:900;font-size:12.5px;color:var(--ink);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.06);transition:transform .15s}
+.hm-foot-btn:active{transform:scale(.96)}
+.hm-foot-btn .bdot{position:absolute;top:5px;left:8px;width:9px;height:9px;border-radius:50%;background:#FF2E63;border:1.5px solid #fff}
+
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -6273,7 +6320,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.6').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.7').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11203,6 +11250,195 @@ accountScr=function(){
     }
   }catch(e){}
 };
+
+
+/* ==========================================================================
+   v12.7 — التصميم الفائق البساطة: 3 كرات طائرة (الشرح / الألعاب / اختبر نفسك)
+           بنافذة منبثقة بأسلوب ماسنجر + قاعة الأبطال تحتها مباشرة
+   ========================================================================== */
+
+var SARAH_HAS_UNSEEN=false, SARAH_LATEST_TITLE='';
+
+function orbModalMeta(k){
+  if(k==='learn')return {ic:'📘',tt:'قسم الشرح والتأسيس',bg:'radial-gradient(circle at 30% 25%,#60A5FA,#2563EB 58%,#1E3A8A)'};
+  if(k==='games')return {ic:'🎮',tt:'قسم الألعاب والتحديات',bg:'radial-gradient(circle at 30% 25%,#FDBA74,#EA580C 58%,#9A3412)'};
+  if(k==='test')return {ic:'📝',tt:'اختبر نفسك ومستواك',bg:'radial-gradient(circle at 30% 25%,#C084FC,#7C3AED 58%,#4C1D95)'};
+  return {ic:'🏫',tt:'السنتر والمهام والهدايا',bg:'radial-gradient(circle at 30% 25%,#C9973F,#7A3B3B 65%,#4A1C1C)'};
+}
+
+function closeOrbModal(){
+  var el=document.getElementById('orbModalOv');
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+}
+
+function openOrbModal(k){
+  closeOrbModal();
+  k=homeKey(k);
+  var m=orbModalMeta(k);
+  var innerHtml='';
+  if(k==='learn'){
+    innerHtml='<button class="sarah-banner" onclick="closeOrbModal();sarahDiariesScr(0)">'+
+      '<img class="sarah-av" src="sarah.png" alt="سارة" onerror="this.style.display=\'none\'">'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:14.5px;color:#A61E4D">🎬 يوميات سارة — حكايات بالإنجليزي! '+(SARAH_HAS_UNSEEN?'<span class="it-bdg r" style="margin-right:4px">حلقة جديدة 🔥</span>':'<span class="it-bdg" style="background:#E64980;color:#fff;margin-right:4px">9 مساءً</span>')+'</div>'+
+        '<div style="font-size:11.5px;font-weight:700;color:#4A2F22;margin-top:2px">'+(SARAH_LATEST_TITLE?('أحدث حلقة: «'+esc(SARAH_LATEST_TITLE)+'»'):sarah9pmCountdownTxt())+'</div>'+
+      '</div>'+
+      '<span style="font-size:20px;font-weight:900;color:#A61E4D">‹</span>'+
+    '</button>'+
+    homeTabHtml('learn');
+  }else if(k==='games'){
+    innerHtml='<button class="hero-play" style="padding:12px 14px" onclick="closeOrbModal();map()">'+
+      '<div>'+
+        '<div style="font-family:Lemonada,sans-serif;font-size:15.5px;font-weight:900;color:#FFD700">▶ خريطة المغامرات — الجولة '+S.max+' من 40</div>'+
+        '<div style="font-size:12px;font-weight:700;margin-top:2px">🗺️ اهزم الوحوش واجمع النجوم والنقاط!</div>'+
+      '</div>'+
+      '<div style="background:#FFD700;color:#4A2F22;font-weight:900;padding:6px 12px;border-radius:10px;font-size:14px;white-space:nowrap">العب ▶</div>'+
+    '</button>'+
+    homeTabHtml('games');
+  }else{
+    innerHtml=homeTabHtml(k);
+  }
+
+  var ov=document.createElement('div');
+  ov.id='orbModalOv';
+  ov.className='orb-ov';
+  ov.setAttribute('onclick','if(event.target===this)closeOrbModal()');
+  ov.innerHTML='<div class="orb-sheet sk-'+k+'">'+
+    '<div class="orb-head-pin" style="background:'+m.bg+'">'+m.ic+'</div>'+
+    '<div class="orb-sheet-top">'+
+      '<b>'+m.tt+'</b>'+
+      '<button class="orb-close" aria-label="إغلاق" onclick="closeOrbModal()">✕</button>'+
+    '</div>'+
+    '<div class="orb-body" id="orbModalBody">'+innerHtml+'</div>'+
+  '</div>';
+
+  /* إغلاق النافذة المنبثقة تلقائياً عند الضغط على أي زر ينقل لشاشة أخرى */
+  ov.querySelector('#orbModalBody').addEventListener('click',function(ev){
+    var btn=ev.target.closest('button');
+    if(!btn)return;
+    var oc=btn.getAttribute('onclick')||'';
+    if(oc && oc.indexOf('closeOrbModal')<0 && oc.indexOf('feedPet')<0){
+      setTimeout(closeOrbModal,20);
+    }
+  },true);
+
+  document.body.appendChild(ov);
+  try{ding()}catch(e){}
+}
+
+/* تحويل homeTab لاستخدام النافذة المنبثقة السلسة */
+homeTab=function(k){
+  openOrbModal(k);
+};
+
+/* إغلاق النافذة بزر Esc على الكمبيوتر */
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Escape'&&document.getElementById('orbModalOv'))closeOrbModal();
+});
+
+/* الشاشة الرئيسية الجديدة فائقة البساطة: شريط رفيع + 3 كرات طائرة + قاعة الأبطال + زرين سفليين */
+home=function(){
+  closeOrbModal();
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var VM=vaultCheck();if(VM.length)setTimeout(function(){try{sfxChest()}catch(e){}showToast(VM[VM.length-1])},1300);
+  var bMsg=bdgCheck();if(bMsg)setTimeout(function(){rmsg(bMsg)},200);
+  setTimeout(function(){ensureReg();claimPrev();askSync();checkWhatsNew()},50);
+
+  var D=dm(), misLeft=D.list.length-D.done.length;
+  var misCnt=(S.mis||[]).length;
+  var canTax=(S.cTax!==cDay())&&(cityDailyInc()>0);
+  var hasLearnDot=askNew()||SARAH_HAS_UNSEEN;
+  var hasGamesDot=canTax||!!S.rm;
+
+  app.innerHTML=
+    /* شريط الطالب النحيف (للموبايل فقط؛ الكمبيوتر يعرض اللوحة الجانبية) */
+    '<div class="only-m">'+
+      '<div class="hm-mini">'+
+        misterImg('c',38)+
+        '<div class="hm-mini-tx">'+
+          '<b>'+esc(S.nick||'بطل التحدي')+'</b>'+
+          '<small>'+stgLbl()+' • '+gName()+' • 🔥 '+skAlive()+' يوم</small>'+
+        '</div>'+
+        '<button class="hm-mini-pill" onclick="store()">'+coin()+'<span>'+S.coins+'</span></button>'+
+        '<button class="hm-mini-gear" aria-label="الإعدادات" onclick="accountScr()">⚙️</button>'+
+      '</div>'+
+    '</div>'+
+
+    /* تنبيهات عاجلة فقط عند وجودها */
+    (S.cm?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;line-height:1.7;padding:9px">'+esc(S.cm)+'<br><div class="row" style="justify-content:center;margin-top:6px">'+(S.cert?'<button class="btn" style="font-size:13px;min-height:34px;padding:4px 12px" onclick="certScr()">🎓 استلم شهادتك</button>':'')+'<button class="btn t" style="font-size:13px;min-height:34px;padding:4px 12px" onclick="S.cm=null;save();home()">تمام</button></div></div>':'')+
+    (askNew()?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;padding:8px">💬 مستر عبدالرحمن رد على سؤالك! <button class="btn t" style="font-size:12.5px;min-height:32px;padding:3px 10px;margin-right:6px" onclick="askScr()">شوف الرد</button></div>':'')+
+    (DB?'<div class="card" style="text-align:center;font-weight:900;background:#CFE3D4;border-color:#2F6B4A;padding:8px;font-size:13px">🎉 مكافأة دخولك النهاردة: +'+DB+' عملة</div>':'')+
+
+    /* الكرات الثلاث الطائرة (الشرح • الألعاب • اختبر نفسك) */
+    '<div class="orb-wrap">'+
+      '<div class="orb-prompt">أهلاً يا '+esc(S.nick||'بطل')+' 👋 اختار كورة وابدأ!</div>'+
+      '<div class="orb-stage">'+
+        '<div class="orb-col">'+
+          '<button id="orbLearn" class="orb-btn o-learn" onclick="openOrbModal(\'learn\')">'+
+            (hasLearnDot?'<span class="orb-badge" id="orbLearnBdg">'+(SARAH_HAS_UNSEEN?'جديد':'!')+'</span>':'')+
+            '<span class="o-ic">📘</span>'+
+            '<span class="o-tt">الشرح</span>'+
+          '</button>'+
+          '<span class="orb-sub">سارة والتأسيس</span>'+
+        '</div>'+
+        '<div class="orb-col mid">'+
+          '<button id="orbGames" class="orb-btn o-games" onclick="openOrbModal(\'games\')">'+
+            (hasGamesDot?'<span class="orb-badge">!</span>':'')+
+            '<span class="o-ic">🎮</span>'+
+            '<span class="o-tt">الألعاب</span>'+
+          '</button>'+
+          '<span class="orb-sub">خريطة وتحديات</span>'+
+        '</div>'+
+        '<div class="orb-col">'+
+          '<button id="orbTest" class="orb-btn o-test" onclick="openOrbModal(\'test\')">'+
+            (misCnt>0?'<span class="orb-badge">'+misCnt+'</span>':'')+
+            '<span class="o-ic">📝</span>'+
+            '<span class="o-tt">اختبر نفسك</span>'+
+          '</button>'+
+          '<span class="orb-sub">امتحانات ومستواك</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    /* قاعة أبطال تحدي الأصحاب تحت الكرات مباشرة */
+    '<div class="hm-lb" id="homeLbBox">'+
+      '<div class="hm-lb-hd">'+
+        '<div class="hm-lb-ttl"><b>👑 قاعة أبطال تحدي الأصحاب</b><small id="homeLbSub">🛡️ ترتيب تراكمي دائم • كل نقطة محفوظة للأبد</small></div>'+
+        '<button class="hm-lb-all" onclick="board(\'all\')">قاعة الشرف 🏆</button>'+
+      '</div>'+
+      '<div id="homeLbList"><div style="text-align:center;padding:10px;font-size:12.5px;color:#CFE3D4;font-weight:700">جاري تجهيز منصة تتويج الأبطال... ✨</div></div>'+
+    '</div>'+
+
+    /* سطر واحد أنيق للسنتر ونبذة المستر */
+    '<div class="hm-foot-row">'+
+      '<button class="hm-foot-btn" onclick="openOrbModal(\'more\')">'+(misLeft>0?'<span class="bdot"></span>':'')+'🏫 السنتر والهدايا</button>'+
+      '<button class="hm-foot-btn" onclick="aboutMisterScr()">👨‍🏫 عن مستر عبدالرحمن</button>'+
+    '</div>'+
+    bnav('home');
+
+  setTimeout(loadHomeLbWidget,80);
+  setTimeout(checkSarahOrbNotif,140);
+};
+
+/* فحص أحدث حلقة من يوميات سارة وإضاءة شارة كورة الشرح + تشغيل الإعلان مرة واحدة */
+function checkSarahOrbNotif(){
+  loadSarahVids(function(rawVids){
+    var vids=sortSarahNewest(rawVids||[]);
+    if(vids.length){
+      var latest=vids[0];
+      SARAH_LATEST_TITLE=latest.title||'';
+      S.sarahDone=Array.isArray(S.sarahDone)?S.sarahDone:[];
+      SARAH_HAS_UNSEEN=!!(latest && latest.id && S.sarahSeenLatest!==latest.id && S.sarahDone.indexOf(latest.id)<0);
+      var orb=document.getElementById('orbLearn');
+      if(orb && SARAH_HAS_UNSEEN && !document.getElementById('orbLearnBdg')){
+        orb.insertAdjacentHTML('afterbegin','<span class="orb-badge" id="orbLearnBdg">جديد 🎬</span>');
+      }
+    }
+  });
+  if(S.stage && S.grade && S.nick && S.sarahPromoSeen!==SARAH_PROMO_ID){
+    setTimeout(function(){showSarahPromoModal(false)},900);
+  }
+}
 
 </script>
 </body>
