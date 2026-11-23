@@ -6320,7 +6320,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.7').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.7.1').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11439,6 +11439,10 @@ function checkSarahOrbNotif(){
     setTimeout(function(){showSarahPromoModal(false)},900);
   }
 }
+
+
+/* v12.7.1 — إعادة رسم الشاشة الرئيسية فور اكتمال تحميل كل التحديثات */
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home();if(typeof renderSide==='function')renderSide()}catch(e){}}
 
 </script>
 </body>
