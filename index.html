@@ -1089,6 +1089,35 @@ body.dark .card{border-color:rgba(255,255,255,.1)!important;box-shadow:0 6px 18p
 #fabHome:active{transform:scale(.93)}
 @media(min-width:768px){#fabHome{display:none!important}}
 
+/* --- v13.0: لوحة الأدمن الموحدة (Unified Admin Hub) --- */
+.adm-hero{background:linear-gradient(145deg,#132A2E,#1E4844 55%,#0F2143);border:2px solid #FFD700;border-radius:22px;padding:14px;color:#FFE9B8;box-shadow:0 10px 26px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:10px}
+.adm-hero-top{display:flex;align-items:center;gap:10px}
+.adm-hero-top b{font-family:Lemonada,'Cairo',sans-serif;font-size:clamp(15px,4.2vw,19px);color:#FFD700;display:block;line-height:1.35}
+.adm-hero-top small{font-size:11.5px;font-weight:700;color:#CFE3D4;display:block}
+.adm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.adm-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,215,0,.35);border-radius:14px;padding:7px 4px;text-align:center}
+.adm-kpi b{display:block;font-size:16px;font-weight:900;color:#FFD700;line-height:1.2}
+.adm-kpi span{font-size:10px;font-weight:700;color:#E2E8F0}
+.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:768px){.adm-grid{grid-template-columns:repeat(3,1fr)}}
+.adm-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:18px;padding:12px;cursor:pointer;text-align:right;font-family:'Cairo',sans-serif;color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,.06);transition:transform .16s}
+.adm-tile:active{transform:scale(.97)}
+.adm-tile .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(47,95,90,.12)}
+.adm-tile b{font-size:14px;font-weight:900;line-height:1.3}
+.adm-tile small{font-size:11px;font-weight:700;color:var(--teal);line-height:1.4}
+.adm-sec-tt{font-weight:900;font-size:14px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+/* --- v13.1: قسم أسئلة الطلاب من askq داخل لوحة الأدمن والرد المباشر --- */
+.adm-q-card{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.adm-q-card.unans{border-color:#D97706;background:linear-gradient(135deg,rgba(254,243,199,.45),var(--card))}
+.adm-q-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11.5px;font-weight:800}
+.adm-q-badge{padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:900}
+.adm-q-badge.wait{background:#FEF3C7;color:#92400E;border:1px solid #F59E0B}
+.adm-q-badge.done{background:#D1FAE5;color:#065F46;border:1px solid #10B981}
+.adm-q-txt{font-size:14px;font-weight:900;line-height:1.65;color:var(--ink)}
+.adm-q-ans{background:rgba(47,95,90,.1);border-right:3.5px solid #2F6B4A;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700;line-height:1.65}
+/* --- v13.2: نافذة إدارة وحذف أكواد الهدايا السحابية في Firestore --- */
+.adm-g-row{background:var(--card);border:1.5px solid rgba(138,106,74,.38);border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.adm-g-code{direction:ltr;background:linear-gradient(135deg,#2B1055,#7A3B3B);color:#FFD700;border:1.5px solid #FFD700;border-radius:10px;padding:4px 9px;font-family:Arial,sans-serif;font-weight:900;font-size:13px;white-space:nowrap}
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -1184,7 +1213,30 @@ if(window.FIREBASE_CONFIG){
     adjGet:async(u)=>{const x=await FS.getDoc(FS.doc(db,'adj',u));return x.exists()?x.data():null},
     askAdd:(d)=>FS.addDoc(FS.collection(db,'askq'),Object.assign({a:''},d,{t:FS.serverTimestamp()})).then((r)=>r.id),
     askGet:async(id)=>{const x=await FS.getDoc(FS.doc(db,'askq',id));return x.exists()?x.data():null},
+    askList:async()=>{
+      const s=await FS.getDocs(FS.query(FS.collection(db,'askq'),FS.orderBy('t','desc'),FS.limit(30)));
+      return s.docs.map(d=>Object.assign({id:d.id},d.data()));
+    },
+    askReply:async(id,ans)=>{
+      const clean=String(ans||'').trim().slice(0,600);
+      await FS.updateDoc(FS.doc(db,'askq',String(id)),{a:clean,ansAt:FS.serverTimestamp()});
+    },
+    askDel:async(id)=>{
+      await FS.deleteDoc(FS.doc(db,'askq',String(id)));
+    },
     giftGet:async(c)=>{const x=await FS.getDoc(FS.doc(db,'gifts',c));return x.exists()?x.data():null},
+    giftSet:async(c,d)=>{
+      const cleanCode=String(c||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,18);
+      await FS.setDoc(FS.doc(db,'gifts',cleanCode),Object.assign({active:true},d,{t:FS.serverTimestamp()}));
+    },
+    giftList:async()=>{
+      const s=await FS.getDocs(FS.query(FS.collection(db,'gifts'),FS.limit(50)));
+      return s.docs.map(d=>Object.assign({code:d.id},d.data()));
+    },
+    giftDel:async(c)=>{
+      const cleanCode=String(c||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,18);
+      await FS.deleteDoc(FS.doc(db,'gifts',cleanCode));
+    },
     ytSet:(k,d)=>FS.setDoc(FS.doc(db,'cfg','yt'),{[k]:d||null,t:FS.serverTimestamp()},{merge:true}),
     ytGet:async()=>{const x=await FS.getDoc(FS.doc(db,'cfg','yt'));return x.exists()?x.data():null},
     ping:(uid,first)=>{const d={last:FS.serverTimestamp(),v:FS.increment(1)};if(first)d.first=FS.serverTimestamp();return FS.setDoc(FS.doc(db,'visitors',uid),d,{merge:true})},
@@ -6366,7 +6418,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.9').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=13.2').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11763,6 +11815,427 @@ tPanelScr=function(){
     }
   }catch(e){}
 };
+
+
+/* ==========================================================================
+   v13.0 — لوحة الأدمن الموحدة (Unified Admin Hub) لمستر عبدالرحمن حسنين
+           تجميع المجموعات + يوميات سارة + روابط الشرح + الهدايا السحابية
+           + نبض حالة المنصة السحابية في مكان واحد نظيف ومنسّق
+   ========================================================================== */
+
+function admFetchStats(){
+  var el=document.getElementById('admLivePulse');
+  if(!el)return;
+  if(!window.FB||!FB.stats){
+    el.textContent='وضع محلي • السحابة غير مفعّلة';
+    return;
+  }
+  FB.stats(Date.now()-864e5).then(function(st){
+    var box=document.getElementById('admLivePulse');
+    if(!box||!st)return;
+    box.innerHTML='🟢 متصل بالسحابة • متواجد الآن: <b>'+(st.online||1)+'</b> • نشط اليوم: <b>'+(st.today||1)+'</b> • إجمالي الأبطال: <b>'+(st.total||0)+'</b>';
+  }).catch(function(){});
+}
+
+function admQuickGiftModal(){
+  if(!T_AUTH){tPinScr();return}
+  if(!isCloudAdmin()){
+    rmsg('⚠️ سجّل دخول Google أولاً لنشر كود هدية سحابي محمي بـ isAdmin()');
+    return;
+  }
+  var old=document.getElementById('admGiftOv');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var ov=document.createElement('div');
+  ov.id='admGiftOv';
+  ov.className='orb-ov';
+  ov.setAttribute('onclick','if(event.target===this)this.remove()');
+  ov.innerHTML='<div class="orb-sheet" style="padding-top:20px">'+
+    '<div class="orb-sheet-top"><b>🎁 إرسال كود هدية للطلاب (سحابي)</b><button class="orb-close" onclick="document.getElementById(\'admGiftOv\').remove()">✕</button></div>'+
+    '<div class="orb-body">'+
+      '<div class="sm">كود الهدية (حروف إنجليزية وأرقام فقط):</div>'+
+      '<input id="agCode" class="inp" maxlength="16" placeholder="مثال: ALEX2026" style="direction:ltr;text-transform:uppercase;font-size:17px">'+
+      '<div class="sm">عنوان الهدية:</div>'+
+      '<input id="agTitle" class="inp" maxlength="45" placeholder="مثال: هدية أبطال الإسكندرية 🌟" style="font-size:14px">'+
+      '<div class="row" style="gap:8px">'+
+        '<div class="sp"><div class="sm">عملات ذهبية:</div><input id="agCoins" type="number" class="inp" value="250" style="font-size:15px"></div>'+
+        '<div class="sp"><div class="sm">نقاط ترتيب:</div><input id="agPts" type="number" class="inp" value="200" style="font-size:15px"></div>'+
+      '</div>'+
+      '<div class="sm">رسالة تشجيع من المستر:</div>'+
+      '<input id="agMsg" class="inp" maxlength="120" placeholder="عاش يا بطل! كمل بنفس القوة" style="font-size:14px">'+
+      '<button class="btn" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:16px" onclick="admPublishGift()">☁️ نشر الكود للطلاب الآن</button>'+
+    '</div>'+
+  '</div>';
+  document.body.appendChild(ov);
+}
+
+function admPublishGift(){
+  if(!isCloudAdmin()){rmsg('⚠️ يلزم تسجيل دخول Google بالأدمن');return}
+  var code=(($('#agCode')&&$('#agCode').value)||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var title=(($('#agTitle')&&$('#agTitle').value)||'هدية مستر عبدالرحمن 🎁').trim();
+  var coins=Math.max(0,Math.min(10000,Math.round(Number(($('#agCoins')&&$('#agCoins').value)||0))));
+  var pts=Math.max(0,Math.min(10000,Math.round(Number(($('#agPts')&&$('#agPts').value)||0))));
+  var msg=(($('#agMsg')&&$('#agMsg').value)||'هدية خاصة من مستر عبدالرحمن حسنين!').trim();
+  if(code.length<3){rmsg('اكتب كود من 3 حروف أو أكتر');return}
+  PROMO_CODES[code]={t:title,c:coins,p:pts,h:3,pw:{fifty:1,time:1},m:msg};
+  GIFT_HISTORY_NAMES[code]=title;
+  var ov=document.getElementById('admGiftOv');
+  if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
+  sfxWin();
+  rmsg('✅ تم تفعيل الكود «'+code+'» ('+coins+' عملة • +'+pts+' نقطة) للطلاب!');
+}
+
+tPanelScr=function(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var grps=S.cgrps||[];
+  ensureGrpCodes(grps);
+  var totStudents=grps.reduce(function(acc,g){return acc+((g.students&&g.students.length)||0)},0);
+  var sarahCnt=(SARAH_VIDS_CACHE&&SARAH_VIDS_CACHE.length)||(S.sarahVids&&S.sarahVids.length)||0;
+  var ytCnt=Object.keys(S.ytLinks||{}).length;
+
+  var grpCards=grps.map(function(g){
+    var stgName=gName(g.grade||1,g.stage);
+    var cnt=(g.students||[]).length;
+    return '<div class="card" style="border-color:#2F5F5A">'+
+      '<div class="row">'+
+        '<div style="font-size:28px">🏫</div>'+
+        '<div class="sp">'+
+          '<div style="font-weight:900;font-size:16px;color:#7A3B3B">'+esc(g.name)+'</div>'+
+          '<div class="sm">'+stgLbl(g.stage)+' • الصف '+stgName+' • <b>'+cnt+' طالب</b></div>'+
+          '<div class="sm" style="margin-top:2px">🔑 كود طلاب المجموعة: <b style="direction:ltr;display:inline-block;background:#FFE8B5;padding:1px 8px;border-radius:6px;border:1px solid #C9973F;color:#7A3B3B">'+esc(g.code||'')+'</b> <button class="pwb" style="display:inline-block;min-height:22px;padding:1px 6px;font-size:11px;width:auto" onclick="copyGrpCode(\''+esc(g.code||'')+'\')">نسخ الكود</button></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">'+
+        '<button class="btn" style="flex:2;font-size:14px;min-height:40px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="clsSetupArena(\''+g.id+'\')">⚡ ابدأ بطولة الحصة الآن</button>'+
+        '<button class="btn t" style="flex:1;font-size:12px;min-height:40px;padding:6px" onclick="tEditGrpScr(\''+g.id+'\')">✏️ تعديل / الكود</button>'+
+        '<button class="btn t" style="font-size:12px;min-height:40px;padding:6px;background:#8B2E2E" onclick="tResetGrpPts(\''+g.id+'\')">🔄 تصفير</button>'+
+        '<button class="btn t" style="flex:1 1 100%;font-size:13px;min-height:38px;padding:6px;background:#2A5298" onclick="tClsHistScr(\''+g.id+'\')">📅 سجل الحصص بالتاريخ ('+((g.hist||[]).length)+')</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  app.innerHTML=
+    '<div class="adm-hero">'+
+      '<div class="adm-hero-top">'+
+        misterImg('c',50)+
+        '<div class="sp">'+
+          '<b>لوحة إدارة مستر عبدالرحمن</b>'+
+          '<small id="admLivePulse">جاري فحص حالة السحابة والطلاب...</small>'+
+        '</div>'+
+      '</div>'+
+      '<div class="adm-kpis">'+
+        '<div class="adm-kpi"><b>'+grps.length+'</b><span>مجموعات</span></div>'+
+        '<div class="adm-kpi"><b>'+totStudents+'</b><span>طلاب السنتر</span></div>'+
+        '<div class="adm-kpi"><b>'+sarahCnt+'</b><span>حلقات سارة</span></div>'+
+        '<div class="adm-kpi"><b>'+ytCnt+'</b><span>فيديوهات شرح</span></div>'+
+      '</div>'+
+    '</div>'+
+
+    adminAuthCardHtml()+
+
+    '<div class="adm-sec-tt"><span>⚡ أدوات الإدارة السريعة</span></div>'+
+    '<div class="adm-grid">'+
+      '<button class="adm-tile" onclick="tEditGrpScr()"><span class="ic">➕</span><b>مجموعة سنتر جديدة</b><small>إضافة طلاب وكود دخول</small></button>'+
+      '<button class="adm-tile" onclick="tSarahAdminScr()"><span class="ic">🎬</span><b>إدارة يوميات سارة</b><small>نشر وحلقات ومزامنة</small></button>'+
+      '<button class="adm-tile" onclick="tYtScr()"><span class="ic">🎥</span><b>روابط شرح الوحدات</b><small>ربط يوتيوب بالمنهج</small></button>'+
+      '<button class="adm-tile" onclick="admQuickGiftModal()"><span class="ic">🎁</span><b>إرسال كود هدية</b><small>عملات ونقاط للطلاب</small></button>'+
+      '<button class="adm-tile" onclick="board(\'cls\')"><span class="ic">🏅</span><b>لوحة شرف السنتر</b><small>عرض الشهادات والنتائج</small></button>'+
+      '<button class="adm-tile" onclick="T_AUTH=false;home()"><span class="ic">🔒</span><b>قفل وخروج</b><small>العودة للشاشة الرئيسية</small></button>'+
+    '</div>'+
+
+    '<div class="adm-sec-tt"><span>🏫 مجموعات السنتر وبطولات الحصة ('+grps.length+')</span></div>'+
+    (grpCards||'<div class="card" style="text-align:center;font-weight:700;padding:18px">مفيش مجموعات لسه يا مستر! اضغط على «➕ مجموعة سنتر جديدة» فوق واكتب أسماء طلاب المجموعة مرة واحدة.</div>')+
+    bnav('home');
+
+  setTimeout(admFetchStats,120);
+  if(typeof loadSarahVids==='function'){loadSarahVids(function(){})}
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.1 — قسم أسئلة الطلاب (askq) داخل لوحة الأدمن + الرد والحذف المباشر
+   ========================================================================== */
+var ADM_ASK_CACHE=[];
+var ADM_ASK_FILTER='all';
+
+function admAskStageGrLbl(s,g){
+  var st=(s==='p'||s==='m'||s==='s')?s:'m';
+  var gr=Number(g)||0;
+  return stgLbl(st)+(gr>0?(' • '+gName(gr,st)):'');
+}
+
+function admAskScr(filter){
+  if(!T_AUTH){tPinScr();return}
+  if(filter)ADM_ASK_FILTER=filter;
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+
+  var fBtn=function(k,lbl){
+    var act=(ADM_ASK_FILTER===k);
+    return '<button class="pwb" style="flex:1;font-size:12px;min-height:36px;'+(act?'background:#2F5F5A;color:#FFE9B8;border-color:#FFD700':'')+'" onclick="admAskScr(\''+k+'\')">'+lbl+'</button>';
+  };
+
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#1E3C72,#2F5F5A);border-color:#FFD700">'+
+      '<h1>💬 أسئلة الطلاب والرد المباشر</h1>'+
+      '<div>مراجعة أسئلة الطلاب من قاعدة البيانات والرد عليها فوراً</div>'+
+    '</div>'+
+    adminAuthCardHtml()+
+    '<div class="row" style="gap:6px">'+
+      fBtn('all','الكل')+
+      fBtn('unans','⏳ بانتظار الرد')+
+      fBtn('ans','✅ تم الرد')+
+    '</div>'+
+    '<div id="admAskBox"><div class="card" style="text-align:center;font-weight:800;padding:16px">⏳ جاري تحميل أسئلة الطلاب من السحابة...</div></div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+
+  loadAdmAskList();
+}
+
+function loadAdmAskList(){
+  var box=document.getElementById('admAskBox');
+  if(!box)return;
+  if(!window.FB||!FB.askList){
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800">⚠️ خدمة الأسئلة السحابية غير متاحة حالياً.</div>';
+    return;
+  }
+  FB.askList().then(function(list){
+    ADM_ASK_CACHE=Array.isArray(list)?list:[];
+    renderAdmAskItems();
+  }).catch(function(err){
+    var isPerm=(err&&err.code==='permission-denied');
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800;line-height:1.8">'+(isPerm?'🔒 يلزم تسجيل دخول Google بحساب الأدمن (mbtsman@gmail.com) لعرض قائمة الأسئلة (isAdmin).':'⚠️ تعذر تحميل الأسئلة الآن، جرّب التحديث بعد قليل.')+'</div>';
+  });
+}
+
+function renderAdmAskItems(){
+  var box=document.getElementById('admAskBox');
+  if(!box)return;
+  var items=ADM_ASK_CACHE.slice();
+  if(ADM_ASK_FILTER==='unans')items=items.filter(function(x){return !x.a});
+  else if(ADM_ASK_FILTER==='ans')items=items.filter(function(x){return !!x.a});
+
+  if(!items.length){
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800;padding:16px">لا توجد أسئلة مطابقة لهذا الفلتر حالياً ✨</div>';
+    return;
+  }
+
+  box.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+
+    items.map(function(x,idx){
+      var hasAns=!!x.a;
+      var taId='admAnsTa_'+idx;
+      return '<div class="adm-q-card'+(hasAns?'':' unans')+'">'+
+        '<div class="adm-q-meta">'+
+          '<span>👤 <b>'+esc(x.n||'بطل')+'</b> • '+esc(admAskStageGrLbl(x.s,x.g))+'</span>'+
+          '<span class="adm-q-badge '+(hasAns?'done':'wait')+'">'+(hasAns?'✅ تم الرد':'⏳ بانتظار الرد')+'</span>'+
+        '</div>'+
+        '<div class="adm-q-txt">'+esc(x.q||'')+'</div>'+
+        (hasAns?'<div class="adm-q-ans"><b>ردك:</b> '+esc(x.a)+'</div>':'')+
+        '<textarea id="'+taId+'" class="inp" rows="2" maxlength="600" placeholder="اكتب رد مستر عبدالرحمن هنا..." style="font-size:13.5px;text-align:right;min-height:56px">'+esc(x.a||'')+'</textarea>'+
+        '<div class="row" style="gap:6px">'+
+          '<button class="btn" style="flex:2;font-size:13.5px;min-height:38px;padding:6px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="admSendAskReply(\''+esc(x.id)+'\',\''+taId+'\')">📤 حفظ وإرسال الرد</button>'+
+          '<button class="btn t" style="flex:1;font-size:12.5px;min-height:38px;padding:6px;background:#8B2E2E" onclick="admDelAskItem(\''+esc(x.id)+'\')">🗑️ حذف</button>'+
+        '</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+}
+
+function admSendAskReply(qid,taId){
+  if(!isCloudAdmin()){
+    rmsg('⚠️ سجّل دخول Google بحساب الأدمن أولاً للرد على الأسئلة');
+    return;
+  }
+  var ta=document.getElementById(taId);
+  var ans=(ta?ta.value:'').trim();
+  if(!ans){rmsg('اكتب نص الرد الأول يا مستر!');return}
+  if(!window.FB||!FB.askReply){rmsg('الخدمة غير متاحة');return}
+  rmsg('📤 جاري إرسال الرد...');
+  FB.askReply(qid,ans).then(function(){
+    sfxWin();
+    rmsg('✅ تم إرسال ردك للطالب بنجاح!');
+    ADM_ASK_CACHE.forEach(function(item){if(item.id===qid)item.a=ans});
+    renderAdmAskItems();
+  }).catch(function(err){
+    var isPerm=(err&&err.code==='permission-denied');
+    rmsg(isPerm?'🔒 صلاحية الرد تتطلب تسجيل دخول Google بالأدمن':'⚠️ تعذر إرسال الرد، تأكد من الاتصال');
+  });
+}
+
+function admDelAskItem(qid){
+  if(!isCloudAdmin()){
+    rmsg('⚠️ سجّل دخول Google بحساب الأدمن أولاً للحذف');
+    return;
+  }
+  if(!confirm('هل تريد حذف هذا السؤال نهائياً؟'))return;
+  if(!window.FB||!FB.askDel)return;
+  FB.askDel(qid).then(function(){
+    rmsg('🗑️ تم حذف السؤال');
+    ADM_ASK_CACHE=ADM_ASK_CACHE.filter(function(item){return item.id!==qid});
+    renderAdmAskItems();
+  }).catch(function(){rmsg('⚠️ تعذر حذف السؤال')});
+}
+
+/* إضافة بطاقة «أسئلة الطلاب» ضمن أدوات الإدارة السريعة في لوحة الأدمن */
+var _tPanel131=tPanelScr;
+tPanelScr=function(){
+  _tPanel131();
+  var grid=app.querySelector('.adm-grid');
+  if(grid && !document.getElementById('admAskTile')){
+    grid.insertAdjacentHTML('beforeend',
+      '<button id="admAskTile" class="adm-tile" onclick="admAskScr()"><span class="ic">💬</span><b>أسئلة الطلاب</b><small>عرض والرد المباشر</small></button>'
+    );
+  }
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v13.2 — نافذة إدارة وحذف أكواد الهدايا السحابية في Firestore (gifts)
+           إضافة وتعديل وحذف أكواد الهدايا السحابية مباشرة للأدمن
+   ========================================================================== */
+var ADM_GIFTS_CACHE=[];
+
+function admGiftsScr(){
+  if(!T_AUTH){tPinScr();return}
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+
+  app.innerHTML=
+    '<div class="hd" style="background:linear-gradient(135deg,#7A3B3B,#C9973F);border-color:#FFD700">'+
+      '<h1>🎁 إدارة أكواد الهدايا السحابية</h1>'+
+      '<div>إضافة وتعديل وحذف أكواد الهدايا في Firestore مباشرة ☁️</div>'+
+    '</div>'+
+    adminAuthCardHtml()+
+    '<div class="card" style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="tag" style="background:#7A3B3B">➕ إنشاء أو تحديث كود هدية سحابي</div>'+
+      '<div class="sm">كود الهدية (حروف إنجليزية وأرقام فقط):</div>'+
+      '<input id="gfCodeInp" class="inp" maxlength="18" placeholder="مثال: ALEX2026" style="direction:ltr;text-transform:uppercase;font-size:17px">'+
+      '<div class="sm">عنوان الهدية للطالب:</div>'+
+      '<input id="gfTitleInp" class="inp" maxlength="50" placeholder="مثال: هدية أبطال الإسكندرية 🌟" style="font-size:14px">'+
+      '<div class="row" style="gap:8px">'+
+        '<div class="sp"><div class="sm">عملات ذهبية:</div><input id="gfCoinsInp" type="number" class="inp" value="250" min="0" max="50000" style="font-size:15px"></div>'+
+        '<div class="sp"><div class="sm">نقاط ترتيب:</div><input id="gfPtsInp" type="number" class="inp" value="200" min="0" max="50000" style="font-size:15px"></div>'+
+      '</div>'+
+      '<div class="sm">رسالة مستر عبدالرحمن للطالب:</div>'+
+      '<input id="gfMsgInp" class="inp" maxlength="140" placeholder="عاش يا بطل! استمر في التحدي" style="font-size:14px">'+
+      '<button class="btn" style="background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:16px" onclick="admSaveCloudGift()">☁️ حفظ ونشر الكود في Firestore</button>'+
+    '</div>'+
+    '<div class="adm-sec-tt"><span>📋 الأكواد السحابية الحالية في Firestore</span><button class="pwb" style="flex:none;width:auto;min-height:30px;padding:2px 10px;font-size:12px" onclick="loadAdmGiftsList()">🔄 تحديث</button></div>'+
+    '<div id="admGiftsListBox"><div class="card" style="text-align:center;font-weight:800;padding:14px">⏳ جاري تحميل الأكواد السحابية...</div></div>'+
+    '<button class="btn t" onclick="tPanelScr()">⬅️ رجوع للوحة الإدارة</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+
+  loadAdmGiftsList();
+}
+
+function loadAdmGiftsList(){
+  var box=document.getElementById('admGiftsListBox');
+  if(!box)return;
+  if(!window.FB||!FB.giftList){
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800">⚠️ خدمة الهدايا السحابية غير متاحة حالياً.</div>';
+    return;
+  }
+  FB.giftList().then(function(list){
+    ADM_GIFTS_CACHE=Array.isArray(list)?list:[];
+    renderAdmGiftsItems();
+  }).catch(function(err){
+    var isPerm=(err&&err.code==='permission-denied');
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800;line-height:1.8">'+(isPerm?'🔒 سجّل دخول Google بحساب الأدمن (mbtsman@gmail.com) لعرض وإدارة أكواد الهدايا (isAdmin).':'⚠️ تعذر تحميل الأكواد الآن، جرّب التحديث بعد قليل.')+'</div>';
+  });
+}
+
+function renderAdmGiftsItems(){
+  var box=document.getElementById('admGiftsListBox');
+  if(!box)return;
+  if(!ADM_GIFTS_CACHE.length){
+    box.innerHTML='<div class="card" style="text-align:center;font-weight:800;padding:14px">لا توجد أكواد هدايا مضافة في Firestore حالياً.</div>';
+    return;
+  }
+  box.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+
+    ADM_GIFTS_CACHE.map(function(g){
+      var cCode=esc(g.code||'');
+      var cTitle=esc(g.t||'هدية سحابية');
+      var cCoins=Number(g.c)||0;
+      var cPts=Number(g.p)||0;
+      var isAct=(g.active!==false);
+      return '<div class="adm-g-row">'+
+        '<span class="adm-g-code">'+cCode+'</span>'+
+        '<div class="sp" style="min-width:0">'+
+          '<div style="font-weight:900;font-size:14px">'+cTitle+' <span class="sm">'+(isAct?'• نشط ✅':'• متوقف ⏸️')+'</span></div>'+
+          '<div class="sm">🪙 +'+cCoins+' عملة • 🏆 +'+cPts+' نقطة</div>'+
+        '</div>'+
+        '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 9px;font-size:12px" onclick="admFillGiftForm(\''+cCode+'\')">✏️</button>'+
+        '<button class="btn t" style="flex:none;width:auto;min-height:34px;padding:4px 10px;font-size:12px;background:#8B2E2E" onclick="admDeleteCloudGift(\''+cCode+'\')">🗑️ حذف</button>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+}
+
+function admFillGiftForm(code){
+  var found=ADM_GIFTS_CACHE.filter(function(x){return x.code===code})[0];
+  if(!found)return;
+  if(document.getElementById('gfCodeInp'))document.getElementById('gfCodeInp').value=found.code||'';
+  if(document.getElementById('gfTitleInp'))document.getElementById('gfTitleInp').value=found.t||'';
+  if(document.getElementById('gfCoinsInp'))document.getElementById('gfCoinsInp').value=Number(found.c)||0;
+  if(document.getElementById('gfPtsInp'))document.getElementById('gfPtsInp').value=Number(found.p)||0;
+  if(document.getElementById('gfMsgInp'))document.getElementById('gfMsgInp').value=found.m||'';
+  rmsg('تم تحميل بيانات الكود «'+code+'» للتعديل');
+}
+
+function admSaveCloudGift(){
+  if(!isCloudAdmin()){
+    rmsg('⚠️ سجّل دخول Google بحساب الأدمن أولاً لحفظ الكود في Firestore');
+    return;
+  }
+  var code=((document.getElementById('gfCodeInp')&&document.getElementById('gfCodeInp').value)||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var title=((document.getElementById('gfTitleInp')&&document.getElementById('gfTitleInp').value)||'هدية مستر عبدالرحمن 🎁').trim();
+  var coins=Math.max(0,Math.min(50000,Math.round(Number((document.getElementById('gfCoinsInp')&&document.getElementById('gfCoinsInp').value)||0))));
+  var pts=Math.max(0,Math.min(50000,Math.round(Number((document.getElementById('gfPtsInp')&&document.getElementById('gfPtsInp').value)||0))));
+  var msg=((document.getElementById('gfMsgInp')&&document.getElementById('gfMsgInp').value)||'هدية خاصة من مستر عبدالرحمن حسنين!').trim();
+  if(code.length<3){rmsg('اكتب كود هدية من 3 حروف أو أكتر');return}
+  if(!window.FB||!FB.giftSet){rmsg('خدمة الهدايا السحابية غير متاحة');return}
+
+  var payload={t:title,c:coins,p:pts,h:3,pw:{fifty:1,time:1},m:msg,active:true};
+  rmsg('☁️ جاري حفظ الكود في Firestore...');
+  FB.giftSet(code,payload).then(function(){
+    PROMO_CODES[code]=payload;
+    GIFT_HISTORY_NAMES[code]=title;
+    sfxWin();
+    rmsg('✅ تم حفظ ونشر الكود «'+code+'» في Firestore!');
+    loadAdmGiftsList();
+  }).catch(function(err){
+    var isPerm=(err&&err.code==='permission-denied');
+    rmsg(isPerm?'🔒 يلزم تسجيل دخول Google بحساب الأدمن (isAdmin)':'⚠️ تعذر حفظ الكود في Firestore');
+  });
+}
+
+function admDeleteCloudGift(code){
+  if(!isCloudAdmin()){
+    rmsg('⚠️ سجّل دخول Google بحساب الأدمن أولاً لحذف الكود');
+    return;
+  }
+  if(!confirm('هل تريد حذف كود الهدية «'+code+'» نهائياً من Firestore؟'))return;
+  if(!window.FB||!FB.giftDel)return;
+  FB.giftDel(code).then(function(){
+    delete PROMO_CODES[code];
+    delete GIFT_HISTORY_NAMES[code];
+    rmsg('🗑️ تم حذف الكود «'+code+'» من Firestore');
+    ADM_GIFTS_CACHE=ADM_GIFTS_CACHE.filter(function(x){return x.code!==code});
+    renderAdmGiftsItems();
+  }).catch(function(){rmsg('⚠️ تعذر حذف الكود من Firestore')});
+}
+
+/* تحديث زر «إرسال كود هدية» في لوحة الأدمن لفتح نافذة الإدارة الكاملة في Firestore */
+var _admQuickGiftModal132=admQuickGiftModal;
+admQuickGiftModal=function(){
+  if(!T_AUTH){tPinScr();return}
+  admGiftsScr();
+};
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
 
 </script>
 </body>
