@@ -1137,11 +1137,22 @@ window.FIREBASE_CONFIG = {
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import * as FS from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 if(window.FIREBASE_CONFIG){
-  const db=FS.getFirestore(initializeApp(window.FIREBASE_CONFIG));
+  const fbApp=initializeApp(window.FIREBASE_CONFIG);
+  const db=FS.getFirestore(fbApp);
+  const auth=getAuth(fbApp);
+  window.FB_ADMIN_EMAIL='';
+  onAuthStateChanged(auth,(u)=>{
+    window.FB_ADMIN_EMAIL=(u&&u.email)?u.email:'';
+    if(window.onAdminAuthChange)window.onAdminAuthChange(window.FB_ADMIN_EMAIL);
+  });
   const vs=FS.collection(db,'visitors');
   const cnt=(q)=>FS.getCountFromServer(q).then((x)=>x.data().count);
   window.FB={
+    adminLogin:()=>{const p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});return signInWithPopup(auth,p).then(r=>(r.user&&r.user.email)||'')},
+    adminLogout:()=>signOut(auth),
+    adminEmail:()=>(auth.currentUser&&auth.currentUser.email)||window.FB_ADMIN_EMAIL||'',
     submit:(wk,uid,name,pts,meta)=>{
       const ref=FS.doc(db,'weeks',String(wk),'scores',uid);
       const cleanName=String(name||'بطل').slice(0,14);
@@ -6355,7 +6366,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=12.8.1').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=12.9').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -11666,6 +11677,92 @@ tSarahAdminScr=function(){
 
 /* تحديث فوري لإشعار سارة على الرئيسية */
 if(S.stage&&S.grade&&S.nick&&!RQ){try{setTimeout(checkSarahOrbNotif,200)}catch(e){}}
+
+
+/* ==========================================================================
+   v12.9 — توثيق دخول المستر بحساب Google (Firebase Auth isAdmin)
+           لحماية يوميات سارة ومجموعات السنتر وروابط الشرح في Firestore
+   ========================================================================== */
+var ADMIN_EMAIL_TARGET='mbtsman@gmail.com';
+
+function isCloudAdmin(){
+  var em=(window.FB&&FB.adminEmail)?FB.adminEmail():(window.FB_ADMIN_EMAIL||'');
+  return em.toLowerCase()===ADMIN_EMAIL_TARGET;
+}
+
+function adminAuthCardHtml(){
+  var em=(window.FB&&FB.adminEmail)?FB.adminEmail():(window.FB_ADMIN_EMAIL||'');
+  var ok=(em.toLowerCase()===ADMIN_EMAIL_TARGET);
+  if(ok){
+    return '<div id="adminAuthCard" class="card" style="background:linear-gradient(135deg,#E6F4F1,#CFE3D4);border-color:#2F6B4A;display:flex;align-items:center;gap:10px;padding:10px 12px">'+
+      '<div style="font-size:26px;line-height:1">🛡️</div>'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:14px;color:#1B432C">✅ موثّق كأدمن سحابي (Firebase Auth)</div>'+
+        '<div class="sm" style="direction:ltr;text-align:right;font-size:11.5px">'+esc(em)+'</div>'+
+      '</div>'+
+      '<button class="pwb" style="flex:none;width:auto;min-height:34px;padding:4px 10px;background:#8B2E2E;color:#fff;border-color:#fff;font-size:12px" onclick="doAdminLogout()">خروج</button>'+
+    '</div>';
+  }
+  return '<div id="adminAuthCard" class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border-color:#C9973F;display:flex;flex-direction:column;gap:8px;padding:11px 12px">'+
+    '<div class="row">'+
+      '<div style="font-size:26px;line-height:1">🔐</div>'+
+      '<div class="sp">'+
+        '<div style="font-weight:900;font-size:14px;color:#7A3B3B">'+(em?'⚠️ الحساب المسجّل غير مطابق للأدمن':'توثيق حساب المستر السحابي (Google)')+'</div>'+
+        '<div class="sm" style="font-size:11.5px">'+(em?('مسجّل حالياً بـ '+esc(em)+' — سجّل بـ '+ADMIN_EMAIL_TARGET):'سجّل دخولك بإيميل الأدمن لتتمكن من النشر والحذف المحمي بـ isAdmin()')+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="row" style="gap:6px">'+
+      '<button class="btn" style="flex:1;font-size:13.5px;min-height:40px;padding:6px;background:linear-gradient(135deg,#1E3C72,#2A5298);border-color:#FFD700" onclick="doAdminLogin()">🔑 تسجيل دخول المستر بحساب Google</button>'+
+      (em?'<button class="pwb" style="flex:none;width:auto;min-height:40px;padding:4px 10px;background:#8B2E2E;color:#fff" onclick="doAdminLogout()">خروج</button>':'')+
+    '</div>'+
+  '</div>';
+}
+
+function doAdminLogin(){
+  if(!window.FB||!FB.adminLogin){rmsg('Firebase غير متصل حالياً');return}
+  rmsg('جاري فتح نافذة تسجيل دخول Google...');
+  FB.adminLogin().then(function(em){
+    if(em&&em.toLowerCase()===ADMIN_EMAIL_TARGET){
+      sfxWin();
+      rmsg('✅ أهلاً يا مستر! تم توثيق حساب الأدمن السحابي بنجاح');
+    }else if(em){
+      sfxBad(true);
+      rmsg('⚠️ سجّلت بـ '+em+' — المطلوب إيميل الأدمن '+ADMIN_EMAIL_TARGET);
+    }
+    var card=document.getElementById('adminAuthCard');
+    if(card)card.outerHTML=adminAuthCardHtml();
+  }).catch(function(err){
+    var code=(err&&err.code)||'';
+    if(code==='auth/popup-closed-by-user')return;
+    sfxBad(true);
+    rmsg('⚠️ تعذر تسجيل الدخول ('+(code||'تأكد من تفعيل Google Sign-In في Firebase')+')');
+  });
+}
+
+function doAdminLogout(){
+  if(!window.FB||!FB.adminLogout)return;
+  FB.adminLogout().then(function(){
+    rmsg('تم تسجيل الخروج من حساب الأدمن السحابي');
+    var card=document.getElementById('adminAuthCard');
+    if(card)card.outerHTML=adminAuthCardHtml();
+  }).catch(function(){});
+}
+
+window.onAdminAuthChange=function(){
+  var card=document.getElementById('adminAuthCard');
+  if(card)card.outerHTML=adminAuthCardHtml();
+};
+
+var _tPanel129=tPanelScr;
+tPanelScr=function(){
+  _tPanel129();
+  try{
+    var hd=app.querySelector('.hd');
+    if(hd && !document.getElementById('adminAuthCard')){
+      hd.insertAdjacentHTML('afterend',adminAuthCardHtml());
+    }
+  }catch(e){}
+};
 
 </script>
 </body>
