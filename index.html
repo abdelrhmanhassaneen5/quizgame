@@ -1157,6 +1157,15 @@ body.dark .adm-log-row.sus{background:linear-gradient(135deg,rgba(127,29,29,.45)
 .adm-sus-tag{background:#DC2626;color:#FFF;border-radius:8px;padding:1px 7px;font-size:10.5px;font-weight:900}
 .adm-ok-tag{background:#15803D;color:#FFF;border-radius:8px;padding:1px 7px;font-size:10.5px;font-weight:900}
 .adm-sr-card{background:var(--card);border:1.5px solid rgba(47,95,90,.45);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+/* --- v14.0: محرك المنهج والقصص الديناميكي (قصة واحدة / قصتان) --- */
+.curr-st-tabs{display:flex;gap:8px;margin:4px 0 6px}
+.curr-st-tab{flex:1;background:var(--card);border:2px solid #8A6A4A;border-radius:14px;padding:9px 8px;font-family:'Cairo',sans-serif;font-weight:900;font-size:13px;color:var(--ink);cursor:pointer;text-align:center;box-shadow:0 3px 0 rgba(138,106,74,.3);transition:transform .15s,background .2s,color .2s}
+.curr-st-tab:active{transform:scale(.97)}
+.curr-st-tab.act{background:linear-gradient(135deg,#7A3B3B,#4A1C1C);color:#FFE9B8;border-color:#FFD700;box-shadow:0 3px 0 #2B0E0E}
+.curr-st-tab small{display:block;font-size:10.5px;font-weight:700;opacity:.88;margin-top:2px}
+.lv.done-lv{border-color:#2F6B4A!important;background:linear-gradient(135deg,#ECFDF5,#D1FAE5)!important;color:#065F46!important}
+body.dark .lv.done-lv{background:linear-gradient(135deg,#123226,#0D261D)!important;color:#6EE7A8!important;border-color:#10B981!important}
+.curr-st-head{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(201,151,63,.16);border:1.5px solid #C9973F;border-radius:12px;padding:7px 11px;font-size:13px;font-weight:900;color:var(--ink)}
 .cls-tm-wrap{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:12px;border:1.5px solid rgba(138,106,74,.35)}
 .cls-tm-bar{flex:1;height:14px;border-radius:7px;background:#E3C98F;overflow:hidden;border:1.5px solid #8A6A4A}
 .cls-tm-bar i{display:block;height:100%;width:100%;background:#2F6B4A;transition:width .1s linear,background .3s}
@@ -6479,7 +6488,7 @@ function installCard(){
 function setupSW(){
   if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js?v=13.9').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=14.0.2').then(function(reg){
       if(reg&&reg.update){reg.update().catch(function(){});setInterval(function(){if(isOnline())reg.update().catch(function(){})},36e5)}
     }).catch(function(){});
   });
@@ -13468,6 +13477,422 @@ tPanelScr=function(){
     }
   }catch(e){}
 };
+
+if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
+
+
+/* ==========================================================================
+   v14.0 — محرك المنهج والقصص الديناميكي (Dynamic Curriculum & Multi-Story Engine)
+           - يدعم القصة الواحدة (ابتدائي 1-6، تالتة إعدادي، ثانوي 1-3)
+           - يدعم القصتين بتبويب تلقائي (أولى وتانية إعدادي)
+           - متوافق 100% مع curriculum.js القديم والجديد (Data-Driven)
+   ========================================================================== */
+
+var CURR_ST_TAB=0;
+
+/* عدد القصص المقررة لكل مرحلة وصف */
+function currExpectedStories(st,gr){
+  st=st||S.stage||'m';
+  gr=Number(gr||S.grade||1);
+  if(st==='p' && (gr===1 || gr===2))return 0; /* أولى وتانية ابتدائي: لا توجد قصة مقررة */
+  if(st==='m' && (gr===1 || gr===2))return 2; /* أولى وتانية إعدادي: قصتان */
+  return 1; /* ابتدائي 3-6 + تالتة إعدادي + ثانوي 1-3: قصة واحدة */
+}
+
+/* تحويل بيانات الصف (القديمة أو الجديدة) إلى هيكل موحّد */
+function currNormGrade(st,gr){
+  st=st||S.stage||'m';
+  gr=Number(gr||S.grade||1);
+  var stgC=(st==='s'
+    ? (typeof CURRICULUM!=='undefined'&&CURRICULUM.s ? CURRICULUM.s : SEC_CURR)
+    : (typeof CURRICULUM!=='undefined'&&CURRICULUM[st] ? CURRICULUM[st] : {}));
+  var raw=(stgC&&stgC[gr])||{};
+
+  /* ١) تطبيع الوحدات (Units) */
+  var rawUnits=Array.isArray(raw.units)?raw.units:[];
+  var units=rawUnits.map(function(u,idx){
+    if(Array.isArray(u)){
+      return {id:'u'+(idx+1),title:'Unit '+(idx+1),sub:'',qs:u};
+    }
+    if(u&&typeof u==='object'){
+      return {
+        id:u.id||('u'+(idx+1)),
+        title:u.title||('Unit '+(idx+1)),
+        sub:u.sub||'',
+        qs:Array.isArray(u.qs)?u.qs:[]
+      };
+    }
+    return {id:'u'+(idx+1),title:'Unit '+(idx+1),sub:'',qs:[]};
+  });
+  while(units.length<6){
+    var n=units.length+1;
+    units.push({id:'u'+n,title:'Unit '+n,sub:'',qs:[]});
+  }
+
+  /* ٢) تطبيع القصص (Stories) */
+  var expStories=currExpectedStories(st,gr);
+  var stories=[];
+
+  function normChapters(arr){
+    var list=(Array.isArray(arr)?arr:[]).map(function(ch,ci){
+      if(Array.isArray(ch)){
+        return {id:'ch'+(ci+1),title:'Ch '+(ci+1),qs:ch};
+      }
+      if(ch&&typeof ch==='object'){
+        return {
+          id:ch.id||('ch'+(ci+1)),
+          title:ch.title||('Ch '+(ci+1)),
+          qs:Array.isArray(ch.qs)?ch.qs:[]
+        };
+      }
+      return {id:'ch'+(ci+1),title:'Ch '+(ci+1),qs:[]};
+    });
+    while(list.length<3){
+      var cn=list.length+1;
+      list.push({id:'ch'+cn,title:'Ch '+cn,qs:[]});
+    }
+    return list;
+  }
+
+  if(Array.isArray(raw.stories)){
+    stories=raw.stories.map(function(so,si){
+      var defT=(expStories>1 ? (si===0?'القصة الأولى':'القصة الثانية') : 'القصة المقررة');
+      return {
+        id:(so&&so.id)||('st'+(si+1)),
+        title:(so&&so.title)||defT,
+        chapters:normChapters(so&&so.chapters)
+      };
+    });
+  }else if(expStories>0 || (Array.isArray(raw.story)&&raw.story.length)){
+    var legacySt=Array.isArray(raw.story)?raw.story:[];
+    stories.push({
+      id:'st1',
+      title:(raw.storyTitle||(expStories>1?'القصة الأولى (Story 1)':'القصة المقررة (Story)')),
+      chapters:normChapters(legacySt)
+    });
+  }
+
+  /* التأكد من وجود القصة الثانية لأولى وتانية إعدادي */
+  while(stories.length<expStories){
+    var sn=stories.length+1;
+    stories.push({
+      id:'st'+sn,
+      title:'القصة الثانية (Story '+sn+')',
+      chapters:normChapters([])
+    });
+  }
+
+  return {units:units,stories:stories};
+}
+
+function currGetItem(type,idx,sIdx){
+  var norm=currNormGrade(S.stage,S.grade);
+  if(type==='u'){
+    var u=norm.units[idx];
+    return u ? {title:u.title,sub:u.sub||'',qs:u.qs||[],sIdx:0} : null;
+  }
+  var si=Math.max(0,Number(sIdx)||0);
+  var stObj=norm.stories[si]||norm.stories[0];
+  if(!stObj)return null;
+  var ch=stObj.chapters[idx];
+  return ch ? {title:stObj.title+' — '+ch.title,shortTitle:ch.title,storyTitle:stObj.title,qs:ch.qs||[],sIdx:si} : null;
+}
+
+/* تحديث شاشة المنهج (ديناميكية بالكامل للوحدات والقصص) */
+curriculum=function(stTab){
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  if(typeof CURRICULUM==='undefined' && S.stage!=='s'){
+    app.innerHTML='<div class="hd"><h1>تدريبات المنهج</h1></div><div class="card">جاري تحديث المنهج، يرجى التأكد من رفع ملف curriculum.js</div><button class="btn t" onclick="home()">رجوع</button>';
+    return;
+  }
+  var norm=currNormGrade(S.stage,S.grade);
+  if(typeof stTab==='number')CURR_ST_TAB=stTab;
+  if(CURR_ST_TAB>=norm.stories.length)CURR_ST_TAB=0;
+
+  var doneMap=(S.currDone&&typeof S.currDone==='object')?S.currDone:{};
+  var fcList=Array.isArray(S.fcDone)?S.fcDone:[];
+
+  var unitsHtml=norm.units.map(function(u,i){
+    var hasU=u.qs&&u.qs.length>0;
+    var k='c_'+S.stage+'_'+S.grade+'_u_'+i;
+    var isDone=!!doneMap[k];
+    var fcDone=fcList.indexOf('fc_'+S.stage+'_'+S.grade+'_u_'+i)>=0;
+    var subLbl=!hasU?'قريباً':(isDone?'✅ مكتملة':(fcDone?'🃏 راجعتها':(u.qs.length+' سؤال')));
+    var pts=String(u.title||'Unit '+(i+1)).split(':');
+    var uHead=pts[0].trim(), uSub=pts.slice(1).join(':').trim();
+    return '<button class="lv'+(isDone?' done-lv':'')+'" '+(hasU?'onclick="unitPrep(\'u\','+i+',0)"':'disabled')+'>'+
+      '<b style="font-size:18px">'+esc(uHead)+'</b>'+
+      (uSub?'<span style="font-size:10px;opacity:.85;line-height:1.2;padding:0 2px;direction:ltr">'+esc(uSub)+'</span>':'')+
+      '<span>'+subLbl+'</span>'+
+    '</button>';
+  }).join('');
+
+  /* قسم القصص: يختفي تلقائياً لو الصف بدون قصة، أو يعرض قصة واحدة أو تبويبين لقصتين */
+  var storiesBlockHtml='';
+  if(norm.stories.length>0){
+    var storiesTabsHtml='';
+    if(norm.stories.length>1){
+      storiesTabsHtml='<div class="curr-st-tabs">'+norm.stories.map(function(so,si){
+        var totalQ=so.chapters.reduce(function(acc,c){return acc+(c.qs?c.qs.length:0)},0);
+        return '<button class="curr-st-tab'+(CURR_ST_TAB===si?' act':'')+'" onclick="curriculum('+si+')">'+
+          '📖 '+esc(so.title)+
+          '<small>'+(totalQ>0?(totalQ+' سؤال متاح'):'قريباً')+'</small>'+
+        '</button>';
+      }).join('')+'</div>';
+    }
+    var curStory=norm.stories[CURR_ST_TAB]||norm.stories[0];
+    var storyChHtml=curStory.chapters.map(function(ch,j){
+      var hasS=ch.qs&&ch.qs.length>0;
+      var k='c_'+S.stage+'_'+S.grade+'_s'+CURR_ST_TAB+'_'+j;
+      var isDone=!!doneMap[k];
+      var fcKey='fc_'+S.stage+'_'+S.grade+'_s'+(CURR_ST_TAB>0?CURR_ST_TAB:'')+'_'+j;
+      var fcDone=fcList.indexOf(fcKey)>=0;
+      var subLbl=!hasS?'قريباً':(isDone?'✅ مكتمل':(fcDone?'🃏 راجعته':(ch.qs.length+' سؤال')));
+      return '<button class="lv'+(isDone?' done-lv':'')+'" style="border-color:#C9973F" '+(hasS?'onclick="unitPrep(\'s\','+j+','+CURR_ST_TAB+')"':'disabled')+'>'+
+        '<b>'+esc(ch.title)+'</b>'+
+        '<span>'+subLbl+'</span>'+
+      '</button>';
+    }).join('');
+    storiesBlockHtml='<div class="tag" style="margin-top:6px">📖 '+(norm.stories.length>1?'القصص المقررة (قصتان)':'القصة المقررة (Story)')+'</div>'+
+      storiesTabsHtml+
+      '<div class="curr-st-head"><span>📚 '+esc(curStory.title)+'</span><span class="sm">'+curStory.chapters.length+' فصول</span></div>'+
+      '<div class="grid" style="grid-template-columns:1fr 1fr 1fr">'+storyChHtml+'</div>';
+  }
+
+  var html='<div class="hd"><h1>تدريبات المنهج والبطاقات الذكية 📚</h1><div>'+stgLbl()+' • الصف '+gName()+'</div></div>'+
+    '<div class="row"><div class="chip">'+coin()+'<span>'+S.coins+'</span></div><div class="sp"></div><div class="chip">♾️ لعب مفتوح</div></div>'+
+    '<div class="card row" style="align-items:center">'+misterImg('c',50)+'<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">اختار أي وحدة'+(norm.stories.length?' أو فصل من القصة':'')+' عشان تراجع أهم الكلمات والقواعد <b>بالبطاقات الذكية الناطقة 🃏</b> قبل ما تبدأ المعركة!</div></div>'+
+    '<div class="tag g">📘 الوحدات الدراسية (Units)</div>'+
+    '<div class="grid" style="grid-template-columns:1fr 1fr 1fr">'+unitsHtml+'</div>'+
+    storiesBlockHtml+
+    '<button class="btn" style="background:linear-gradient(135deg,#C9973F,#8A5A1E);border-color:#FFE9B8;font-size:16px" onclick="startVocabCards()">🃏 بطاقات مراجعة أهم الكلمات (Flashcards)</button>'+
+    '<button class="btn t" onclick="home()">🏠 الرئيسية</button>';
+  app.innerHTML=html;
+};
+
+/* تحديث شاشة استعداد الوحدة / فصل القصة مع الحفاظ على الخطوة ١ (فيديو الشرح وبرشامة القاعدة) */
+unitPrep=function(type,idx,sIdx){
+  sIdx=Math.max(0,Number(sIdx)||0);
+  app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+  var item=currGetItem(type,idx,sIdx);
+  if(!item||!item.qs.length)return;
+  var rawQs=item.qs;
+  var title=item.title;
+  var fcKey='fc_'+S.stage+'_'+S.grade+'_'+type+(type==='s'&&sIdx>0?sIdx:'')+'_'+idx;
+  var revDone=S.fcDone&&S.fcDone.indexOf(fcKey)>=0;
+
+  app.innerHTML='<div class="hd"><h1>استعداد '+esc(title)+' 🎯</h1><div>'+stgLbl()+' • الصف '+gName()+'</div></div>'+
+    '<div class="card row" style="align-items:flex-start">'+misterImg('c',58)+
+      '<div class="sp" style="font-size:14px;line-height:1.7;font-weight:700">نصيحة مستر عبدالرحمن: راجع <b>البطاقات الذكية (Flashcards) 🃏</b> الأول في دقيقة واحدة عشان تثبت الإجابات وتسمع النطق الصح وتكسب <b>+15 عملة هدية</b> قبل المعركة!</div>'+
+    '</div>'+
+    '<div class="card" style="background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid #C9973F;text-align:center">'+
+      '<div style="font-size:34px;line-height:1">🃏✨</div>'+
+      '<div style="font-weight:900;font-size:18px;color:#7A3B3B;margin-top:4px">البطاقات الذكية السريعة ('+Math.min(8,rawQs.length)+' بطاقات)</div>'+
+      '<div class="sm" style="margin:4px 0 10px">'+(revDone?'✅ راجعت بطاقات هذا الدرس من قبل • تقدر تراجعها تاني في أي وقت!':'🎁 راجع البطاقات كلها وخد +15 عملة ذهبية مجانية!')+'</div>'+
+      '<button class="btn" style="width:100%;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700;font-size:18px" onclick="startUnitCards(\''+type+'\','+idx+','+sIdx+')">🃏 ابدأ المراجعة بالبطاقات الذكية</button>'+
+    '</div>'+
+    '<button class="btn" style="font-size:19px" onclick="startCurriculum(\''+type+'\','+idx+','+sIdx+')">⚔️ ادخل معركة الأسئلة مباشرة ('+Math.min(10,rawQs.length)+' أسئلة)</button>'+
+    '<div class="sp"></div>'+
+    '<button class="btn t" onclick="curriculum('+sIdx+')">رجوع لقائمة المنهج</button>';
+
+  /* حقن الخطوة ١ (فيديو الشرح وبرشامة القاعدة) للوحدات والقصة الأولى */
+  try{
+    if(typeof lesKey==='function' && (type==='u' || sIdx===0)){
+      var first=app.querySelector('.card');
+      if(first){
+        var k=lesKey(type,idx),dv=(S.watchedVocab||[]).indexOf(k)>=0,dg=(S.studiedUnits||[]).indexOf(k)>=0,g=lesGrammar(type,idx),y=lesYt(type,idx);
+        var h='<div class="card" style="border-color:#7A3B3B;border-width:3px">'+
+          '<div class="tag" style="background:#7A3B3B">🎥 الخطوة ١: اسمع واتعلّم قبل المعركة</div>'+
+          '<button class="btn" style="width:100%;margin-top:8px;font-size:15px;font-family:\'Cairo\',sans-serif;font-weight:900;line-height:1.6;background:linear-gradient(135deg,#7A3B3B,#4A1C1C);border-color:#FFD700" onclick="lessonVocabScr(\''+type+'\','+idx+')">🎥 اسمع كلمات الدرس '+(y?'بصوت مستر عبدالرحمن ':'')+(dv?'✅':'(+30 عملة)')+'</button>'+
+          (g?'<button class="btn t" style="width:100%;margin-top:6px;font-size:14px;font-family:\'Cairo\',sans-serif;font-weight:900" onclick="lessonGrammarScr(\''+type+'\','+idx+')">📘 برشامة القاعدة: '+esc(g.t)+' '+(dg?'✅':'(+20 عملة)')+'</button>':'')+
+        '</div>';
+        first.insertAdjacentHTML('afterend',h);
+      }
+    }
+  }catch(e){}
+};
+
+/* تحديث البطاقات الذكية لتدعم sIdx */
+startUnitCards=function(type,idx,sIdx){
+  sIdx=Math.max(0,Number(sIdx)||0);
+  var item=currGetItem(type,idx,sIdx);
+  if(!item||!item.qs.length)return;
+  var pick=shuffle(item.qs.slice()).slice(0,8);
+  var cards=pick.map(function(q){
+    var ans=q.o[q.a];
+    var fullEn=q.q.indexOf('____')>=0?q.q.replace(/____+/g,ans):q.q;
+    var spkTxt=q.q.indexOf('____')>=0?fullEn:(ans+' . '+q.q);
+    return {
+      tag:item.title,
+      frontMain:q.q,
+      frontSub:q.ar||'اضغط على البطاقة لقلبها ومعرفة الإجابة والشرح',
+      backMain:ans,
+      backSentence:fullEn,
+      backHint:q.hint||(q.ar||'احفظ الكلمة والجملة كويس يا بطل!'),
+      speakTxt:spkTxt
+    };
+  });
+  var fcKey='fc_'+S.stage+'_'+S.grade+'_'+type+(type==='s'&&sIdx>0?sIdx:'')+'_'+idx;
+  FC={mode:'curr',type:type,idx:idx,sIdx:sIdx,title:'بطاقات '+item.title,cards:cards,i:0,flipped:false,key:fcKey};
+  renderFlashcard();
+};
+
+/* تحديث معركة أسئلة المنهج لتدعم sIdx وتسجّل الإنجاز */
+startCurriculum=function(type,idx,sIdx){
+  sIdx=Math.max(0,Number(sIdx)||0);
+  var item=currGetItem(type,idx,sIdx);
+  if(!item||!item.qs.length)return;
+  var qs=shuffle(item.qs.slice()).slice(0,10);
+  var formattedQs=qs.map(function(q){
+    return [q.q,q.ar||'',q.o,q.a,q.hint||'',type==='u'?'mc':'st',S.stage];
+  });
+  var n=formattedQs.length, mx=Math.ceil(n*0.7);
+  G={lv:idx+1,tier:0,n:n,T:15,qs:formattedQs,i:0,h:3,mx:mx,mhp:mx,earned:0,combo:0,ok:0,bad:[],left:15,done:false,currType:type,currIdx:idx,currSIdx:sIdx,currTitle:item.title};
+  show();
+};
+
+/* تسجيل إتمام الوحدة/فصل القصة عند الفوز في endRound */
+var _endRound140=endRound;
+endRound=function(){
+  if(G&&G.currType&&(G.mhp<=0||G.ok>=Math.ceil(G.n*0.5))){
+    S.currDone=(S.currDone&&typeof S.currDone==='object')?S.currDone:{};
+    var ck='c_'+S.stage+'_'+S.grade+'_'+(G.currType==='s'?('s'+(G.currSIdx||0)):'u')+'_'+(G.currIdx!==undefined?G.currIdx:(G.lv-1));
+    S.currDone[ck]=1;
+    save();
+  }
+  _endRound140();
+  /* تحديث زر الإعادة ليمرر sIdx في حالة القصة الثانية */
+  try{
+    if(G&&G.currType==='s'&&(G.currSIdx||0)>0){
+      var btns=app.querySelectorAll('button');
+      btns.forEach(function(b){
+        var oc=b.getAttribute('onclick')||'';
+        if(oc.indexOf("startCurriculum('s'")>=0){
+          b.setAttribute('onclick',"startCurriculum('s',"+(G.currIdx||0)+","+(G.currSIdx||0)+")");
+        }
+      });
+    }
+  }catch(e){}
+};
+
+/* تحديث getGradeCurrQs ليقرأ تلقائياً من الهيكل الديناميكي (الوحدات + كل القصص) */
+getGradeCurrQs=function(st,gr){
+  var out=[];
+  for(var g=1;g<=gr;g++){
+    var norm=currNormGrade(st,g);
+    var weight=(g===gr)?2:1;
+    for(var w=0;w<weight;w++){
+      norm.units.forEach(function(u){
+        (u.qs||[]).forEach(function(q){
+          out.push([q.q,q.ar||'',q.o,q.a,q.hint||'','mc',st]);
+        });
+      });
+      if(g===gr){
+        norm.stories.forEach(function(so){
+          so.chapters.forEach(function(ch){
+            (ch.qs||[]).forEach(function(q){
+              out.push([q.q,q.ar||'',q.o,q.a,q.hint||'','st',st]);
+            });
+          });
+        });
+      }
+    }
+  }
+  if(st==='p'){
+    if(gr>=1)out=out.concat(GRADE_FOUNDATION_Q.p1,GRADE_FOUNDATION_Q.p1);
+    if(gr>=2)out=out.concat(GRADE_FOUNDATION_Q.p2,GRADE_FOUNDATION_Q.p2);
+    if(gr>=3)out=out.concat(GRADE_FOUNDATION_Q.p3);
+  }
+  return out;
+};
+
+/* تحديث genClsQuestions (لبطولة حصة السنتر) ليدعم الهيكل الجديد والقصتين تلقائياً */
+var _genClsQ140=genClsQuestions;
+genClsQuestions=function(g,src,count){
+  count=count||35;
+  var st=g.stage||'m',gr=g.grade||1,pool=[];
+  var norm=currNormGrade(st,gr);
+  if(src!=='all'){
+    if(src.charAt(0)==='u'){
+      var u=norm.units[+src.slice(1)];
+      if(u&&u.qs&&u.qs.length){
+        pool=u.qs.map(function(q){return [q.q,q.ar||'',q.o,q.a,q.hint||'','mc',st]});
+      }
+    }else if(src.charAt(0)==='s'){
+      var parts=src.slice(1).split('_');
+      var sIdx=parts.length>1?+parts[0]:0;
+      var chIdx=parts.length>1?+parts[1]:+parts[0];
+      var so=norm.stories[sIdx]||norm.stories[0];
+      var ch=so&&so.chapters[chIdx];
+      if(ch&&ch.qs&&ch.qs.length){
+        pool=ch.qs.map(function(q){return [q.q,q.ar||'',q.o,q.a,q.hint||'','st',st]});
+      }
+    }
+  }
+  if(pool.length)return shuffle(pool).slice(0,count);
+  return _genClsQ140(g,src,count);
+};
+
+
+/* ==========================================================================
+   v14.0.2 — محمّل ملفات المنهج المنفصلة لكل صف تلقائياً (Auto Grade Loader)
+             يقرأ تلقائياً ملف curriculum_{stage}{grade}.js
+             مثل: curriculum_p2.js, curriculum_p3.js, curriculum_m1.js, curriculum_s1.js
+   ========================================================================== */
+var CURR_FILES_STATE={};
+
+function loadGradeCurr(st,gr,cb){
+  st=st||S.stage;
+  gr=Number(gr||S.grade||0);
+  if(!st||!gr){if(cb)cb(false);return}
+  var key=st+String(gr);
+  var state=CURR_FILES_STATE[key];
+  if(state==='ok'){if(cb)cb(true);return}
+  if(state==='err'){if(cb)cb(false);return}
+  if(Array.isArray(state)){
+    if(cb)state.push(cb);
+    return;
+  }
+  CURR_FILES_STATE[key]=cb?[cb]:[];
+  var sc=document.createElement('script');
+  sc.src='curriculum_'+key+'.js?v=14.0.2';
+  sc.async=true;
+  sc.onload=function(){
+    var cbs=Array.isArray(CURR_FILES_STATE[key])?CURR_FILES_STATE[key]:[];
+    CURR_FILES_STATE[key]='ok';
+    cbs.forEach(function(fn){try{fn(true)}catch(e){}});
+  };
+  sc.onerror=function(){
+    var cbs=Array.isArray(CURR_FILES_STATE[key])?CURR_FILES_STATE[key]:[];
+    CURR_FILES_STATE[key]='err';
+    cbs.forEach(function(fn){try{fn(false)}catch(e){}});
+  };
+  document.head.appendChild(sc);
+}
+
+/* ربط المحمّل بشاشة المنهج وتغيير الصف */
+var _curr1402=curriculum;
+curriculum=function(stTab){
+  var key=(S.stage||'')+String(S.grade||'');
+  var st=CURR_FILES_STATE[key];
+  if(S.stage&&S.grade&&st!=='ok'&&st!=='err'){
+    app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
+    app.innerHTML='<div class="hd"><h1>تدريبات المنهج والبطاقات الذكية 📚</h1><div>'+stgLbl()+' • الصف '+gName()+'</div></div>'+
+      '<div class="card" style="text-align:center;font-weight:900;padding:24px">جاري تحميل منهج الصف... ⏳</div>';
+    loadGradeCurr(S.stage,S.grade,function(){_curr1402(stTab)});
+    return;
+  }
+  _curr1402(stTab);
+};
+
+var _setGrade1402=setGrade;
+setGrade=function(g){
+  loadGradeCurr(S.stage,g);
+  _setGrade1402(g);
+};
+
+/* تحميل منهج الصف الحالي تلقائياً في الخلفية فور فتح المنصة */
+if(S.stage&&S.grade){loadGradeCurr(S.stage,S.grade)}
 
 if(S.stage&&S.grade&&S.nick&&!RQ){try{home()}catch(e){}}
 
