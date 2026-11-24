@@ -1177,6 +1177,33 @@ body.dark .lv.done-lv{background:linear-gradient(135deg,#123226,#0D261D)!importa
 .read-ar{font-size:18px;font-weight:800;color:#CFE3D4;margin-bottom:8px}
 
 
+
+/* ==========================================================================
+   v14.1 — إصلاحات الواجهة: زر الخريطة، العناوين، الإشعارات، الوضع الليلي،
+           زر الرئيسية العائم، وتبسيط شاشة المدينة
+   ========================================================================== */
+/* عناصر النوافذ المنبثقة لا تنضغط داخل منطقة التمرير (كان زر «خريطة المغامرات» بيتقص) */
+.orb-body>*{flex-shrink:0}
+/* العناوين الطويلة تنزل لسطر ثاني بدل ما تتقص بـ «…» */
+.hd h1{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-overflow:clip}
+/* الإشعار يظهر أعلى الشاشة بعيداً عن أزرار الإجابة والتأكيد */
+#toast{bottom:auto;top:-160px;transition:top .4s cubic-bezier(.18,.89,.32,1.28),opacity .3s ease}
+#toast.show{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 62px)}
+/* مساحة أسفل الشاشات حتى لا يغطي زر «الرئيسية» العائم آخر المحتوى */
+@media(max-width:767px){#app{padding-bottom:84px!important}}
+/* الوضع الليلي: عناوين بطاقات «ما الجديد» */
+body.dark .wn-t{color:#FFC98B!important}
+/* شاشة المدينة المبسطة */
+.rep-bar.rep-bar3{grid-template-columns:repeat(4,1fr)}
+.rep-bar3 .rep-coin{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(135deg,#FFF8E7,#FFE8B5);border:2px solid var(--gold);border-radius:12px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;color:#4A2F22;padding:4px 2px;line-height:1.2}
+.rep-bar3 .rep-coin b{font-size:15px;display:flex;align-items:center;gap:3px}
+.rep-bar3 .rep-coin span{font-size:10px;font-weight:700}
+.rep-tabs.rep-tabs2{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;overflow:visible}
+.rep-tabs2 .pwb{flex:none;width:100%;font-size:12px;padding:6px 2px;min-height:38px;white-space:nowrap}
+@media(min-width:768px){.rep-tabs.rep-tabs2{grid-template-columns:repeat(7,1fr)}.rep-tabs2 .pwb{font-size:13px}.rep-bar3 .rep-coin b{font-size:19px}.rep-bar3 .rep-coin span{font-size:12px}}
+.adv-bar.adv-1{padding:6px 8px}
+.adv-bar.adv-1 .tx{font-size:12.5px}
+.rep-more{display:flex;flex-direction:column;gap:8px}
 </style>
 <script>
 /* بعد ما تفعّل Firebase: امسح null والصق الإعدادات هنا، شكلها:
@@ -1490,6 +1517,8 @@ var APP_UPDATE={
 };
 function checkWhatsNew(){
   if(S.ver===APP_UPDATE.ver)return;
+  /* v14.1: الطالب الجديد لا يرى «ما الجديد» ولا هدية التعويض (لم يكن عنده شيء يتعوّض عنه) */
+  if(S.fresh&&!S.ver){S.ver=APP_UPDATE.ver;save();return}
   showWhatsNew(false);
 }
 function showWhatsNew(manual){
@@ -1499,7 +1528,7 @@ function showWhatsNew(manual){
     return '<div class="wn-item">'+
       '<div class="wn-ic">'+it.ic+'</div>'+
       '<div class="sp">'+
-        '<div style="font-weight:900;font-size:14px;color:#7A3B3B">'+it.t+'</div>'+
+        '<div class="wn-t" style="font-weight:900;font-size:14px;color:#7A3B3B">'+it.t+'</div>'+
         '<div style="font-size:12px;line-height:1.5;font-weight:700;margin-top:2px">'+it.d+'</div>'+
       '</div>'+
     '</div>';
@@ -1517,7 +1546,7 @@ function showWhatsNew(manual){
       '<div class="sp" style="font-size:13px;font-weight:700;line-height:1.6">'+APP_UPDATE.intro+'</div>'+
     '</div>'+
     itemsHtml+
-    (isNew&&APP_UPDATE.gift>0?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;font-size:14px;padding:10px;line-height:1.7">🎁 هدية وتعويض هذا التحديث:<br>🪙 <b>+'+APP_UPDATE.gift+' عملة ذهبية</b> + 🏆 <b>+'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب أسبوعي</b> + ❤️ <b>شحن 3 قلوب</b>!</div>':'')+
+    (isNew&&APP_UPDATE.gift>0?'<div class="card" style="background:#E3B03F;text-align:center;font-weight:900;font-size:14px;padding:10px;line-height:1.7">🎁 هدية وتعويض هذا التحديث:<br>🪙 <b>+'+APP_UPDATE.gift+' عملة ذهبية</b> + 🏆 <b>+'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب أسبوعي</b>!</div>':'')+
     '<button class="btn" style="width:100%;font-size:17px;background:linear-gradient(135deg,#2F6B4A,#1B432C);border-color:#FFD700" onclick="closeWhatsNew(1)">'+(isNew&&APP_UPDATE.gift>0?'🎉 استلم +1500 نقطة و+1000 عملة الآن!':'🚀 تمام، يلا نلعب!')+'</button>'+
   '</div>';
   document.body.appendChild(ov);
@@ -1531,7 +1560,7 @@ function closeWhatsNew(goCity){
     S.dhp=3;S.hpWaitUntil=0;
     save();submit();
     try{sfxChest()}catch(e){}
-    if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب و+'+APP_UPDATE.gift+' عملة ذهبية و3 قلوب!');
+    if(APP_UPDATE.gift>0)rmsg('🎉 استلمت +'+(APP_UPDATE.giftPts||0)+' نقطة ترتيب و+'+APP_UPDATE.gift+' عملة ذهبية!');
   }
   var el=document.getElementById('wnModal');
   if(el&&el.parentNode)el.parentNode.removeChild(el);
@@ -2160,7 +2189,7 @@ function start(lv){
   G={lv:lv,tier:t,n:n,T:T,qs:pickQs(n),i:0,h:S.dhp,mx:mx,mhp:mx,shld:shld,maxShld:shld,rage:false,earned:0,combo:0,ok:0,bad:[],left:T,done:false};
   show();
 }
-function hearts(){var s=Math.max(1,Math.min(3,G.h||3));return '<span class="chip" style="background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#C9973F;font-size:13px;padding:3px 10px" title="درع الإتقان: كلما قلت أخطاؤك زادت نجومك ومكافأتك!">درع الإتقان: '+stars(s,16)+'</span>'}
+function hearts(){var s=Math.max(1,Math.min(3,G.h||3));return '<span class="chip" style="background:linear-gradient(135deg,#FFFDF5,#FCE8B2);border-color:#C9973F;color:#4A2F22;font-size:13px;padding:3px 10px" title="درع الإتقان: كلما قلت أخطاؤك زادت نجومك ومكافأتك!">درع الإتقان: '+stars(s,16)+'</span>'}
 function show(){app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var q=G.qs[G.i],isSB=(q[5]==='sb'),isBoss=(G.lv%5===0&&!G.rev&&!G.currType);
   if(isBoss&&G.mhp===1&&G.shld<=0&&!G.rage){G.rage=true;setTimeout(sfxRage,180)}
@@ -3317,7 +3346,7 @@ function creditPts(raw){
   }
   return cred;
 }
-function dayRoundDone(){var D=dayState();if(D.rounds===0)streakTouch();D.rounds++;save()}
+function dayRoundDone(){var D=dayState();if(D.rounds===0)streakTouch();D.rounds++;if(S.fresh)S.fresh=0;save()}
 function dayCard(){
   var D=dayState(),left=DEARLY-D.rounds,n=Number(D.chest)||0,into=Math.max(0,Math.min(DCHEST_EVERY,D.raw-n*DCHEST_EVERY)),rem=Math.max(0,DCHEST_EVERY-into);
   return'<div class="card"><div class="tag g">هدف اليوم 🎯</div>'+
@@ -6013,7 +6042,7 @@ function nickReq(){
 function saveNickReq(){
   var v=$('#nk').value.trim().replace(/\s+/g,' ').slice(0,14),e=nickErr(v);
   if(e){rmsg(e);return}
-  S.nick=v;if(!S.t0)S.t0=Date.now();S.regW=wkId(wkKey());save();submit();home();
+  S.nick=v;if(!S.t0){S.t0=Date.now();S.fresh=1}S.regW=wkId(wkKey());save();submit();home();
 }
 function ensureReg(){if(!window.FB||!S.nick||!S.stage)return;var k=wkId(wkKey());if(S.regW===k)return;S.regW=k;save();submitP()}
 function claimPrev(){
@@ -6775,7 +6804,7 @@ function repBanHtml(c){
 function repTabsHtml(){
   var r=roleInfo();
   function t(k,l){return '<button class="pwb'+(REP_TAB===k?' act':'')+'" onclick="cityScr(\''+k+'\')">'+l+'</button>'}
-  return '<div class="rep-tabs">'+t('map','🗺️ الخريطة الحية')+t('eco','📊 الضرائب والاقتصاد')+t('res','🔬 مركز الأبحاث')+t('def','🛡️ الدفاع والدبلوماسية')+t('parl','🏛️ مجلس الشعب')+t('pvp','🚨 رادار اللاعبين')+t('roles',r.ic+' وظيفتي')+'</div>';
+  return '<div class="rep-tabs rep-tabs2" aria-label="أقسام المدينة">'+t('map','🗺️ الخريطة')+t('eco','📊 الاقتصاد')+t('res','🔬 الأبحاث')+t('def','🛡️ الدفاع')+t('parl','🏛️ المجلس')+t('pvp','🚨 الرادار')+t('roles',r.ic+' وظيفتي')+'</div>';
 }
 function repTreasuryHtml(c){
   var canTax=(S.cTax!==cDay());
@@ -6922,6 +6951,41 @@ function repStartActors(){
 }
 
 /* ---------- شاشة الجمهورية (تستبدل واجهة cityScr وتحتفظ برادار اللاعبين والوظائف كما هي) ---------- */
+
+/* v14.1 — شاشة المدينة المبسطة: صف حالة من 3 مؤشرات + سطر نصيحة واحد،
+   والمؤشرات الستة كاملة في تبويب الاقتصاد، والمستشارون والدليل أسفل الخريطة */
+function repStatusHtml(c){
+  function ind(ic,v,l,pct,cls,tip){return '<div class="rep-ind'+(cls?' '+cls:'')+'" title="'+tip+'"><b>'+ic+' '+v+'</b><span>'+l+'</span><i style="width:'+Math.max(0,Math.min(100,Math.round(pct)))+'%"></i></div>'}
+  var fp=Math.round(c.foodR*100);
+  return '<div class="rep-bar rep-bar3">'+
+    '<button class="rep-coin" onclick="store()" title="رصيد العملات — افتح المتجر"><b>'+coin()+S.coins+'</b><span>عملاتك</span></button>'+
+    ind('👥',c.pop,'السكان',c.pop/Math.max(1,Math.min(c.popCap,c.foodCap))*100,'','السكان الحاليون من حد أقصى '+Math.min(c.popCap,c.foodCap))+
+    ind('🌾',Math.min(999,fp)+'%','الغذاء',fp,(fp<70?'bad':(fp<100?'warn':'')),'إنتاج الغذاء '+c.food+' مقابل احتياج '+c.foodNeed)+
+    ind('😊',c.appr+'%','رضا الشعب',c.appr,(c.strike?'bad':(c.appr<55?'warn':'')),'رضا الشعب والشارع')+
+  '</div>';
+}
+function repAdvLineHtml(c){
+  var r=repAdvice(c),a=r.A[r.top],m=REP_ADV[r.top];
+  return '<div class="adv-bar adv-1" role="status">'+misterImg('h',34)+
+      '<div class="tx"><b>💡 '+m.ic+' نصيحة الآن:</b> '+a.t+'</div>'+
+      (a.a?'<button class="adv-go" onclick="'+a.a+'">'+a.b+'</button>':'')+
+    '</div>';
+}
+function repMoreHtml(c){
+  var r=repAdvice(c);
+  return '<div class="rep-more">'+
+    '<div class="h-sec">🧭 مجلس المستشارين</div>'+
+    '<div class="adv-row" aria-label="مجلس المستشارين الأربعة">'+['eco','edu','res','def'].map(function(k){
+      var x=REP_ADV[k];
+      return '<button class="adv-chip'+(r.A[k].p>=70?' al':'')+'" onclick="repCouncil(\''+k+'\')"><span class="i">'+x.ic+'</span><span>مستشار ال'+x.s+'</span></button>';
+    }).join('')+'</div>'+
+    '<button class="btn adv-guide" onclick="repTutOpen()">❓ إزاي ألعب وأكسب من مدينتي؟ (دليل خطوة بخطوة)'+(S.cityTutDone?'':' 🎁')+'</button>'+
+  '</div>';
+}
+function repHeadHtml(){
+  var r=roleInfo();
+  return '<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700;padding:10px 12px"><h1>جمهوريتي ومدينتي 🏙️</h1><div>الحاكم: '+esc(S.nick||'بطل التحدي')+' ('+r.ic+' '+r.n+') • '+cityRankName()+'</div></div>';
+}
 var _cityScr0=cityScr;
 cityScr=function(tab){
   if(tab==='build')tab='map';
@@ -6935,27 +6999,24 @@ cityScr=function(tab){
       var cv=app.querySelector('.city-view'),tr=cv&&cv.nextElementSibling,tb=tr&&tr.nextElementSibling;
       if(tb&&tb.classList.contains('row'))tb.outerHTML=repTabsHtml();
       if(tr&&tr.parentNode)tr.parentNode.removeChild(tr);
-      if(cv)cv.outerHTML=repBarHtml(c)+repAdvisorHtml(c);
+      var rw=cv&&cv.previousElementSibling;if(rw&&rw.classList.contains('row')&&rw.querySelector('.chip'))rw.parentNode.removeChild(rw); /* صف العملات القديم مكرر في صف الحالة */
+      if(cv)cv.outerHTML=repStatusHtml(c)+repBanHtml(c)+repRaidBanHtml()+repAdvLineHtml(c);
+      var hd0=app.querySelector('.hd');if(hd0)hd0.outerHTML=repHeadHtml();
     }catch(e){}
     return;
   }
   CITY_TAB='build';
   app.classList.remove('fade-in');void app.offsetWidth;app.classList.add('fade-in');
   var r=roleInfo(),body='';
-  if(REP_TAB==='eco')body=repEcoHtml(c);
+  if(REP_TAB==='eco')body=repBarHtml(c)+repEcoHtml(c); /* المؤشرات الستة كاملة هنا */
   else if(REP_TAB==='parl')body=repParlHtml(c);
   else if(REP_TAB==='res')body=repResHtml(c);
   else if(REP_TAB==='def')body=repDefHtml(c);
-  else body=repMapHtml(c)+repTreasuryHtml(c)+goldRuleHtml()+repSectorsHtml(c)+
+  else body=repMapHtml(c)+repTreasuryHtml(c)+repMoreHtml(c)+goldRuleHtml()+repSectorsHtml(c)+
     '<button class="btn" style="margin-top:4px" onclick="shareCity()">📲 شارك مدينتك وشخصيتك مع صحابك</button>';
-  app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#2F5F5A,#1B3B38);border-color:#FFD700"><h1>جمهوريتي ومدينتي الحية 🏛️🏙️</h1><div>الحاكم: '+esc(S.nick||'بطل التحدي')+' ('+r.ic+' '+r.n+') • '+cityRankName()+'</div></div>'+
-    '<div class="row">'+
-      '<div class="chip">'+coin()+'<span>'+S.coins+'</span></div>'+
-      '<div class="chip" onclick="cityScr(\'roles\')" style="cursor:pointer">'+r.ic+' <span>'+r.n+' (غيّر)</span></div>'+
-      '<div class="sp"></div>'+
-      '<div class="sm">موظفون: '+c.staff+' • ضرائب '+c.tax.r+'% • 🛡️ '+c.def+'</div>'+
-    '</div>'+
-    repBarHtml(c)+repBanHtml(c)+repRaidBanHtml()+repAdvisorHtml(c)+repTabsHtml()+body+bnav('city');
+  /* v14.1: العنوان ← 3 مؤشرات ← تنبيه عاجل (لو موجود) ← نصيحة واحدة ← الأقسام ← المحتوى (الخريطة أولاً) */
+  app.innerHTML=repHeadHtml()+
+    repStatusHtml(c)+repBanHtml(c)+repRaidBanHtml()+repAdvLineHtml(c)+repTabsHtml()+body+bnav('city');
   if(REP_TAB==='map'){
     setTimeout(repStartActors,30);
     /* أول زيارة: الدليل التفاعلي يفتح تلقائياً مرة واحدة (ويُعاد من زر «إزاي ألعب») */
@@ -9683,7 +9744,7 @@ var _saveNickReq116=saveNickReq;
 saveNickReq=function(){
   var v=$('#nk')?$('#nk').value.trim().replace(/\s+/g,' ').slice(0,14):'',e=nickErr(v);
   if(e){rmsg(e);return}
-  S.nick=v;if(!S.t0)S.t0=Date.now();S.regW=wkId(wkKey());save();
+  S.nick=v;if(!S.t0){S.t0=Date.now();S.fresh=1}S.regW=wkId(wkKey());save();
   autoRecoverFromCloud(function(){
     submit();home();
   });
@@ -10997,6 +11058,7 @@ function sortSarahNewest(arr){
 function showSarahPromoModal(force){
   if(document.getElementById('sarahPromoOv'))return;
   if(!force && (document.getElementById('wnModal') || S.sarahPromoSeen===SARAH_PROMO_ID))return;
+  if(!force && S.fresh)return; /* v14.1: الطالب الجديد يلعب أول جولة الأول */
   var ov=document.createElement('div');
   ov.id='sarahPromoOv';
   ov.className='sp-ov';
@@ -11044,7 +11106,7 @@ sarahDiariesScr=function(epIdx){
   app.innerHTML='<div class="hd" style="background:linear-gradient(135deg,#A61E4D,#E64980);border-color:#FFD700">'+
       '<div class="row" style="justify-content:center;gap:12px">'+
         '<img class="sarah-av" src="sarah.png" alt="سارة" style="width:62px;height:62px;border-color:#FFD700" onerror="this.style.display=\'none\'">'+
-        '<div style="text-align:right"><h1 style="font-size:22px">🎬 يوميات سارة</h1><div>'+sarah9pmCountdownTxt()+'</div></div>'+
+        '<div style="text-align:right"><h1 style="font-size:22px;color:#FFFFFF">🎬 يوميات سارة</h1><div style="color:#FFE3EE">'+sarah9pmCountdownTxt()+'</div></div>'+
       '</div>'+
       '<button class="pwb" style="margin-top:8px;min-height:32px;padding:3px 12px;font-size:12px;background:rgba(255,215,0,.22);color:#FFE9B8;border-color:#FFD700;width:auto;display:inline-block" onclick="showSarahPromoModal(true)">▶️ شاهد إعلان يوميات سارة (35ث)</button>'+
     '</div>'+
@@ -11644,7 +11706,8 @@ var _fabObs=new MutationObserver(function(){
   if(!fab)return;
   var onHome=!!document.getElementById('orbLearn');
   var inPlay=!!(document.getElementById('mon')||document.getElementById('sbSlot')||document.getElementById('clsOpts'));
-  if(onHome||inPlay)fab.style.display='none';
+  var ownHome=!!app.querySelector('button[onclick="home()"]'); /* v14.1: الشاشة فيها زر رئيسية خاص بها */
+  if(onHome||inPlay||ownHome)fab.style.display='none';
 });
 if(app)_fabObs.observe(app,{childList:true});
 

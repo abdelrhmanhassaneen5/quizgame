@@ -1,7 +1,7 @@
 /* تحدّي الأصحاب — Service Worker (offline-first)
    ارفع هذا الملف في نفس مجلد index.html.
    عند أي تحديث للعبة غيّر رقم الإصدار في السطر التالي ليتم تجديد الكاش عند الطلاب. */
-var VERSION = 'qd-v14.0.2';
+var VERSION = 'qd-v14.1.0';
 var CORE = VERSION + '-core';
 var RUNTIME = VERSION + '-runtime';
 
@@ -74,8 +74,11 @@ self.addEventListener('fetch', function (e) {
         }
         return res;
       }).catch(function () {
+        /* كل خطوة تنتظر نتيجة اللي قبلها (fromCache بترجع Promise فلازم ننتظرها) */
         return fromCache(req, { ignoreSearch: true }).then(function (r) {
-          return r || fromCache('index.html') || fromCache('./');
+          return r || fromCache('index.html');
+        }).then(function (r) {
+          return r || fromCache('./');
         }).then(function (r) {
           return r || new Response('<meta charset="utf-8"><body dir="rtl" style="font-family:sans-serif;text-align:center;padding:40px">افتح المنصة مرة واحدة والإنترنت شغال عشان تتحمّل وتشتغل بعد كده بدون إنترنت.</body>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
         });
